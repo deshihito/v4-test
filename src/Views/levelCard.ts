@@ -1,16 +1,11 @@
-/**
- * レベルカード画像の生成 (@napi-rs/canvas).
- * ライブラリが導入されていない環境では null を返し、
- * 呼び出し側は Embed のみの表示にフォールバックする。
- * デザイン: 淡色グラスカード (AGO BOT の PIL 版カードの移植)。
- */
+
 
 export interface LevelCardData {
   name: string;
   level: number;
-  /** 現在レベル内の EXP */
+
   current: number;
-  /** 次レベルまでに必要な EXP */
+
   next: number;
   total: number;
   serverRank: number;
@@ -20,13 +15,11 @@ export interface LevelCardData {
 
 const W = 1000;
 const H = 360;
-// TakasumiBOT 公式サイトの書体に合わせ、欧文は Geist、日本語は Noto Sans CJK。
-// Geist に無い字形は後続フォントへフォールバックする。
+
 const FONT = '"Geist", "LevelCardFont", "Noto Sans CJK JP", sans-serif';
 
 let fontTried = false;
 
-// フォントを登録する (失敗してもデフォルトフォントで描画を続ける)
 function registerFont(GlobalFonts: {
   registerFromPath: (path: string, name?: string) => boolean;
 }): void {
@@ -41,7 +34,6 @@ function registerFont(GlobalFonts: {
     try {
       if (GlobalFonts.registerFromPath(path, "Geist")) break;
     } catch {
-      // 次の候補へ
     }
   }
   const jpCandidates = [
@@ -54,14 +46,12 @@ function registerFont(GlobalFonts: {
     try {
       if (GlobalFonts.registerFromPath(path, "LevelCardFont")) break;
     } catch {
-      // 次の候補へ
     }
   }
 }
 
 type Ctx = CanvasRenderingContext2D;
 
-// 角丸矩形のパス
 function rr(ctx: Ctx, x: number, y: number, w: number, h: number, r: number): void {
   const rad = Math.min(r, w / 2, h / 2);
   ctx.beginPath();
@@ -73,7 +63,6 @@ function rr(ctx: Ctx, x: number, y: number, w: number, h: number, r: number): vo
   ctx.closePath();
 }
 
-// ぼんやりした色玉 (radial gradient で代用)
 function orb(
   ctx: Ctx,
   cx: number,
@@ -89,7 +78,6 @@ function orb(
   ctx.fillRect(cx - radius, cy - radius, radius * 2, radius * 2);
 }
 
-// 幅に収まるよう末尾を … で切り詰める
 function fitText(ctx: Ctx, text: string, maxWidth: number): string {
   if (ctx.measureText(text).width <= maxWidth) return text;
   const chars = [...text];
@@ -103,7 +91,7 @@ function fitText(ctx: Ctx, text: string, maxWidth: number): string {
 
 export async function renderLevelCard(data: LevelCardData): Promise<Buffer | null> {
   try {
-    // 任意依存: 入っていない環境では import が失敗するので null を返す
+
     const mod = await import("@napi-rs/canvas").catch(() => null);
     if (!mod) return null;
     const { createCanvas, loadImage, GlobalFonts } = mod;
@@ -112,7 +100,6 @@ export async function renderLevelCard(data: LevelCardData): Promise<Buffer | nul
     const canvas = createCanvas(W, H);
     const ctx = canvas.getContext("2d") as unknown as Ctx;
 
-    // 背景: 淡いグラデーション + 色玉
     const bgGrad = ctx.createLinearGradient(0, 0, W, H);
     bgGrad.addColorStop(0, "rgb(224, 231, 255)");
     bgGrad.addColorStop(1, "rgb(186, 230, 253)");
@@ -122,7 +109,6 @@ export async function renderLevelCard(data: LevelCardData): Promise<Buffer | nul
     orb(ctx, 70, 350, 260, "253, 224, 171", 0.55);
     orb(ctx, 590, 370, 260, "199, 210, 254", 0.47);
 
-    // グラスパネル (影付き)
     ctx.save();
     ctx.shadowColor = "rgba(100, 116, 139, 0.35)";
     ctx.shadowBlur = 14;
@@ -136,7 +122,6 @@ export async function renderLevelCard(data: LevelCardData): Promise<Buffer | nul
     ctx.lineWidth = 2;
     ctx.stroke();
 
-    // アバター (円形)
     ctx.save();
     ctx.beginPath();
     ctx.arc(174, 180, 110, 0, Math.PI * 2);
@@ -167,14 +152,12 @@ export async function renderLevelCard(data: LevelCardData): Promise<Buffer | nul
     const accent = "rgb(16, 185, 129)";
     ctx.textBaseline = "top";
 
-    // 名前とレベル
     ctx.fillStyle = ink;
     ctx.font = `bold 42px ${FONT}`;
     ctx.fillText(fitText(ctx, data.name, 606), 330, 58);
     ctx.font = `bold 58px ${FONT}`;
     ctx.fillText(`Lv.${data.level}`, 330, 116);
 
-    // 進捗バー
     rr(ctx, 330, 206, 606, 36, 18);
     ctx.fillStyle = "rgba(226, 232, 240, 0.86)";
     ctx.fill();

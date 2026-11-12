@@ -25,13 +25,12 @@ class LevelSettingsButtonController extends LevelSettingsBase implements ButtonC
   public async execute(
     interaction: ButtonInteraction,
   ): Promise<InteractionResponse<boolean> | void> {
-    // levelSettings_<key>_<userId>
+
     const [, key, ownerId] = interaction.customId.split("_");
     if (!key) return;
 
     if (ownerId !== interaction.user.id) return await this.deny(interaction);
 
-    // ギルドの通知チャンネルを未設定に戻す
     if (key === "channelReset") {
       if (
         !interaction.inGuild() ||
@@ -47,8 +46,6 @@ class LevelSettingsButtonController extends LevelSettingsBase implements ButtonC
 
     if (!(key in COLUMNS)) return;
 
-    // 現在値の反転を1文でアトミックに行う (連打してもトグルが失われない)。
-    // 行が無い場合は既定値 true の反転として false で作る。
     const column = COLUMNS[key as SettingKey];
     const rows = await toggleLevelSetting(interaction.user.id, column);
 

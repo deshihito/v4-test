@@ -25,13 +25,12 @@ class LevelSettingsChannelController
   public async execute(
     interaction: ChannelSelectMenuInteraction,
   ): Promise<InteractionResponse<boolean> | void> {
-    // levelSettings_<key>_<userId>
+
     const [, key, ownerId] = interaction.customId.split("_");
     if (!key) return;
 
     if (ownerId !== interaction.user.id) return await this.deny(interaction);
 
-    // ギルドの通知チャンネル変更 (チャンネル選択メニュー)
     if (key !== "channel") return;
     if (
       !interaction.inGuild() ||

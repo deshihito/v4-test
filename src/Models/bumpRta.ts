@@ -4,9 +4,9 @@ import { NotificationType } from "@/generated";
 
 export interface BumpRtaResult {
   elapsedMs: number;
-  /** このユーザーのサーバー内順位 (ベスト記録同士で比較) */
+
   serverRank: number;
-  /** このユーザーの全体順位 (ベスト記録同士で比較) */
+
   globalRank: number;
 }
 
@@ -22,7 +22,6 @@ export const BUMP_RTA_TYPE_LABEL: Record<NotificationType, string> = {
   [NotificationType.discom]: "DISCOM UP",
 };
 
-/** ミリ秒を「12.3秒」「1分05秒」の形にする */
 export function formatElapsed(ms: number): string {
   const totalSeconds = ms / 1000;
   if (totalSeconds < 60) return `${totalSeconds.toFixed(1)}秒`;
@@ -31,11 +30,6 @@ export function formatElapsed(ms: number): string {
   return `${minutes}分${String(seconds).padStart(2, "0")}秒`;
 }
 
-/**
- * bump/up 完了メッセージから実行したユーザーを特定する。
- * スラッシュコマンドへの応答なら interactionMetadata が確実。
- * 無ければ本文と Embed 内のメンションを探す。
- */
 export function resolveBumpActorId(message: Message): string | null {
   const fromInteraction = message.interactionMetadata?.user?.id;
   if (fromInteraction) return fromInteraction;
@@ -55,7 +49,6 @@ export function resolveBumpActorId(message: Message): string | null {
   return null;
 }
 
-/** 通知が送られたタイミングで RTA のラウンドを開始する */
 export async function startBumpRtaRound(
   guildId: string,
   type: NotificationType,
@@ -70,11 +63,6 @@ export async function startBumpRtaRound(
     .catch(() => {});
 }
 
-/**
- * bump/up の完了でラウンドを締め、記録と順位を返す。
- * ラウンドが無い (通知を挟んでいない) 場合は何も記録せず null を返す。
- * ラウンドは最初に完了した1件だけが記録され、消費される。
- */
 export async function finishBumpRtaRound(
   guildId: string,
   type: NotificationType,
@@ -85,7 +73,6 @@ export async function finishBumpRtaRound(
   });
   if (!round) return null;
 
-  // 先にラウンドを消すことで、同じラウンドの二重記録を防ぐ
   await prisma.bumpRtaRound.deleteMany({ where: { guildId, type } });
 
   const elapsedMs = Date.now() - round.notifiedAt.getTime();
@@ -131,7 +118,6 @@ export async function finishBumpRtaRound(
   };
 }
 
-/** RTA 記録のアナウンス用 Embed */
 export function buildBumpRtaEmbed(
   type: NotificationType,
   userId: string,

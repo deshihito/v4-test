@@ -15,7 +15,6 @@ import {
   LevelSettings,
 } from "@/Views/levelSettingsPanel";
 
-// customId のキー → DB カラム (ホワイトリスト。これ以外の文字列が SQL に入ることはない)
 export const COLUMNS = {
   notify: '"notify"',
   mention: '"mention"',
@@ -25,10 +24,8 @@ export const COLUMNS = {
 export type SettingKey = keyof typeof COLUMNS;
 export type PanelInteraction = ButtonInteraction | ChannelSelectMenuInteraction;
 
-// レベル設定パネルのボタン/チャンネル選択コントローラー共通基盤。
-// kind を持たないため、ローダーはコントローラーとして登録しない。
 abstract class LevelSettingsBase {
-  // 現在の DB の状態からパネルを組み立てる (管理者にはギルド設定も付く)
+
   protected async buildPanel(
     interaction: PanelInteraction,
     userSettings?: LevelSettings,

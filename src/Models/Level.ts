@@ -1,10 +1,6 @@
 import { prisma } from "@/Models/db";
 import type { LevelSettings } from "@/Views/levelSettingsPanel";
 
-/**
- * 付与間隔を過ぎている場合だけ EXP を加算する条件付き更新。
- * チェックと加算を1文で行うため、同時発言でも二重付与しない。
- */
 export async function grantLevelChatExp(
   userId: string,
   guildId: string,
@@ -52,7 +48,6 @@ export async function countLevelUsersAboveExp(guildId: string, chatExp: number) 
   });
 }
 
-/** ユーザーの全サーバー合計 EXP を DB 側で集計する */
 export async function queryLevelUserTotalExp(userId: string) {
   return await prisma.$queryRaw<{ total: number }[]>`
       SELECT COALESCE(SUM("chatExp"), 0)::int AS "total"
@@ -60,7 +55,6 @@ export async function queryLevelUserTotalExp(userId: string) {
       WHERE "userId" = ${userId}`;
 }
 
-/** 合計 EXP が指定値を上回るユーザー数を数える (全体順位の算出用) */
 export async function countLevelUsersByTotalExpAbove(totalExp: number) {
   return await prisma.$queryRaw<{ count: number }[]>`
       SELECT COUNT(*)::int AS "count"
@@ -95,11 +89,6 @@ export async function upsertLevelGuildSettingNotifyChannel(
   });
 }
 
-/**
- * レベル設定の真偽値カラムを1文でアトミックに反転する。
- * column は呼び出し側のホワイトリストで検証済みの文字列だけが渡る。
- * 行が無い場合は既定値 true の反転として false で作る。
- */
 export async function toggleLevelSetting(userId: string, column: string) {
   return await prisma.$queryRawUnsafe<LevelSettings[]>(
     `INSERT INTO "levelSetting" ("userId", ${column}, "updatedAt", "registeredAt")

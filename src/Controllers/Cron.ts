@@ -102,9 +102,7 @@ class Cron {
   private sendingNotifications = false;
 
   private async sendNotifications(): Promise<void> {
-    // 前回の送信が終わっていない間は新しい送信を始めない。
-    // 送信対象は claimDue がアトミックに占有するので、
-    // 万一ランナーが複数立っても同じ通知が二重に送られることはない。
+
     if (this.sendingNotifications) return;
     this.sendingNotifications = true;
 
@@ -202,7 +200,6 @@ class Cron {
               }
             }
 
-            // 通知が実際に届いたら RTA のラウンドを開始する
             if (sent) {
               await startBumpRtaRound(notification.guildId, notification.type, notification.channelId);
             }

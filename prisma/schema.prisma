@@ -300,3 +300,23 @@ model webauth {
   requiresSubAccountCheck Boolean  @default(false)
   createdAt               DateTime @default(now())
 }
+
+model levelUser {
+  id            Int       @id @default(autoincrement())
+  userId        String
+  guildId       String
+  chatExp       Int       @default(0)
+  lastChatGrant DateTime?
+  updatedAt     DateTime  @updatedAt
+  registeredAt  DateTime  @default(now())
+
+  @@unique([userId, guildId])
+  @@index([guildId, chatExp])
+}
+
+model levelSetting {
+  userId       String   @id
+  notify       Boolean  @default(true)
+  updatedAt    DateTime @updatedAt
+  registeredAt DateTime @default(now())
+}

@@ -1,6 +1,6 @@
 import { Client } from "discord.js";
 import { ReadyEvent } from "@/@types/Util";
-import updateStatus from "@/util/updateStatus";
+import updateStatus from "@/Models/updateStatus";
 
 class UpdateEvent implements ReadyEvent {
   public readonly client: Client;

@@ -1,12 +1,12 @@
 import { Client, GatewayIntentBits } from "discord.js";
 import config from "@/config";
 import Handler from "@/Controllers/Handler";
-import Cron from "@/Cron";
+import Cron from "@/Controllers/Cron";
 import Log from "@/util/Log";
 import { ShardStats } from "@/@types/Util";
 import { env } from "@/util/Env";
 import { shardRedis } from "@/Models/redis";
-import updateStatus from "@/util/updateStatus";
+import updateStatus from "@/Models/updateStatus";
 
 const client: Client = new Client({
   intents: [

@@ -1,5 +1,5 @@
 import { muteGuild, muteIp, muteUser } from "@/generated";
-import Notice from "@/util/Notice";
+import Notice from "@/Models/Notice";
 import { prisma } from "@/Models/db";
 
 class Mute {

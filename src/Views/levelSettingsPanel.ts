@@ -50,7 +50,7 @@ export interface LevelGuildSettings {
 
 /**
  * /level_settings の Components V2 パネルを組み立てる。
- * 各設定はセクションで、右端のボタンが現在の状態を示し、押すと切り替わる。
+ * 各設定はセクションで、右端のボタンは押したときの動作 (オンにする/オフにする) を示し、押すと切り替わる。
  * guild を渡すと、管理者向けの通知チャンネル設定セクションが付く。
  */
 export function buildLevelSettingsPanel(
@@ -77,8 +77,8 @@ export function buildLevelSettingsPanel(
         .setButtonAccessory(
           new ButtonBuilder()
             .setCustomId(`levelSettings_${item.key}_${userId}`)
-            .setLabel(value ? "オン" : "オフ")
-            .setStyle(value ? ButtonStyle.Success : ButtonStyle.Secondary),
+            .setLabel(value ? "オフにする" : "オンにする")
+            .setStyle(value ? ButtonStyle.Secondary : ButtonStyle.Success),
         ),
     );
   }

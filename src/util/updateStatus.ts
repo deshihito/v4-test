@@ -1,5 +1,5 @@
 import { Client } from "discord.js";
-import { shardRedis } from "@/util/redis";
+import { shardRedis } from "@/Models/redis";
 import { env } from "@/util/Env";
 
 async function updateStatus(client: Client) {

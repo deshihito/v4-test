@@ -3,7 +3,7 @@ import Log from "@/util/Log";
 import config from "@/config";
 import Notice from "@/util/Notice";
 import { env } from "@/util/Env";
-//import "./util/redis"; //redisの接続処理のためにロード。副作用(接続処理)のみ動作します。
+//import "./Models/redis"; //redisの接続処理のためにロード。副作用(接続処理)のみ動作します。
 
 const manager = new ShardingManager("./src/index.ts", {
   token: env.BOT_TOKEN,

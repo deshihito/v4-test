@@ -35,7 +35,6 @@ class BumpEvent implements MessageCreateEvent {
 
       if (bumpNoticeIgnoreData) return;
 
-      // 既に同じ通知が予約済みなら、受信メッセージも含めて何もしない (重複防止)
       const created = await NotificationQueueService.add({
         guildId: message.guild.id,
         channelId: message.channel.id,
@@ -57,7 +56,6 @@ class BumpEvent implements MessageCreateEvent {
           .catch(() => {});
       }
 
-      // RTA: 通知からのラウンドがあれば、この bump を記録する
       const actorId = resolveBumpActorId(message);
       if (actorId) {
         const result = await finishBumpRtaRound(

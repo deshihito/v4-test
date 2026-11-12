@@ -71,8 +71,6 @@ class LevelCommand implements Command {
     const serverRank =
       (await countLevelUsersAboveExp(interaction.guild.id, data.chatExp)) + 1;
 
-    // 全体順位はユーザーごとの全サーバー合計同士で比べる。
-    // 集計は DB 側で完結させ、全行をメモリに読み込まない。
     const totalRows = await queryLevelUserTotalExp(interaction.user.id);
     const totalExp: number = totalRows[0]?.total ?? data.chatExp;
 

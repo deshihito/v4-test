@@ -18,22 +18,17 @@ import {
   findVoteNoticeIgnore,
 } from "@/Models/BoardNotice";
 
-/**
- * DISBOARD / Dissoku 以外の掲示板サービスの bump/up 検出定義。
- * 成功サインとクールダウンは AGO BOT の boardNotify (core/game/rta) で
- * 実地観測された仕様を移植したもの。
- */
 export interface BoardServiceDef {
   type: NotificationType;
-  /** 送信者 Bot の ID (config.bot のキーではなく実 ID を保持する) */
+
   botId: string;
-  /** 表示名 (RTA ラベルとそろえる) */
+
   label: string;
-  /** 受信表示に使う動詞 */
+
   verb: "UP" | "BUMP" | "VOTE";
-  /** 固定クールダウン (ミリ秒)。次回時刻が読めるサービスはそちら優先 */
+
   cooldownMs: number;
-  /** 時刻指定時の通知タイトル/色/本文 (Cron 用) */
+
   notifyTitle: string;
   notifyColor: number;
   notifyDescription: string;
@@ -121,14 +116,13 @@ export const BOARD_SERVICES: BoardServiceDef[] = [
 export const BOARD_SERVICE_BY_TYPE: Partial<Record<NotificationType, BoardServiceDef>> =
   Object.fromEntries(BOARD_SERVICES.map((def) => [def.type, def]));
 
-/** Embed 全文 + Components V2 のテキストを集める (署名照合用) */
 export function collectMessageText(message: Message): string {
   const parts: string[] = [message.content ?? ""];
   for (const embed of message.embeds) {
     parts.push(embed.title ?? "", embed.description ?? "", embed.author?.name ?? "", embed.footer?.text ?? "");
     for (const field of embed.fields) parts.push(field.name, field.value);
   }
-  // Components V2 の TextDisplay は embeds に入らないため、JSON 化して content を拾う
+
   const walk = (node: unknown): void => {
     if (Array.isArray(node)) {
       node.forEach(walk);
@@ -142,7 +136,6 @@ export function collectMessageText(message: Message): string {
   return parts.join("\n");
 }
 
-/** テキストから次回可能時刻を読む。読めなければ null (AGO _next_time_from_text の移植) */
 export function nextTimeFromText(text: string, eventAt: Date): Date | null {
   let candidate: Date | null = null;
   const tsMatch = text.match(/<t:(\d+)/);
@@ -168,10 +161,6 @@ export interface BoardDetection {
   delayMs: number;
 }
 
-/**
- * 掲示板サービスの成功メッセージを検出する。該当しなければ null。
- * 送信者 ID は author / applicationId / webhookId のいずれかで照合する。
- */
 export function detectBoardService(message: Message): BoardDetection | null {
   const appIds = new Set(
     [message.author?.id, message.applicationId, message.webhookId].filter(
@@ -188,7 +177,7 @@ export function detectBoardService(message: Message): BoardDetection | null {
   let matched = false;
   switch (def.type) {
     case NotificationType.vote:
-      // 鯖ちゃんねる: footer または全文に 'voted'
+
       matched =
         embeds.some((embed) => (embed.footer?.text ?? "").includes("voted")) ||
         folded.includes("voted");
@@ -219,7 +208,6 @@ export function detectBoardService(message: Message): BoardDetection | null {
   }
   if (!matched) return null;
 
-  // 次回時刻が応答に書かれているサービスはそちらを優先する
   const eventAt = message.editedAt ?? message.createdAt;
   let dueAt: Date | null = null;
   if (def.type === NotificationType.vote) {
@@ -236,7 +224,6 @@ export function detectBoardService(message: Message): BoardDetection | null {
   return { def, delayMs };
 }
 
-/** 「約2時間後」「約45分後」のような遅延表示 */
 export function formatDelay(delayMs: number): string {
   const minutes = Math.round(delayMs / 60000);
   if (minutes < 60) return `約${minutes}分後`;
@@ -245,10 +232,6 @@ export function formatDelay(delayMs: number): string {
   return rest === 0 ? `約${hours}時間後` : `約${hours}時間${rest}分後`;
 }
 
-/**
- * 検出メッセージへの共通処理 (Bump.ts と同じ流れ):
- * 権限確認 → 無効化設定 → 通知キュー追加 (重複時は無音) → 受信表示 → RTA 完了記録
- */
 export async function handleBoardServiceMessage(message: Message): Promise<void> {
   if (
     !message.inGuild() ||

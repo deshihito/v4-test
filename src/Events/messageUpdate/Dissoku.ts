@@ -48,8 +48,6 @@ class AfkEvent implements MessageUpdateEvent {
 
       if (dissokuNoticeIgnoreData) return;
 
-      // messageUpdate は同じメッセージで何度も発火しうるため、
-      // 既に同じ通知が予約済みなら受信メッセージも含めて何もしない (重複防止)
       const created = await NotificationQueueService.add({
         guildId: newMessage.guild.id,
         channelId: newMessage.channel.id,
@@ -71,7 +69,6 @@ class AfkEvent implements MessageUpdateEvent {
           .catch(() => {});
       }
 
-      // RTA: 通知からのラウンドがあれば、この UP を記録する
       const actorId = resolveBumpActorId(newMessage);
       if (actorId) {
         const result = await finishBumpRtaRound(

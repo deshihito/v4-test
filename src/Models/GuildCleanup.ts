@@ -1,9 +1,5 @@
 import { prisma } from "@/Models/db";
 
-/**
- * サーバー削除時に、そのサーバーの全データを削除する。
- * 削除したグローバルチャットの件数を返す。
- */
 export async function deleteGuildData(guildId: string): Promise<number> {
   await prisma.joinNotice.deleteMany({
     where: {

@@ -44,15 +44,10 @@ const ITEMS: { key: SettingKey; title: string; description: string }[] = [
 ];
 
 export interface LevelGuildSettings {
-  /** レベルアップ通知の送信先チャンネル。null は「発言したチャンネルに送る」 */
+
   notifyChannelId: string | null;
 }
 
-/**
- * /level_settings の Components V2 パネルを組み立てる。
- * 各設定はセクションで、右端のボタンは押したときの動作 (オンにする/オフにする) を示し、押すと切り替わる。
- * guild を渡すと、管理者向けの通知チャンネル設定セクションが付く。
- */
 export function buildLevelSettingsPanel(
   userId: string,
   settings: LevelSettings,

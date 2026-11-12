@@ -95,16 +95,22 @@ class LevelCommand implements Command {
       ) AS "totals"`;
     const globalRank: number = (rankRows[0]?.count ?? 0) + 1;
 
-    const card = await renderLevelCard({
-      name: interaction.user.displayName,
-      level,
-      current,
-      next,
-      total: totalExp,
-      serverRank,
-      globalRank,
-      avatarUrl: interaction.user.displayAvatarURL({ extension: "png", size: 256 }),
+    const cardSetting = await prisma.levelSetting.findUnique({
+      where: { userId: interaction.user.id },
     });
+    const card =
+      cardSetting?.card === false
+        ? null
+        : await renderLevelCard({
+            name: interaction.user.displayName,
+            level,
+            current,
+            next,
+            total: totalExp,
+            serverRank,
+            globalRank,
+            avatarUrl: interaction.user.displayAvatarURL({ extension: "png", size: 256 }),
+          });
 
     const filled = Math.min(12, Math.floor((current / next) * 12));
     const bar = "█".repeat(filled) + "░".repeat(12 - filled);

@@ -79,7 +79,7 @@ class LevelEvent implements MessageCreateEvent {
 
     await message.channel
       .send({
-        content: `<@${userId}>`,
+        ...(setting?.mention === false ? {} : { content: `<@${userId}>` }),
         embeds: [
           {
             color: Colors.Green,

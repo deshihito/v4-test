@@ -317,6 +317,8 @@ model levelUser {
 model levelSetting {
   userId       String   @id
   notify       Boolean  @default(true)
+  mention      Boolean  @default(true)
+  card         Boolean  @default(true)
   updatedAt    DateTime @updatedAt
   registeredAt DateTime @default(now())
 }

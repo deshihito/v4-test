@@ -17,6 +17,11 @@ import {
   SlashCommandSubcommandBuilder,
   ContextMenuCommandBuilder,
   PartialGuildMember,
+  ButtonInteraction,
+  StringSelectMenuInteraction,
+  ChannelSelectMenuInteraction,
+  ModalSubmitInteraction,
+  AutocompleteInteraction,
 } from "discord.js";
 
 type ErrorLogData = {
@@ -116,6 +121,52 @@ interface InteractionCreateEvent {
   readonly client: Client;
   execute(interaction: BaseInteraction): Promise<InteractionResponse<boolean> | void>;
 }
+
+interface ButtonController {
+  readonly client: Client;
+  readonly kind: "button";
+  readonly customId: string;
+  readonly prefix: boolean;
+  execute(interaction: ButtonInteraction): Promise<InteractionResponse<boolean> | void>;
+}
+
+interface SelectController {
+  readonly client: Client;
+  readonly kind: "select";
+  readonly customId: string;
+  readonly prefix: boolean;
+  execute(interaction: StringSelectMenuInteraction): Promise<InteractionResponse<boolean> | void>;
+}
+
+interface ChannelSelectController {
+  readonly client: Client;
+  readonly kind: "channelSelect";
+  readonly customId: string;
+  readonly prefix: boolean;
+  execute(interaction: ChannelSelectMenuInteraction): Promise<InteractionResponse<boolean> | void>;
+}
+
+interface ModalController {
+  readonly client: Client;
+  readonly kind: "modal";
+  readonly customId: string;
+  readonly prefix: boolean;
+  execute(interaction: ModalSubmitInteraction): Promise<InteractionResponse<boolean> | void>;
+}
+
+interface AutocompleteController {
+  readonly client: Client;
+  readonly kind: "autocomplete";
+  readonly commandName: string;
+  execute(interaction: AutocompleteInteraction): Promise<InteractionResponse<boolean> | void>;
+}
+
+type ComponentController =
+  | ButtonController
+  | SelectController
+  | ChannelSelectController
+  | ModalController
+  | AutocompleteController;
 
 interface GuildCreateEvent {
   readonly client: Client;
@@ -237,6 +288,12 @@ export {
   MessageCreateEvent,
   ValidSubCommandInteraction,
   InteractionCreateEvent,
+  ButtonController,
+  SelectController,
+  ChannelSelectController,
+  ModalController,
+  AutocompleteController,
+  ComponentController,
   CommandData,
   ApiPermissionType,
   Word,

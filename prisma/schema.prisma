@@ -274,6 +274,78 @@ enum NotificationType {
   bump
   dissoku
   tksmup
+  vote
+  dicoall
+  dcafe
+  sharkbot
+  dsio
+  discom
+}
+
+model voteNotice {
+  guildId  String   @id
+  roleId   String
+  createAt DateTime @default(now())
+}
+
+model voteNoticeIgnore {
+  guildId   String   @id
+  createdAt DateTime @default(now())
+}
+
+model dicoallNotice {
+  guildId  String   @id
+  roleId   String
+  createAt DateTime @default(now())
+}
+
+model dicoallNoticeIgnore {
+  guildId   String   @id
+  createdAt DateTime @default(now())
+}
+
+model dcafeNotice {
+  guildId  String   @id
+  roleId   String
+  createAt DateTime @default(now())
+}
+
+model dcafeNoticeIgnore {
+  guildId   String   @id
+  createdAt DateTime @default(now())
+}
+
+model sharkbotNotice {
+  guildId  String   @id
+  roleId   String
+  createAt DateTime @default(now())
+}
+
+model sharkbotNoticeIgnore {
+  guildId   String   @id
+  createdAt DateTime @default(now())
+}
+
+model dsioNotice {
+  guildId  String   @id
+  roleId   String
+  createAt DateTime @default(now())
+}
+
+model dsioNoticeIgnore {
+  guildId   String   @id
+  createdAt DateTime @default(now())
+}
+
+model discomNotice {
+  guildId  String   @id
+  roleId   String
+  createAt DateTime @default(now())
+}
+
+model discomNoticeIgnore {
+  guildId   String   @id
+  createdAt DateTime @default(now())
 }
 
 model NotificationQueue {
@@ -282,6 +354,32 @@ model NotificationQueue {
   channelId   String
   type        NotificationType
   scheduledAt DateTime
+  claimedAt   DateTime?
+
+  @@unique([guildId, type])
+  @@index([scheduledAt])
+}
+
+model BumpRtaRound {
+  guildId    String
+  type       NotificationType
+  channelId  String
+  notifiedAt DateTime
+
+  @@id([guildId, type])
+}
+
+model BumpRtaRecord {
+  id         Int              @id @default(autoincrement())
+  guildId    String
+  userId     String
+  type       NotificationType
+  elapsedMs  Int
+  achievedAt DateTime         @default(now())
+
+  @@index([guildId, type, elapsedMs])
+  @@index([type, elapsedMs])
+  @@index([userId, type, elapsedMs])
 }
 
 model ShardStatus {
@@ -299,4 +397,34 @@ model webauth {
   type                    String   @default("roleauth")
   requiresSubAccountCheck Boolean  @default(false)
   createdAt               DateTime @default(now())
+}
+
+model levelUser {
+  id            Int       @id @default(autoincrement())
+  userId        String
+  guildId       String
+  chatExp       Int       @default(0)
+  lastChatGrant DateTime?
+  updatedAt     DateTime  @updatedAt
+  registeredAt  DateTime  @default(now())
+
+  @@unique([userId, guildId])
+  @@index([guildId, chatExp])
+  @@index([userId, chatExp])
+}
+
+model levelGuildSetting {
+  guildId         String   @id
+  notifyChannelId String?
+  updatedAt       DateTime @updatedAt
+  registeredAt    DateTime @default(now())
+}
+
+model levelSetting {
+  userId       String   @id
+  notify       Boolean  @default(true)
+  mention      Boolean  @default(true)
+  card         Boolean  @default(true)
+  updatedAt    DateTime @updatedAt
+  registeredAt DateTime @default(now())
 }

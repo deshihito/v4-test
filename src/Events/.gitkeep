@@ -1,0 +1,1 @@
+Events: Discordイベントの入口。MVCの例外としてこの層に残す。現行 src/event の移行先。

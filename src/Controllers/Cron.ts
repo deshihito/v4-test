@@ -12,6 +12,7 @@ import Log from "@/util/Log";
 import getUserCount from "@/Models/getUserCount";
 import getGuildCount from "@/Models/getGuildCount";
 import { NotificationQueueService } from "@/Models/NotificationQueue";
+import { BOARD_SERVICE_BY_TYPE } from "@/Models/boardServices";
 import { startBumpRtaRound } from "@/Models/bumpRta";
 import { NotificationType } from "@/generated";
 import { env } from "@/util/Env";
@@ -180,6 +181,25 @@ class Cron {
                 })
                 .then(() => true)
                 .catch(() => false);
+            } else {
+              const boardService = BOARD_SERVICE_BY_TYPE[notification.type];
+              if (boardService) {
+                const boardNoticeData = await boardService.findNotice(notification.guildId);
+
+                sent = await channel
+                  .send({
+                    content: boardNoticeData ? `<@&${boardNoticeData.roleId}>` : "",
+                    embeds: [
+                      {
+                        color: boardService.notifyColor,
+                        title: boardService.notifyTitle,
+                        description: boardService.notifyDescription,
+                      },
+                    ],
+                  })
+                  .then(() => true)
+                  .catch(() => false);
+              }
             }
 
             // 通知が実際に届いたら RTA のラウンドを開始する

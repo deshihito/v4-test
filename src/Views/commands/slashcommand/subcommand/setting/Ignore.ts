@@ -12,6 +12,24 @@ import {
   findBumpNoticeIgnore,
   findDissokuNoticeIgnore,
   findUpNoticeIgnore,
+  createVoteNoticeIgnore,
+  deleteVoteNoticeIgnore,
+  findVoteNoticeIgnore,
+  createDicoallNoticeIgnore,
+  deleteDicoallNoticeIgnore,
+  findDicoallNoticeIgnore,
+  createDcafeNoticeIgnore,
+  deleteDcafeNoticeIgnore,
+  findDcafeNoticeIgnore,
+  createSharkbotNoticeIgnore,
+  deleteSharkbotNoticeIgnore,
+  findSharkbotNoticeIgnore,
+  createDsioNoticeIgnore,
+  deleteDsioNoticeIgnore,
+  findDsioNoticeIgnore,
+  createDiscomNoticeIgnore,
+  deleteDiscomNoticeIgnore,
+  findDiscomNoticeIgnore,
 } from "@/Models/BoardNotice";
 
 class IgnoreSubCommand implements SubCommand {
@@ -136,6 +154,198 @@ class IgnoreSubCommand implements SubCommand {
           ],
         });
       }
+    } else if (type === "vote") {
+      const voteNoticeIgnoreData = await findVoteNoticeIgnore(interaction.guildId);
+
+      if (!voteNoticeIgnoreData) {
+        await createVoteNoticeIgnore(interaction.guildId);
+
+        await interaction.reply({
+          embeds: [
+            {
+              color: Colors.Green,
+              author: {
+                name: "鯖ちゃんねる Vote通知を無効にしました",
+                icon_url: config.image.successIcon,
+              },
+            },
+          ],
+        });
+      } else {
+        await deleteVoteNoticeIgnore(interaction.guildId);
+
+        await interaction.reply({
+          embeds: [
+            {
+              color: Colors.Green,
+              author: {
+                name: "鯖ちゃんねる Vote通知を有効にしました",
+                icon_url: config.image.successIcon,
+              },
+            },
+          ],
+        });
+      }
+    } else if (type === "dicoall") {
+      const dicoallNoticeIgnoreData = await findDicoallNoticeIgnore(interaction.guildId);
+
+      if (!dicoallNoticeIgnoreData) {
+        await createDicoallNoticeIgnore(interaction.guildId);
+
+        await interaction.reply({
+          embeds: [
+            {
+              color: Colors.Green,
+              author: {
+                name: "Dicoall UP通知を無効にしました",
+                icon_url: config.image.successIcon,
+              },
+            },
+          ],
+        });
+      } else {
+        await deleteDicoallNoticeIgnore(interaction.guildId);
+
+        await interaction.reply({
+          embeds: [
+            {
+              color: Colors.Green,
+              author: {
+                name: "Dicoall UP通知を有効にしました",
+                icon_url: config.image.successIcon,
+              },
+            },
+          ],
+        });
+      }
+    } else if (type === "dcafe") {
+      const dcafeNoticeIgnoreData = await findDcafeNoticeIgnore(interaction.guildId);
+
+      if (!dcafeNoticeIgnoreData) {
+        await createDcafeNoticeIgnore(interaction.guildId);
+
+        await interaction.reply({
+          embeds: [
+            {
+              color: Colors.Green,
+              author: {
+                name: "Discord Cafe UP通知を無効にしました",
+                icon_url: config.image.successIcon,
+              },
+            },
+          ],
+        });
+      } else {
+        await deleteDcafeNoticeIgnore(interaction.guildId);
+
+        await interaction.reply({
+          embeds: [
+            {
+              color: Colors.Green,
+              author: {
+                name: "Discord Cafe UP通知を有効にしました",
+                icon_url: config.image.successIcon,
+              },
+            },
+          ],
+        });
+      }
+    } else if (type === "sharkbot") {
+      const sharkbotNoticeIgnoreData = await findSharkbotNoticeIgnore(interaction.guildId);
+
+      if (!sharkbotNoticeIgnoreData) {
+        await createSharkbotNoticeIgnore(interaction.guildId);
+
+        await interaction.reply({
+          embeds: [
+            {
+              color: Colors.Green,
+              author: {
+                name: "SharkBot UP通知を無効にしました",
+                icon_url: config.image.successIcon,
+              },
+            },
+          ],
+        });
+      } else {
+        await deleteSharkbotNoticeIgnore(interaction.guildId);
+
+        await interaction.reply({
+          embeds: [
+            {
+              color: Colors.Green,
+              author: {
+                name: "SharkBot UP通知を有効にしました",
+                icon_url: config.image.successIcon,
+              },
+            },
+          ],
+        });
+      }
+    } else if (type === "dsio") {
+      const dsioNoticeIgnoreData = await findDsioNoticeIgnore(interaction.guildId);
+
+      if (!dsioNoticeIgnoreData) {
+        await createDsioNoticeIgnore(interaction.guildId);
+
+        await interaction.reply({
+          embeds: [
+            {
+              color: Colors.Green,
+              author: {
+                name: "DiscordServers.io BUMP通知を無効にしました",
+                icon_url: config.image.successIcon,
+              },
+            },
+          ],
+        });
+      } else {
+        await deleteDsioNoticeIgnore(interaction.guildId);
+
+        await interaction.reply({
+          embeds: [
+            {
+              color: Colors.Green,
+              author: {
+                name: "DiscordServers.io BUMP通知を有効にしました",
+                icon_url: config.image.successIcon,
+              },
+            },
+          ],
+        });
+      }
+    } else if (type === "discom") {
+      const discomNoticeIgnoreData = await findDiscomNoticeIgnore(interaction.guildId);
+
+      if (!discomNoticeIgnoreData) {
+        await createDiscomNoticeIgnore(interaction.guildId);
+
+        await interaction.reply({
+          embeds: [
+            {
+              color: Colors.Green,
+              author: {
+                name: "DISCOM UP通知を無効にしました",
+                icon_url: config.image.successIcon,
+              },
+            },
+          ],
+        });
+      } else {
+        await deleteDiscomNoticeIgnore(interaction.guildId);
+
+        await interaction.reply({
+          embeds: [
+            {
+              color: Colors.Green,
+              author: {
+                name: "DISCOM UP通知を有効にしました",
+                icon_url: config.image.successIcon,
+              },
+            },
+          ],
+        });
+      }
     } else {
       await interaction.reply({
         embeds: [
@@ -164,7 +374,13 @@ class IgnoreSubCommand implements SubCommand {
           .addChoices(
             { name: "Bump通知", value: "bump" },
             { name: "Dissoku Up通知", value: "dissoku" },
-            { name: "UP通知", value: "up" }
+            { name: "UP通知", value: "up" },
+            { name: "鯖ちゃんねる Vote通知", value: "vote" },
+            { name: "Dicoall UP通知", value: "dicoall" },
+            { name: "Discord Cafe UP通知", value: "dcafe" },
+            { name: "SharkBot UP通知", value: "sharkbot" },
+            { name: "DiscordServers.io BUMP通知", value: "dsio" },
+            { name: "DISCOM UP通知", value: "discom" }
           ),
       );
   }

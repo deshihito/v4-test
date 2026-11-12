@@ -14,6 +14,12 @@ export const BUMP_RTA_TYPE_LABEL: Record<NotificationType, string> = {
   [NotificationType.bump]: "BUMP",
   [NotificationType.dissoku]: "Dissoku UP",
   [NotificationType.tksmup]: "TakasumiBOT UP",
+  [NotificationType.vote]: "鯖ちゃんねる Vote",
+  [NotificationType.dicoall]: "Dicoall UP",
+  [NotificationType.dcafe]: "Discord Cafe UP",
+  [NotificationType.sharkbot]: "SharkBot UP",
+  [NotificationType.dsio]: "DiscordServers.io BUMP",
+  [NotificationType.discom]: "DISCOM UP",
 };
 
 /** ミリ秒を「12.3秒」「1分05秒」の形にする */

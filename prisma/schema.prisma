@@ -274,6 +274,78 @@ enum NotificationType {
   bump
   dissoku
   tksmup
+  vote
+  dicoall
+  dcafe
+  sharkbot
+  dsio
+  discom
+}
+
+model voteNotice {
+  guildId  String   @id
+  roleId   String
+  createAt DateTime @default(now())
+}
+
+model voteNoticeIgnore {
+  guildId   String   @id
+  createdAt DateTime @default(now())
+}
+
+model dicoallNotice {
+  guildId  String   @id
+  roleId   String
+  createAt DateTime @default(now())
+}
+
+model dicoallNoticeIgnore {
+  guildId   String   @id
+  createdAt DateTime @default(now())
+}
+
+model dcafeNotice {
+  guildId  String   @id
+  roleId   String
+  createAt DateTime @default(now())
+}
+
+model dcafeNoticeIgnore {
+  guildId   String   @id
+  createdAt DateTime @default(now())
+}
+
+model sharkbotNotice {
+  guildId  String   @id
+  roleId   String
+  createAt DateTime @default(now())
+}
+
+model sharkbotNoticeIgnore {
+  guildId   String   @id
+  createdAt DateTime @default(now())
+}
+
+model dsioNotice {
+  guildId  String   @id
+  roleId   String
+  createAt DateTime @default(now())
+}
+
+model dsioNoticeIgnore {
+  guildId   String   @id
+  createdAt DateTime @default(now())
+}
+
+model discomNotice {
+  guildId  String   @id
+  roleId   String
+  createAt DateTime @default(now())
+}
+
+model discomNoticeIgnore {
+  guildId   String   @id
+  createdAt DateTime @default(now())
 }
 
 model NotificationQueue {

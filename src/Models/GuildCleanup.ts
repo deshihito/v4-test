@@ -85,5 +85,77 @@ export async function deleteGuildData(guildId: string): Promise<number> {
     },
   });
 
+  await prisma.voteNotice.deleteMany({
+    where: {
+      guildId: guildId,
+    },
+  });
+
+  await prisma.voteNoticeIgnore.deleteMany({
+    where: {
+      guildId: guildId,
+    },
+  });
+
+  await prisma.dicoallNotice.deleteMany({
+    where: {
+      guildId: guildId,
+    },
+  });
+
+  await prisma.dicoallNoticeIgnore.deleteMany({
+    where: {
+      guildId: guildId,
+    },
+  });
+
+  await prisma.dcafeNotice.deleteMany({
+    where: {
+      guildId: guildId,
+    },
+  });
+
+  await prisma.dcafeNoticeIgnore.deleteMany({
+    where: {
+      guildId: guildId,
+    },
+  });
+
+  await prisma.sharkbotNotice.deleteMany({
+    where: {
+      guildId: guildId,
+    },
+  });
+
+  await prisma.sharkbotNoticeIgnore.deleteMany({
+    where: {
+      guildId: guildId,
+    },
+  });
+
+  await prisma.dsioNotice.deleteMany({
+    where: {
+      guildId: guildId,
+    },
+  });
+
+  await prisma.dsioNoticeIgnore.deleteMany({
+    where: {
+      guildId: guildId,
+    },
+  });
+
+  await prisma.discomNotice.deleteMany({
+    where: {
+      guildId: guildId,
+    },
+  });
+
+  await prisma.discomNoticeIgnore.deleteMany({
+    where: {
+      guildId: guildId,
+    },
+  });
+
   return count;
 }

@@ -1,4 +1,4 @@
-import { prisma } from "@/util/db";
+import { prisma } from "@/Models/db";
 import config from "@/config";
 import { Colors } from "discord.js";
 import { APIMessage } from "discord.js";

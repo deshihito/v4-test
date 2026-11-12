@@ -12,7 +12,7 @@ import {
 import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/util/CommandUtils";
-import { prisma } from "@/util/db";
+import { prisma } from "@/Models/db";
 
 class PublishCommand implements Command {
   public readonly client: Client;

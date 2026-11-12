@@ -1,4 +1,4 @@
-import { prisma } from "@/util/db";
+import { prisma } from "@/Models/db";
 
 const calcNextTime = async (
   userId: string,

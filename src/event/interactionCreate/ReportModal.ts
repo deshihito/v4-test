@@ -13,7 +13,7 @@ import {
 } from "discord.js";
 import { InteractionCreateEvent } from "@/@types/Util";
 import config from "@/config";
-import { prisma } from "@/util/db";
+import { prisma } from "@/Models/db";
 
 class ReportModalEvent implements InteractionCreateEvent {
   public readonly client: Client;

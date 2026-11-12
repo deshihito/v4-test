@@ -2,7 +2,7 @@ import { Client, Message, ChannelType, WebhookClient } from "discord.js";
 import { MessageCreateEvent } from "@/@types/Util";
 import RateLimit from "@/util/RateLimit";
 import sleep from "@/util/sleep";
-import { prisma } from "@/util/db";
+import { prisma } from "@/Models/db";
 
 class PinEvent implements MessageCreateEvent {
   public readonly client: Client;

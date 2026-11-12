@@ -16,7 +16,7 @@ import {
 import { Command, CommandType } from "@/@types/Util";
 import CommandUtils from "@/util/CommandUtils";
 import config from "@/config";
-import { prisma } from "@/util/db";
+import { prisma } from "@/Models/db";
 
 class RegisterCommand implements Command {
   public readonly client: Client;

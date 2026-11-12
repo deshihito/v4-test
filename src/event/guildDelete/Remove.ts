@@ -1,6 +1,6 @@
 import { Client, Guild } from "discord.js";
 import { GuildDeleteEvent } from "@/@types/Util";
-import { prisma } from "@/util/db";
+import { prisma } from "@/Models/db";
 import sendGlobalChat from "@/util/sendGlobalChat";
 
 class RemovedEvent implements GuildDeleteEvent {

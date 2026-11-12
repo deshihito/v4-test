@@ -15,7 +15,7 @@ import {
 import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/util/CommandUtils";
-import { prisma } from "@/util/db";
+import { prisma } from "@/Models/db";
 import sendGlobalChat from "@/util/sendGlobalChat";
 import deleteWebhook from "@/util/deleteWebhook";
 import Random from "@/util/Random";

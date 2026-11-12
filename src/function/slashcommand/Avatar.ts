@@ -14,7 +14,7 @@ import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/util/CommandUtils";
 import matchId from "@/util/matchId";
-import Fetch from "@/util/Fetch";
+import Fetch from "@/Models/Fetch";
 
 class AvatarCommand implements Command {
   public readonly client: Client;

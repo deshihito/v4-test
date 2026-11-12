@@ -1,5 +1,5 @@
 import { APIEmbed, Colors, Message } from "discord.js";
-import { prisma } from "@/util/db";
+import { prisma } from "@/Models/db";
 import { NotificationType } from "@/generated";
 
 export interface BumpRtaResult {

@@ -1,0 +1,1 @@
+Models: データベースやその他データソースとのやり取りを担当する層。段階移行の第1弾として db / Mute / NotificationQueue / DBCache / Fetch を src/util から移設済み。

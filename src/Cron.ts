@@ -1,10 +1,10 @@
 import { Client, Colors } from "discord.js";
 import cron from "node-cron";
-import { prisma } from "@/util/db";
+import { prisma } from "@/Models/db";
 import Log from "@/util/Log";
 import getUserCount from "@/util/getUserCount";
 import getGuildCount from "@/util/getGuildCount";
-import { NotificationQueueService } from "@/util/NotificationQueue";
+import { NotificationQueueService } from "@/Models/NotificationQueue";
 import { startBumpRtaRound } from "@/util/bumpRta";
 import { NotificationType } from "@/generated";
 import { env } from "@/util/Env";

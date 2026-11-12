@@ -8,8 +8,8 @@ import {
 import { SubCommand, ValidSubCommandInteraction } from "@/@types/Util";
 import CommandUtils from "@/util/CommandUtils";
 import config from "@/config";
-import Fetch from "@/util/Fetch";
-import Mute from "@/util/Mute";
+import Fetch from "@/Models/Fetch";
+import Mute from "@/Models/Mute";
 
 class MuteSubCommand implements SubCommand {
   public readonly client: Client;

@@ -1,7 +1,7 @@
 import { Client, BaseInteraction, Colors, InteractionResponse, MessageFlags } from "discord.js";
 import { InteractionCreateEvent } from "@/@types/Util";
 import config from "@/config";
-import { prisma } from "@/util/db";
+import { prisma } from "@/Models/db";
 
 class CheckHumanEvent implements InteractionCreateEvent {
   public readonly client: Client;

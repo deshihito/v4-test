@@ -9,7 +9,7 @@ import {
 import { SubCommand, ValidSubCommandInteraction } from "@/@types/Util";
 import CommandUtils from "@/util/CommandUtils";
 import config from "@/config";
-import Fetch from "@/util/Fetch";
+import Fetch from "@/Models/Fetch";
 
 class LeaveSubCommand implements SubCommand {
   public readonly client: Client;

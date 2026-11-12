@@ -1,6 +1,6 @@
 import { Client, GuildMember } from "discord.js";
 import { GuildMemberAddEvent } from "@/@types/Util";
-import { prisma } from "@/util/db";
+import { prisma } from "@/Models/db";
 
 class StatsEvent implements GuildMemberAddEvent {
   public readonly client: Client;

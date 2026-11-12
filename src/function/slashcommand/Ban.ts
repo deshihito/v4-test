@@ -14,7 +14,7 @@ import {
 import { Command, CommandType } from "@/@types/Util";
 import matchId from "@/util/matchId";
 import config from "@/config";
-import Fetch from "@/util/Fetch";
+import Fetch from "@/Models/Fetch";
 import CommandUtils from "@/util/CommandUtils";
 
 class BanCommand implements Command {

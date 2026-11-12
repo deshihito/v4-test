@@ -1,5 +1,5 @@
 import { APIUser } from "discord.js";
-import { prisma } from "@/util/db";
+import { prisma } from "@/Models/db";
 import { env } from "@/util/Env";
 
 export async function fetchAndCacheUser(userId: string) {

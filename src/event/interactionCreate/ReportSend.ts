@@ -9,9 +9,9 @@ import {
 import { InteractionCreateEvent } from "@/@types/Util";
 import config from "@/config";
 import { reportActionType, reportTargetType } from "@/generated";
-import Fetch from "@/util/Fetch";
-import Mute from "@/util/Mute";
-import { prisma } from "@/util/db";
+import Fetch from "@/Models/Fetch";
+import Mute from "@/Models/Mute";
+import { prisma } from "@/Models/db";
 
 class ReportSendEvent implements InteractionCreateEvent {
   public readonly client: Client;

@@ -4,7 +4,7 @@ import config from "@/config";
 import { relative } from "path";
 import calcTime from "@/util/calcTime";
 import matchId from "@/util/matchId";
-import { prisma } from "@/util/db";
+import { prisma } from "@/Models/db";
 
 class AfkEvent implements MessageCreateEvent {
   public readonly client: Client;

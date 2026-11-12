@@ -1,6 +1,6 @@
 import { Client, Message } from "discord.js";
 import { MessageCreateEvent } from "@/@types/Util";
-import { prisma } from "@/util/db";
+import { prisma } from "@/Models/db";
 
 class StatsEvent implements MessageCreateEvent {
   public readonly client: Client;

@@ -22,18 +22,18 @@ import {
   GuildMember,
   PrimaryEntryPointCommandInteraction,
 } from "discord.js";
-import { prisma } from "@/util/db";
+import { prisma } from "@/Models/db";
 import { disableCommand } from "@/generated";
 import EventLoader from "@/EventLoader";
 import fs from "fs";
 import path from "path";
 import config from "@/config";
-import Mute from "@/util/Mute";
+import Mute from "@/Models/Mute";
 import Log from "@/util/Log";
 import { Command, CommandData } from "@/@types/Util";
 import { pathToFileURL } from "url";
 import Permission from "@/util/Permission";
-import DBCache from "@/util/DBCache";
+import DBCache from "@/Models/DBCache";
 import isAdmin from "@/util/isAdmin";
 import { env } from "@/util/Env";
 

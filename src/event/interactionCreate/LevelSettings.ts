@@ -11,7 +11,7 @@ import {
 } from "discord.js";
 import { InteractionCreateEvent } from "@/@types/Util";
 import config from "@/config";
-import { prisma } from "@/util/db";
+import { prisma } from "@/Models/db";
 import {
   buildLevelSettingsPanel,
   DEFAULT_LEVEL_SETTINGS,

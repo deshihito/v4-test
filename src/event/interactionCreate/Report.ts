@@ -11,10 +11,10 @@ import {
 import { InteractionCreateEvent } from "@/@types/Util";
 import config from "@/config";
 import { reportTargetType } from "@/generated";
-import Fetch from "@/util/Fetch";
+import Fetch from "@/Models/Fetch";
 import createId from "@/util/createId";
-import Mute from "@/util/Mute";
-import { prisma } from "@/util/db";
+import Mute from "@/Models/Mute";
+import { prisma } from "@/Models/db";
 
 class ReportEvent implements InteractionCreateEvent {
   public readonly client: Client;

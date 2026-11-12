@@ -14,7 +14,7 @@ import {
 } from "discord.js";
 import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
-import Fetch from "@/util/Fetch";
+import Fetch from "@/Models/Fetch";
 import CommandUtils from "@/util/CommandUtils";
 
 class TimeoutCommand implements Command {

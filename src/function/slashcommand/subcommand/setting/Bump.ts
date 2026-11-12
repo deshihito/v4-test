@@ -8,8 +8,8 @@ import {
 import { SubCommand, ValidSubCommandInteraction } from "@/@types/Util";
 import CommandUtils from "@/util/CommandUtils";
 import config from "@/config";
-import Fetch from "@/util/Fetch";
-import { prisma } from "@/util/db";
+import Fetch from "@/Models/Fetch";
+import { prisma } from "@/Models/db";
 
 class BumpSubCommand implements SubCommand {
   public readonly client: Client;

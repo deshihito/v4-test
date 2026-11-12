@@ -14,7 +14,7 @@ import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/util/CommandUtils";
 import Permission from "@/util/Permission";
-import Fetch from "@/util/Fetch";
+import Fetch from "@/Models/Fetch";
 
 class PermissionCommand implements Command {
   public readonly client: Client;

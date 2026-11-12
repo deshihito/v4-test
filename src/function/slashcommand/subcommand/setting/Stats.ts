@@ -2,7 +2,7 @@ import { Client, InteractionResponse, Colors, SlashCommandSubcommandBuilder } fr
 import { SubCommand, ValidSubCommandInteraction } from "@/@types/Util";
 import CommandUtils from "@/util/CommandUtils";
 import config from "@/config";
-import { prisma } from "@/util/db";
+import { prisma } from "@/Models/db";
 
 class JoinSubCommand implements SubCommand {
   public readonly client: Client;

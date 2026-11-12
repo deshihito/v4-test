@@ -9,8 +9,8 @@ import {
 } from "discord.js";
 import { MessageUpdateEvent } from "@/@types/Util";
 import config from "@/config";
-import { prisma } from "@/util/db";
-import { NotificationQueueService } from "@/util/NotificationQueue";
+import { prisma } from "@/Models/db";
+import { NotificationQueueService } from "@/Models/NotificationQueue";
 import { NotificationType } from "@/generated";
 import { buildBumpRtaEmbed, finishBumpRtaRound, resolveBumpActorId } from "@/util/bumpRta";
 

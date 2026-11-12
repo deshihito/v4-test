@@ -9,7 +9,7 @@ import {
 } from "discord.js";
 import { Command, CommandType } from "@/@types/Util";
 import CommandUtils from "@/util/CommandUtils";
-import { prisma } from "@/util/db";
+import { prisma } from "@/Models/db";
 import {
   buildLevelSettingsPanel,
   DEFAULT_LEVEL_SETTINGS,

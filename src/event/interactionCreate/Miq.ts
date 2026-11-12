@@ -11,7 +11,7 @@ import {
 } from "discord.js";
 import { InteractionCreateEvent } from "@/@types/Util";
 import config from "@/config";
-import Fetch from "@/util/Fetch";
+import Fetch from "@/Models/Fetch";
 
 class MiqEvent implements InteractionCreateEvent {
   public readonly client: Client;

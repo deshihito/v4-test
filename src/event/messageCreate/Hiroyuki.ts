@@ -12,7 +12,7 @@ import {
 import { MessageCreateEvent } from "@/@types/Util";
 import config from "@/config";
 import RateLimit from "@/util/RateLimit";
-import { prisma } from "@/util/db";
+import { prisma } from "@/Models/db";
 import Random from "@/util/Random";
 
 class HiroyukiEvent implements MessageCreateEvent {

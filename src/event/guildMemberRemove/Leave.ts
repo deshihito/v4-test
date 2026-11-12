@@ -9,10 +9,10 @@ import {
   PartialGuildMember,
 } from "discord.js";
 import { GuildMemberAddEvent } from "@/@types/Util";
-import { prisma } from "@/util/db";
+import { prisma } from "@/Models/db";
 import config from "@/config";
 import { relative } from "path";
-import Fetch from "@/util/Fetch";
+import Fetch from "@/Models/Fetch";
 
 class LeaveEvent implements GuildMemberAddEvent {
   public readonly client: Client;

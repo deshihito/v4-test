@@ -8,7 +8,7 @@ import {
 import { SubCommand, ValidSubCommandInteraction } from "@/@types/Util";
 import CommandUtils from "@/util/CommandUtils";
 import config from "@/config";
-import { prisma } from "@/util/db";
+import { prisma } from "@/Models/db";
 
 class UpSubCommand implements SubCommand {
   public readonly client: Client;

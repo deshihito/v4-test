@@ -12,8 +12,8 @@ import {
 import { Command, CommandType } from "@/@types/Util";
 import CommandUtils from "@/util/CommandUtils";
 import config from "@/config";
-import { prisma } from "@/util/db";
-import { NotificationQueueService } from "@/util/NotificationQueue";
+import { prisma } from "@/Models/db";
+import { NotificationQueueService } from "@/Models/NotificationQueue";
 import { NotificationType } from "@/generated";
 import { buildBumpRtaEmbed, finishBumpRtaRound } from "@/util/bumpRta";
 

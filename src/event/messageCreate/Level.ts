@@ -1,7 +1,7 @@
 import { Client, Message, Colors } from "discord.js";
 import { MessageCreateEvent } from "@/@types/Util";
 import config from "@/config";
-import { prisma } from "@/util/db";
+import { prisma } from "@/Models/db";
 import calcLevel from "@/util/calcLevel";
 
 const GRANT_EXP = 5;

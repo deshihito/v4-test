@@ -9,7 +9,7 @@ import { SubCommand, ValidSubCommandInteraction } from "@/@types/Util";
 import CommandUtils from "@/util/CommandUtils";
 import config from "@/config";
 import commands from "@/static/commands.json";
-import { prisma } from "@/util/db";
+import { prisma } from "@/Models/db";
 
 class CommandSubCommand implements SubCommand {
   public readonly client: Client;

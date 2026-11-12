@@ -1,7 +1,7 @@
 import { ModalBuilder, TextInputBuilder, TextInputStyle, LabelBuilder } from "discord.js";
 import config from "@/config";
 import { ValidCommandInteraction } from "@/@types/Util";
-import { prisma } from "@/util/db";
+import { prisma } from "@/Models/db";
 
 class AntiCheat {
   public static async checkAutomation(command: string, userId: string): Promise<boolean> {

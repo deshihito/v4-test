@@ -12,9 +12,9 @@ import { MessageCreateEvent } from "@/@types/Util";
 import config from "@/config";
 import isAdmin from "@/util/isAdmin";
 import parseMessage from "@/util/parseMessage";
-import Fetch from "@/util/Fetch";
-import { prisma } from "@/util/db";
-import Mute from "@/util/Mute";
+import Fetch from "@/Models/Fetch";
+import { prisma } from "@/Models/db";
+import Mute from "@/Models/Mute";
 import crypto from "node:crypto";
 import { gcerror404 } from "@/util/sendGlobalChat";
 

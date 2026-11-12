@@ -1,4 +1,4 @@
-import { prisma } from "@/util/db";
+import { prisma } from "@/Models/db";
 
 const isAdmin = async (userId: string): Promise<boolean> => {
   return !!(await prisma.admin.findFirst({

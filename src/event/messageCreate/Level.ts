@@ -77,7 +77,22 @@ class LevelEvent implements MessageCreateEvent {
 
     if (setting && !setting.notify) return;
 
-    await message.channel
+    // 通知先: ギルド設定のチャンネルがあればそこ、無ければ発言したチャンネル。
+    // 設定先が取得できない・送信できない場合は発言したチャンネルにフォールバックする。
+    let target = message.channel;
+    const guildSetting = await prisma.levelGuildSetting.findUnique({
+      where: { guildId },
+    });
+    if (guildSetting?.notifyChannelId) {
+      const configured = await this.client.channels
+        .fetch(guildSetting.notifyChannelId)
+        .catch(() => null);
+      if (configured && configured.isSendable() && configured.guildId === guildId) {
+        target = configured;
+      }
+    }
+
+    await target
       .send({
         ...(setting?.mention === false ? {} : { content: `<@${userId}>` }),
         embeds: [

@@ -1,6 +1,9 @@
 import {
+  ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
+  ChannelSelectMenuBuilder,
+  ChannelType,
   Colors,
   ContainerBuilder,
   SectionBuilder,
@@ -40,13 +43,20 @@ const ITEMS: { key: SettingKey; title: string; description: string }[] = [
   },
 ];
 
+export interface LevelGuildSettings {
+  /** レベルアップ通知の送信先チャンネル。null は「発言したチャンネルに送る」 */
+  notifyChannelId: string | null;
+}
+
 /**
  * /level_settings の Components V2 パネルを組み立てる。
  * 各設定はセクションで、右端のボタンが現在の状態を示し、押すと切り替わる。
+ * guild を渡すと、管理者向けの通知チャンネル設定セクションが付く。
  */
 export function buildLevelSettingsPanel(
   userId: string,
   settings: LevelSettings,
+  guild?: LevelGuildSettings,
 ): ContainerBuilder {
   const container = new ContainerBuilder()
     .setAccentColor(Colors.Green)
@@ -71,6 +81,36 @@ export function buildLevelSettingsPanel(
             .setStyle(value ? ButtonStyle.Success : ButtonStyle.Secondary),
         ),
     );
+  }
+
+  if (guild) {
+    container
+      .addSeparatorComponents(new SeparatorBuilder())
+      .addTextDisplayComponents(
+        new TextDisplayBuilder().setContent("## サーバー設定"),
+        new TextDisplayBuilder().setContent(
+          guild.notifyChannelId
+            ? `レベルアップ通知は <#${guild.notifyChannelId}> に送ります`
+            : "レベルアップ通知は、発言したチャンネルに送ります",
+        ),
+      )
+      .addActionRowComponents(
+        new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents(
+          new ChannelSelectMenuBuilder()
+            .setCustomId(`levelSettings_channel_${userId}`)
+            .setPlaceholder("通知を送るチャンネルを選ぶ")
+            .setChannelTypes([ChannelType.GuildText]),
+        ),
+      )
+      .addActionRowComponents(
+        new ActionRowBuilder<ButtonBuilder>().addComponents(
+          new ButtonBuilder()
+            .setCustomId(`levelSettings_channelReset_${userId}`)
+            .setLabel("通知チャンネルを未設定に戻す")
+            .setStyle(ButtonStyle.Secondary)
+            .setDisabled(!guild.notifyChannelId),
+        ),
+      );
   }
 
   return container;

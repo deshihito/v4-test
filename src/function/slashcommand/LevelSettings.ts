@@ -5,6 +5,7 @@ import {
   SlashCommandOptionsOnlyBuilder,
   InteractionResponse,
   MessageFlags,
+  PermissionFlagsBits,
 } from "discord.js";
 import { Command, CommandType } from "@/@types/Util";
 import CommandUtils from "@/util/CommandUtils";
@@ -47,13 +48,29 @@ class LevelSettingsCommand implements Command {
       where: { userId: interaction.user.id },
     });
 
+    // サーバー管理者には、ギルドの通知チャンネル設定も表示する
+    let guild: { notifyChannelId: string | null } | undefined;
+    if (
+      interaction.inGuild() &&
+      interaction.memberPermissions?.has(PermissionFlagsBits.ManageGuild)
+    ) {
+      const guildSetting = await prisma.levelGuildSetting.findUnique({
+        where: { guildId: interaction.guildId },
+      });
+      guild = { notifyChannelId: guildSetting?.notifyChannelId ?? null };
+    }
+
     await interaction.reply({
       components: [
-        buildLevelSettingsPanel(interaction.user.id, {
-          notify: setting?.notify ?? DEFAULT_LEVEL_SETTINGS.notify,
-          mention: setting?.mention ?? DEFAULT_LEVEL_SETTINGS.mention,
-          card: setting?.card ?? DEFAULT_LEVEL_SETTINGS.card,
-        }),
+        buildLevelSettingsPanel(
+          interaction.user.id,
+          {
+            notify: setting?.notify ?? DEFAULT_LEVEL_SETTINGS.notify,
+            mention: setting?.mention ?? DEFAULT_LEVEL_SETTINGS.mention,
+            card: setting?.card ?? DEFAULT_LEVEL_SETTINGS.card,
+          },
+          guild,
+        ),
       ],
       flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
     });

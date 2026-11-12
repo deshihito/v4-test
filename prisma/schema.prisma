@@ -314,6 +314,13 @@ model levelUser {
   @@index([guildId, chatExp])
 }
 
+model levelGuildSetting {
+  guildId         String   @id
+  notifyChannelId String?
+  updatedAt       DateTime @updatedAt
+  registeredAt    DateTime @default(now())
+}
+
 model levelSetting {
   userId       String   @id
   notify       Boolean  @default(true)

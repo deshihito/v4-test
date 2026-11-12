@@ -15,7 +15,7 @@ import {
 import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
-import { prisma } from "@/Models/db";
+import { countPinsByGuild, createPin, deletePin, findPin } from "@/Models/Pin";
 import deleteDuplicateWebhook from "@/Models/deleteDuplicateWebhook";
 import deleteWebhook from "@/Models/deleteWebhook";
 
@@ -57,11 +57,7 @@ class PinContextMenu implements Command {
 
     const message = interaction.options.getMessage("message");
 
-    const pinChannelData = await prisma.pin.findUnique({
-      where: {
-        channelId: interaction.channel.id,
-      },
-    });
+    const pinChannelData = await findPin(interaction.channel.id);
 
     if (!pinChannelData) {
       if (interaction.channel.type !== ChannelType.GuildText)
@@ -94,11 +90,7 @@ class PinContextMenu implements Command {
           flags: MessageFlags.Ephemeral,
         });
 
-      const pinGuildCount = await prisma.pin.count({
-        where: {
-          guildId: interaction.guild.id,
-        },
-      });
+      const pinGuildCount = await countPinsByGuild(interaction.guild.id);
 
       if (pinGuildCount >= 6)
         return await interaction.reply({
@@ -140,14 +132,7 @@ class PinContextMenu implements Command {
           ],
         });
 
-        await prisma.pin.create({
-          data: {
-            channelId: interaction.channelId,
-            messegeId: msg.id,
-            guildId: interaction.guildId,
-            webhookUrl: webhook.url,
-          },
-        });
+        await createPin(interaction.channelId, msg.id, interaction.guildId, webhook.url);
       } catch (error) {
         await interaction.reply({
           embeds: [
@@ -177,11 +162,7 @@ class PinContextMenu implements Command {
         });
       }
     } else {
-      const pin = await prisma.pin.delete({
-        where: {
-          channelId: interaction.channel.id,
-        },
-      });
+      const pin = await deletePin(interaction.channel.id);
 
       void deleteWebhook(pin.webhookUrl);
 

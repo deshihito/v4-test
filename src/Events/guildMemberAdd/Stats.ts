@@ -1,6 +1,6 @@
 import { Client, GuildMember } from "discord.js";
 import { GuildMemberAddEvent } from "@/@types/Util";
-import { prisma } from "@/Models/db";
+import { findGuildStatistics, incrementGuildStatisticsTotalJoin } from "@/Models/GuildStatistics";
 
 class StatsEvent implements GuildMemberAddEvent {
   public readonly client: Client;
@@ -10,24 +10,11 @@ class StatsEvent implements GuildMemberAddEvent {
   }
 
   public async execute(member: GuildMember): Promise<void> {
-    const stats = await prisma.guildStatistics.findUnique({
-      where: {
-        guildId: member.guild.id,
-      },
-    });
+    const stats = await findGuildStatistics(member.guild.id);
 
     if (!stats) return;
 
-    await prisma.guildStatistics.update({
-      where: {
-        guildId: member.guild.id,
-      },
-      data: {
-        totalJoin: {
-          increment: 1,
-        },
-      },
-    });
+    await incrementGuildStatisticsTotalJoin(member.guild.id);
   }
 }
 

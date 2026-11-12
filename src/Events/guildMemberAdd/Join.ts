@@ -8,7 +8,7 @@ import {
   GuildMember,
 } from "discord.js";
 import { GuildMemberAddEvent } from "@/@types/Util";
-import { prisma } from "@/Models/db";
+import { deleteJoinNotice, findJoinNotice } from "@/Models/BoardNotice";
 import config from "@/config";
 import Fetch from "@/Models/Fetch";
 
@@ -20,11 +20,7 @@ class JoinEvent implements GuildMemberAddEvent {
   }
 
   public async execute(member: GuildMember): Promise<void> {
-    const noticeData = await prisma.joinNotice.findUnique({
-      where: {
-        guildId: member.guild.id,
-      },
-    });
+    const noticeData = await findJoinNotice(member.guild.id);
 
     if (!noticeData) return;
 
@@ -46,11 +42,7 @@ class JoinEvent implements GuildMemberAddEvent {
         avatarURL: config.image.botIcon,
       });
     } catch (error) {
-      await prisma.joinNotice.delete({
-        where: {
-          guildId: noticeData.guildId,
-        },
-      });
+      await deleteJoinNotice(noticeData.guildId);
 
       const channel = await Fetch.channel(member.guild, noticeData.channelId);
 

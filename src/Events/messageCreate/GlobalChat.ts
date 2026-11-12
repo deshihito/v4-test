@@ -13,7 +13,13 @@ import config from "@/config";
 import isAdmin from "@/Models/isAdmin";
 import parseMessage from "@/util/parseMessage";
 import Fetch from "@/Models/Fetch";
-import { prisma } from "@/Models/db";
+import {
+  findGlobalChatByChannelId,
+  listGlobalChats,
+  createGlobalChatHistory,
+  createGlobalChatTransferHistory,
+  deleteGlobalChatByGuildId,
+} from "@/Models/GlobalChat";
 import Mute from "@/Models/Mute";
 import crypto from "node:crypto";
 import { gcerror404 } from "@/Models/sendGlobalChat";
@@ -35,23 +41,17 @@ class GlobalChatEvent implements MessageCreateEvent {
     )
       return;
 
-    const guildGlobalChatData = await prisma.globalChat.findFirst({
-      where: {
-        channelId: message.channel.id,
-      },
-    });
+    const guildGlobalChatData = await findGlobalChatByChannelId(message.channel.id);
 
     if (!guildGlobalChatData) return;
 
     let embedColor: ColorResolvable = Colors.Green;
 
-    const history = await prisma.globalChatHistory.create({
-      data: {
-        userId: message.author.id,
-        guildId: message.guildId,
-        channelId: message.channel.id,
-        messageId: message.id,
-      },
+    const history = await createGlobalChatHistory({
+      userId: message.author.id,
+      guildId: message.guildId,
+      channelId: message.channel.id,
+      messageId: message.id,
     });
 
     const embeds = [
@@ -130,7 +130,7 @@ class GlobalChatEvent implements MessageCreateEvent {
       }
     }
 
-    const globalChatData = await prisma.globalChat.findMany();
+    const globalChatData = await listGlobalChats();
 
     globalChatData.forEach(async (gcData) => {
       if (gcData.guildId === message.guild.id) return;
@@ -176,20 +176,14 @@ class GlobalChatEvent implements MessageCreateEvent {
           if (response.status === 200) {
             const msg: APIMessage = await response.json();
 
-            await prisma.globalChatTransferHistory.create({
-              data: {
-                sourceId: history.id,
-                guildId: gcData.guildId,
-                channelId: gcData.channelId,
-                messageId: msg.id,
-              },
+            await createGlobalChatTransferHistory({
+              sourceId: history.id,
+              guildId: gcData.guildId,
+              channelId: gcData.channelId,
+              messageId: msg.id,
             });
           } else if (response.status === 404 || response.status === 401) {
-            await prisma.globalChat.delete({
-              where: {
-                guildId: gcData.guildId,
-              },
-            });
+            await deleteGlobalChatByGuildId(gcData.guildId);
             void gcerror404(gcData.guildId);
           } else if (response.status === 429) {
             console.info(`globalchat message re-send (status 429)`);

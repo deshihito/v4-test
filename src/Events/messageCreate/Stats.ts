@@ -1,6 +1,9 @@
 import { Client, Message } from "discord.js";
 import { MessageCreateEvent } from "@/@types/Util";
-import { prisma } from "@/Models/db";
+import {
+  findGuildStatistics,
+  incrementGuildStatisticsTotalMessage,
+} from "@/Models/GuildStatistics";
 
 class StatsEvent implements MessageCreateEvent {
   public readonly client: Client;
@@ -12,24 +15,11 @@ class StatsEvent implements MessageCreateEvent {
   public async execute(message: Message): Promise<Message | void> {
     if (message.author.bot || !message.inGuild()) return;
 
-    const stats = await prisma.guildStatistics.findUnique({
-      where: {
-        guildId: message.guild.id,
-      },
-    });
+    const stats = await findGuildStatistics(message.guild.id);
 
     if (!stats) return;
 
-    await prisma.guildStatistics.update({
-      where: {
-        guildId: message.guild.id,
-      },
-      data: {
-        totalMessage: {
-          increment: 1,
-        },
-      },
-    });
+    await incrementGuildStatisticsTotalMessage(message.guild.id);
   }
 }
 

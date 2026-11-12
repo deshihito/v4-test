@@ -9,7 +9,11 @@ import { SubCommand, ValidSubCommandInteraction } from "@/@types/Util";
 import CommandUtils from "@/Controllers/CommandUtils";
 import config from "@/config";
 import commands from "@/static/commands.json";
-import { prisma } from "@/Models/db";
+import {
+  findDisableCommandByName,
+  createDisableCommand,
+  deleteDisableCommandByName,
+} from "@/Models/DisableCommand";
 
 class CommandSubCommand implements SubCommand {
   public readonly client: Client;
@@ -52,18 +56,10 @@ class CommandSubCommand implements SubCommand {
         flags: MessageFlags.Ephemeral,
       });
 
-    const commandData = await prisma.disableCommand.findFirst({
-      where: {
-        name: name,
-      },
-    });
+    const commandData = await findDisableCommandByName(name);
 
     if (commandData) {
-      await prisma.disableCommand.delete({
-        where: {
-          name: name,
-        },
-      });
+      await deleteDisableCommandByName(name);
 
       await interaction.reply({
         embeds: [
@@ -77,11 +73,7 @@ class CommandSubCommand implements SubCommand {
         ],
       });
     } else {
-      await prisma.disableCommand.create({
-        data: {
-          name: name,
-        },
-      });
+      await createDisableCommand(name);
 
       await interaction.reply({
         embeds: [

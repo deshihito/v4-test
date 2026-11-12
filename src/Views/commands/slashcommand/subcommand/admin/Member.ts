@@ -9,7 +9,7 @@ import { SubCommand, ValidSubCommandInteraction } from "@/@types/Util";
 import CommandUtils from "@/Controllers/CommandUtils";
 import config from "@/config";
 import Fetch from "@/Models/Fetch";
-import { prisma } from "@/Models/db";
+import { findAdminByUserId, createAdmin, deleteAdminByUserId } from "@/Models/Admin";
 
 class MemberSubCommand implements SubCommand {
   public readonly client: Client;
@@ -53,18 +53,10 @@ class MemberSubCommand implements SubCommand {
         flags: MessageFlags.Ephemeral,
       });
 
-    const adminData = await prisma.admin.findFirst({
-      where: {
-        userId: user.id,
-      },
-    });
+    const adminData = await findAdminByUserId(user.id);
 
     if (adminData) {
-      await prisma.admin.delete({
-        where: {
-          userId: user.id,
-        },
-      });
+      await deleteAdminByUserId(user.id);
 
       await interaction.reply({
         embeds: [
@@ -78,11 +70,7 @@ class MemberSubCommand implements SubCommand {
         ],
       });
     } else {
-      await prisma.admin.create({
-        data: {
-          userId: user.id,
-        },
-      });
+      await createAdmin(user.id);
 
       await interaction.reply({
         embeds: [

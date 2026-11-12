@@ -8,7 +8,12 @@ import {
 import { SubCommand, ValidSubCommandInteraction } from "@/@types/Util";
 import CommandUtils from "@/Controllers/CommandUtils";
 import config from "@/config";
-import { prisma } from "@/Models/db";
+import {
+  createUpNotice,
+  deleteUpNotice,
+  findUpNotice,
+  upsertUpNotice,
+} from "@/Models/BoardNotice";
 
 class UpSubCommand implements SubCommand {
   public readonly client: Client;
@@ -39,11 +44,7 @@ class UpSubCommand implements SubCommand {
 
     const role = interaction.options.getRole("role");
 
-    const upNoticeData = await prisma.upNotice.findUnique({
-      where: {
-        guildId: interaction.guildId,
-      },
-    });
+    const upNoticeData = await findUpNotice(interaction.guildId);
 
     if (!upNoticeData) {
       if (!role)
@@ -60,12 +61,7 @@ class UpSubCommand implements SubCommand {
           ],
         });
 
-      await prisma.upNotice.create({
-        data: {
-          guildId: interaction.guildId,
-          roleId: role.id,
-        },
-      });
+      await createUpNotice(interaction.guildId, role.id);
 
       await interaction.reply({
         embeds: [
@@ -81,18 +77,7 @@ class UpSubCommand implements SubCommand {
       });
     } else {
       if (role) {
-        await prisma.upNotice.upsert({
-          where: {
-            guildId: interaction.guildId,
-          },
-          update: {
-            roleId: role.id,
-          },
-          create: {
-            guildId: interaction.guildId,
-            roleId: role.id,
-          },
-        });
+        await upsertUpNotice(interaction.guildId, role.id);
 
         await interaction.reply({
           embeds: [
@@ -107,11 +92,7 @@ class UpSubCommand implements SubCommand {
           ],
         });
       } else {
-        await prisma.upNotice.delete({
-          where: {
-            guildId: interaction.guildId,
-          },
-        });
+        await deleteUpNotice(interaction.guildId);
 
         await interaction.reply({
           embeds: [

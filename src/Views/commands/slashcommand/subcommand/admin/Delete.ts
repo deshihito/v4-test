@@ -8,7 +8,11 @@ import {
 import { SubCommand, ValidSubCommandInteraction } from "@/@types/Util";
 import CommandUtils from "@/Controllers/CommandUtils";
 import config from "@/config";
-import { prisma } from "@/Models/db";
+import {
+  listGlobalChats,
+  listGlobalChatTransferHistoryBySourceId,
+  deleteGlobalChatTransferHistoryBySourceId,
+} from "@/Models/GlobalChat";
 import crypto from "crypto";
 
 class DeleteSubCommand implements SubCommand {
@@ -37,11 +41,7 @@ class DeleteSubCommand implements SubCommand {
 
     const id = interaction.options.getInteger("id", true);
 
-    const allTransferData = await prisma.globalChatTransferHistory.findMany({
-      where: {
-        sourceId: id,
-      },
-    });
+    const allTransferData = await listGlobalChatTransferHistoryBySourceId(id);
 
     if (allTransferData.length === 0)
       return await interaction.reply({
@@ -77,7 +77,7 @@ class DeleteSubCommand implements SubCommand {
     let RetrySuccess = 0;
     const retryStatusCode = [429, 500, 502];
 
-    const globalChatData = await prisma.globalChat.findMany();
+    const globalChatData = await listGlobalChats();
     const gcWebhook: Record<string, string> = {};
     for (const gc of globalChatData) {
       gcWebhook[gc.guildId] = gc.webhookUrl;
@@ -147,11 +147,7 @@ class DeleteSubCommand implements SubCommand {
 
     await Promise.all(pendingList);
 
-    await prisma.globalChatTransferHistory.deleteMany({
-      where: {
-        sourceId: id,
-      },
-    });
+    await deleteGlobalChatTransferHistoryBySourceId(id);
 
     const time = Math.round((Date.now() - startTime) / 100) / 10;
 

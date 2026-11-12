@@ -22,7 +22,8 @@ import {
   GuildMember,
   PrimaryEntryPointCommandInteraction,
 } from "discord.js";
-import { prisma } from "@/Models/db";
+import { createCommandHistory } from "@/Models/CommandHistory";
+import { findDisableCommandStateByName } from "@/Models/DisableCommand";
 import { disableCommand } from "@/generated";
 import EventLoader from "@/Events/EventLoader";
 import fs from "fs";
@@ -30,7 +31,7 @@ import path from "path";
 import config from "@/config";
 import Mute from "@/Models/Mute";
 import Log from "@/util/Log";
-import { Command, CommandData } from "@/@types/Util";
+import { Command, CommandData, ComponentController } from "@/@types/Util";
 import { pathToFileURL } from "url";
 import Permission from "@/util/Permission";
 import DBCache from "@/Models/DBCache";
@@ -207,13 +208,60 @@ class Handler {
       this.addHisotry(interaction);
     }
 
-    Promise.all(this.loader.interactionCreateEvent.map((event) => event.execute(interaction)));
+    this.dispatchComponent(interaction);
 
     DBCache.addUser(interaction.user);
 
     if (interaction.guild) {
       DBCache.addGuild(interaction.guild);
     }
+  }
+
+  // コンポーネント (ボタン/セレクト/モーダル) と補完は、種別と customId が
+  // 一致するコントローラーにだけ振り分ける (旧来の全件実行+自己選別を置換)
+  private dispatchComponent(interaction: BaseInteraction): void {
+    for (const controller of this.loader.componentControllers) {
+      if (
+        controller.kind === "button" &&
+        interaction.isButton() &&
+        this.matchCustomId(controller, interaction.customId)
+      ) {
+        void controller.execute(interaction);
+      } else if (
+        controller.kind === "select" &&
+        interaction.isStringSelectMenu() &&
+        this.matchCustomId(controller, interaction.customId)
+      ) {
+        void controller.execute(interaction);
+      } else if (
+        controller.kind === "channelSelect" &&
+        interaction.isChannelSelectMenu() &&
+        this.matchCustomId(controller, interaction.customId)
+      ) {
+        void controller.execute(interaction);
+      } else if (
+        controller.kind === "modal" &&
+        interaction.isModalSubmit() &&
+        this.matchCustomId(controller, interaction.customId)
+      ) {
+        void controller.execute(interaction);
+      } else if (
+        controller.kind === "autocomplete" &&
+        interaction.isAutocomplete() &&
+        interaction.commandName === controller.commandName
+      ) {
+        void controller.execute(interaction);
+      }
+    }
+  }
+
+  private matchCustomId(
+    controller: Extract<ComponentController, { customId: string }>,
+    customId: string,
+  ): boolean {
+    return controller.prefix
+      ? customId.startsWith(controller.customId)
+      : customId === controller.customId;
   }
 
   private async onGuildCreate(guild: Guild): Promise<void> {
@@ -240,19 +288,17 @@ class Handler {
       ? interaction.options.data[0].options
       : interaction.options.data;
 
-    await prisma.commandHistory.create({
-      data: {
-        userId: interaction.user.id,
-        channelId: interaction.channelId,
-        guildId: interaction.guildId,
-        name: name,
-        option: options
-          ? options
-              .filter((data) => data.value)
-              .map((data) => `${data.name}:${data.value}`)
-              .join(" ")
-          : "",
-      },
+    await createCommandHistory({
+      userId: interaction.user.id,
+      channelId: interaction.channelId,
+      guildId: interaction.guildId,
+      name: name,
+      option: options
+        ? options
+            .filter((data) => data.value)
+            .map((data) => `${data.name}:${data.value}`)
+            .join(" ")
+        : "",
     });
   }
 
@@ -263,11 +309,9 @@ class Handler {
       | UserContextMenuCommandInteraction
       | PrimaryEntryPointCommandInteraction,
   ): Promise<boolean> {
-    const state: disableCommand | null = await prisma.disableCommand.findUnique({
-      where: {
-        name: interaction.commandName,
-      },
-    });
+    const state: disableCommand | null = await findDisableCommandStateByName(
+      interaction.commandName,
+    );
 
     return state !== null;
   }

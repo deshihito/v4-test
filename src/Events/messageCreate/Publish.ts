@@ -1,6 +1,6 @@
 import { Client, Message, ChannelType } from "discord.js";
 import { MessageCreateEvent } from "@/@types/Util";
-import { prisma } from "@/Models/db";
+import { deletePublish, findPublish } from "@/Models/Publish";
 
 class PublishEvent implements MessageCreateEvent {
   public readonly client: Client;
@@ -12,11 +12,7 @@ class PublishEvent implements MessageCreateEvent {
   public async execute(message: Message): Promise<Message | void> {
     if (message.author.bot || message.channel.type !== ChannelType.GuildAnnouncement) return;
 
-    const publishData = await prisma.publish.findUnique({
-      where: {
-        channelId: message.channelId,
-      },
-    });
+    const publishData = await findPublish(message.channelId);
 
     if (!publishData) return;
 
@@ -26,11 +22,7 @@ class PublishEvent implements MessageCreateEvent {
       await message.crosspost();
       await message.react("✅");
     } catch (error) {
-      await prisma.publish.delete({
-        where: {
-          channelId: message.channelId,
-        },
-      });
+      await deletePublish(message.channelId);
     }
   }
 }

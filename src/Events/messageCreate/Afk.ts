@@ -4,7 +4,7 @@ import config from "@/config";
 import { relative } from "path";
 import calcTime from "@/util/calcTime";
 import matchId from "@/util/matchId";
-import { prisma } from "@/Models/db";
+import { findAfk, deleteAfk, incrementAfkMention } from "@/Models/Afk";
 
 class AfkEvent implements MessageCreateEvent {
   public readonly client: Client;
@@ -17,18 +17,10 @@ class AfkEvent implements MessageCreateEvent {
     if (message.author.bot || message.channel.type === ChannelType.GroupDM) return;
 
     try {
-      const afkData = await prisma.afk.findUnique({
-        where: {
-          userId: message.author.id,
-        },
-      });
+      const afkData = await findAfk(message.author.id);
 
       if (afkData) {
-        await prisma.afk.delete({
-          where: {
-            userId: message.author.id,
-          },
-        });
+        await deleteAfk(message.author.id);
 
         await message.channel.send({
           embeds: [
@@ -49,22 +41,11 @@ class AfkEvent implements MessageCreateEvent {
         const id = matchId(mention[0]);
         if (!id) return;
 
-        const OthorAfkData = await prisma.afk.findUnique({
-          where: {
-            userId: id,
-          },
-        });
+        const OthorAfkData = await findAfk(id);
 
         if (!OthorAfkData) return;
 
-        await prisma.afk.update({
-          where: { userId: id },
-          data: {
-            mention: {
-              increment: 1,
-            },
-          },
-        });
+        await incrementAfkMention(id);
 
         await message.channel.send({
           embeds: [

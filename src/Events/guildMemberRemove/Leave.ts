@@ -9,7 +9,7 @@ import {
   PartialGuildMember,
 } from "discord.js";
 import { GuildMemberAddEvent } from "@/@types/Util";
-import { prisma } from "@/Models/db";
+import { deleteLeaveNotice, findLeaveNotice } from "@/Models/BoardNotice";
 import config from "@/config";
 import { relative } from "path";
 import Fetch from "@/Models/Fetch";
@@ -22,11 +22,7 @@ class LeaveEvent implements GuildMemberAddEvent {
   }
 
   public async execute(member: GuildMember | PartialGuildMember): Promise<void> {
-    const noticeData = await prisma.leaveNotice.findUnique({
-      where: {
-        guildId: member.guild.id,
-      },
-    });
+    const noticeData = await findLeaveNotice(member.guild.id);
 
     if (!noticeData) return;
 
@@ -48,11 +44,7 @@ class LeaveEvent implements GuildMemberAddEvent {
         avatarURL: config.image.botIcon,
       });
     } catch (error) {
-      await prisma.leaveNotice.delete({
-        where: {
-          guildId: noticeData.guildId,
-        },
-      });
+      await deleteLeaveNotice(noticeData.guildId);
 
       const channel = await Fetch.channel(member.guild, noticeData.channelId);
 

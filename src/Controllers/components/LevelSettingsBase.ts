@@ -1,0 +1,77 @@
+import {
+  ButtonInteraction,
+  ChannelSelectMenuInteraction,
+  Colors,
+  ContainerBuilder,
+  InteractionResponse,
+  MessageFlags,
+  PermissionFlagsBits,
+} from "discord.js";
+import config from "@/config";
+import { findLevelSetting, findLevelGuildSetting } from "@/Models/Level";
+import {
+  buildLevelSettingsPanel,
+  DEFAULT_LEVEL_SETTINGS,
+  LevelSettings,
+} from "@/Views/commands/levelSettingsPanel";
+
+// customId のキー → DB カラム (ホワイトリスト。これ以外の文字列が SQL に入ることはない)
+export const COLUMNS = {
+  notify: '"notify"',
+  mention: '"mention"',
+  card: '"card"',
+} as const;
+
+export type SettingKey = keyof typeof COLUMNS;
+export type PanelInteraction = ButtonInteraction | ChannelSelectMenuInteraction;
+
+// レベル設定パネルのボタン/チャンネル選択コントローラー共通基盤。
+// kind を持たないため、ローダーはコントローラーとして登録しない。
+abstract class LevelSettingsBase {
+  // 現在の DB の状態からパネルを組み立てる (管理者にはギルド設定も付く)
+  protected async buildPanel(
+    interaction: PanelInteraction,
+    userSettings?: LevelSettings,
+  ): Promise<ContainerBuilder> {
+    let settings = userSettings;
+    if (!settings) {
+      const row = await findLevelSetting(interaction.user.id);
+      settings = {
+        notify: row?.notify ?? DEFAULT_LEVEL_SETTINGS.notify,
+        mention: row?.mention ?? DEFAULT_LEVEL_SETTINGS.mention,
+        card: row?.card ?? DEFAULT_LEVEL_SETTINGS.card,
+      };
+    }
+
+    let guild: { notifyChannelId: string | null } | undefined;
+    if (
+      interaction.inGuild() &&
+      interaction.memberPermissions?.has(PermissionFlagsBits.ManageGuild)
+    ) {
+      const guildSetting = await findLevelGuildSetting(interaction.guildId);
+      guild = { notifyChannelId: guildSetting?.notifyChannelId ?? null };
+    }
+
+    return buildLevelSettingsPanel(interaction.user.id, settings, guild);
+  }
+
+  protected async deny(
+    interaction: PanelInteraction,
+  ): Promise<InteractionResponse<boolean>> {
+    return await interaction.reply({
+      embeds: [
+        {
+          color: Colors.Red,
+          author: {
+            name: "設定を更新できませんでした",
+            icon_url: config.image.errorIcon,
+          },
+          description: "このコマンドは別の人が操作しています",
+        },
+      ],
+      flags: MessageFlags.Ephemeral,
+    });
+  }
+}
+
+export default LevelSettingsBase;

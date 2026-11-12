@@ -1,6 +1,13 @@
 import { Client, Colors } from "discord.js";
 import cron from "node-cron";
-import { prisma } from "@/Models/db";
+import { countCommandHistorySince } from "@/Models/CommandHistory";
+import { createSystemLog } from "@/Models/SystemLog";
+import { createShardStatus } from "@/Models/ShardStatus";
+import { resetAllGuildStatistics } from "@/Models/GuildStatistics";
+import { deleteExpiredMuteIp } from "@/Models/MuteIp";
+import { deleteExpiredWebauth } from "@/Models/Webauth";
+import { deleteExpiredCommandCooldown } from "@/Models/CommandCooldown";
+import { findBumpNotice, findUpNotice } from "@/Models/BoardNotice";
 import Log from "@/util/Log";
 import getUserCount from "@/Models/getUserCount";
 import getGuildCount from "@/Models/getGuildCount";
@@ -38,26 +45,18 @@ class Cron {
   }
 
   private async recordSystemLog(): Promise<void> {
-    const commandCount = await prisma.commandHistory.count({
-      where: {
-        executedAt: {
-          gte: new Date(Date.now() - 3600000),
-        },
-      },
-    });
+    const commandCount = await countCommandHistorySince(new Date(Date.now() - 3600000));
 
     const loggedAt = new Date();
 
     loggedAt.setMinutes(0, 0, 0);
 
-    await prisma.systemLog.create({
-      data: {
-        ping: this.client.ws.ping,
-        totalUser: await getUserCount(this.client),
-        totalGuild: await getGuildCount(this.client),
-        totalCommand: commandCount,
-        loggedAt: loggedAt,
-      },
+    await createSystemLog({
+      ping: this.client.ws.ping,
+      totalUser: await getUserCount(this.client),
+      totalGuild: await getGuildCount(this.client),
+      totalCommand: commandCount,
+      loggedAt: loggedAt,
     });
 
     Log.debug("システムログを記録しました");
@@ -66,33 +65,17 @@ class Cron {
   private async recordShardStatus(): Promise<void> {
     const shardData = await getShardStatus(this.client);
 
-    await prisma.shardStatus.create({
-      data: {
-        data: JSON.stringify(shardData),
-      },
-    });
+    await createShardStatus(JSON.stringify(shardData));
   }
 
   private async resetGuildStatistics(): Promise<void> {
-    await prisma.guildStatistics.updateMany({
-      data: {
-        totalJoin: 0,
-        totalLeave: 0,
-        totalMessage: 0,
-      },
-    });
+    await resetAllGuildStatistics();
 
     Log.debug(`サーバー統計情報を削除しました`);
   }
 
   private async deleteMuteIp(): Promise<void> {
-    const { count } = await prisma.muteIp.deleteMany({
-      where: {
-        createdAt: {
-          lt: new Date(Date.now() - 2592000000),
-        },
-      },
-    });
+    const { count } = await deleteExpiredMuteIp(new Date(Date.now() - 2592000000));
 
     if (count === 0) return;
 
@@ -100,13 +83,7 @@ class Cron {
   }
 
   private async deleteExpiredAuth(): Promise<void> {
-    const { count } = await prisma.webauth.deleteMany({
-      where: {
-        createdAt: {
-          lt: new Date(Date.now() - 300000),
-        },
-      },
-    });
+    const { count } = await deleteExpiredWebauth(new Date(Date.now() - 300000));
 
     if (count === 0) return;
 
@@ -114,13 +91,7 @@ class Cron {
   }
 
   private async deleteCommandCooldown(): Promise<void> {
-    const { count } = await prisma.commandCooldown.deleteMany({
-      where: {
-        executedAt: {
-          lt: new Date(Date.now() - 604800000),
-        },
-      },
-    });
+    const { count } = await deleteExpiredCommandCooldown(new Date(Date.now() - 604800000));
 
     if (count === 0) return;
 
@@ -160,11 +131,7 @@ class Cron {
             let sent = false;
 
             if (notification.type === NotificationType.bump) {
-              const bumpNoticeData = await prisma.bumpNotice.findUnique({
-                where: {
-                  guildId: notification.guildId,
-                },
-              });
+              const bumpNoticeData = await findBumpNotice(notification.guildId);
 
               sent = await channel
                 .send({
@@ -181,11 +148,7 @@ class Cron {
                 .then(() => true)
                 .catch(() => false);
             } else if (notification.type === NotificationType.dissoku) {
-              const upNoticeData = await prisma.upNotice.findUnique({
-                where: {
-                  guildId: notification.guildId,
-                },
-              });
+              const upNoticeData = await findUpNotice(notification.guildId);
               sent = await channel
                 .send({
                   content: upNoticeData ? `<@&${upNoticeData.roleId}>` : "",
@@ -201,11 +164,7 @@ class Cron {
                 .then(() => true)
                 .catch(() => false);
             } else if (notification.type === NotificationType.tksmup) {
-              const upNoticeData = await prisma.upNotice.findUnique({
-                where: {
-                  guildId: notification.guildId,
-                },
-              });
+              const upNoticeData = await findUpNotice(notification.guildId);
 
               sent = await channel
                 .send({

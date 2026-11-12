@@ -4,7 +4,7 @@ import path from "path";
 import { pathToFileURL } from "url";
 import Log from "@/util/Log";
 import {
-  InteractionCreateEvent,
+  ComponentController,
   MessageCreateEvent,
   ReadyEvent,
   GuildCreateEvent,
@@ -19,7 +19,7 @@ class EventLoader {
   public readonly readyEvents: ReadyEvent[] = [];
   public readonly messageCreateEvent: MessageCreateEvent[] = [];
   public readonly messageUpdateEvent: MessageUpdateEvent[] = [];
-  public readonly interactionCreateEvent: InteractionCreateEvent[] = [];
+  public readonly componentControllers: ComponentController[] = [];
   public readonly guildCreateEvent: GuildCreateEvent[] = [];
   public readonly guildDeleteEvent: GuildDeleteEvent[] = [];
   public readonly guildMemberAddEvent: GuildMemberAddEvent[] = [];
@@ -33,7 +33,7 @@ class EventLoader {
     await this.loadReadyEvent();
     await this.loadMessageCreateEvent();
     await this.loadMessageUpdateEvent();
-    await this.loadInteractionCreateEvent();
+    await this.loadComponentControllers();
     await this.loadGuildCreateEvent();
     await this.loadGuildDeleteEvent();
     await this.loadGuildMemberAddEvent();
@@ -74,16 +74,20 @@ class EventLoader {
     Log.debug("MessageUpdateイベントをロードしました");
   }
 
-  private async loadInteractionCreateEvent(): Promise<void> {
-    for (const filePath of await this.getFiles("./src/Events/interactionCreate")) {
+  private async loadComponentControllers(): Promise<void> {
+    for (const filePath of await this.getFiles("./src/Controllers/components")) {
       const moduleURL = pathToFileURL(filePath).href;
       const module = (await import(moduleURL)) as {
-        default: new (client: Client) => InteractionCreateEvent;
+        default: new (client: Client) => ComponentController;
       };
-      this.interactionCreateEvent.push(new module.default(this.client));
+      const controller = new module.default(this.client);
+      // kind を持たないファイル (共有ベースクラス等) はコントローラーとして登録しない
+      if ("kind" in controller) {
+        this.componentControllers.push(controller);
+      }
     }
 
-    Log.debug("InteractionCreateイベントをロードしました");
+    Log.debug("コンポーネントコントローラーをロードしました");
   }
 
   private async loadGuildCreateEvent(): Promise<void> {

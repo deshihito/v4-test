@@ -12,7 +12,11 @@ import {
 import { Command, CommandType } from "@/@types/Util";
 import CommandUtils from "@/Controllers/CommandUtils";
 import config from "@/config";
-import { prisma } from "@/Models/db";
+import {
+  findGuildBoard,
+  updateGuildBoardInviteUrl,
+  updateGuildBoardUpdatedAt,
+} from "@/Models/GuildBoard";
 import { NotificationQueueService } from "@/Models/NotificationQueue";
 import { NotificationType } from "@/generated";
 import { buildBumpRtaEmbed, finishBumpRtaRound } from "@/Models/bumpRta";
@@ -46,11 +50,7 @@ class UpCommand implements Command {
     )
       return;
 
-    const registerData = await prisma.guildBoard.findUnique({
-      where: {
-        guildId: interaction.guildId,
-      },
-    });
+    const registerData = await findGuildBoard(interaction.guildId);
 
     if (!registerData)
       return await interaction.reply({
@@ -126,24 +126,10 @@ class UpCommand implements Command {
           flags: MessageFlags.Ephemeral,
         });
 
-      await prisma.guildBoard.update({
-        where: {
-          guildId: interaction.guildId,
-        },
-        data: {
-          inviteUrl: invite.url,
-        },
-      });
+      await updateGuildBoardInviteUrl(interaction.guildId, invite.url);
     }
 
-    await prisma.guildBoard.update({
-      where: {
-        guildId: interaction.guildId,
-      },
-      data: {
-        updatedAt: new Date(),
-      },
-    });
+    await updateGuildBoardUpdatedAt(interaction.guildId, new Date());
 
     await interaction.reply({
       embeds: [

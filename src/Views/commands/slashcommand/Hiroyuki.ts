@@ -14,7 +14,11 @@ import {
 import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
-import { prisma } from "@/Models/db";
+import {
+  findHiroyukiByGuildId,
+  createHiroyuki,
+  deleteManyHiroyukiByGuildId,
+} from "@/Models/Hiroyuki";
 import deleteWebhook from "@/Models/deleteWebhook";
 import deleteDuplicateWebhook from "@/Models/deleteDuplicateWebhook";
 
@@ -52,18 +56,10 @@ class HiroyukiCommand implements Command {
     )
       return;
 
-    const hiroyukiData = await prisma.hiroyuki.findFirst({
-      where: {
-        guildId: interaction.guild.id,
-      },
-    });
+    const hiroyukiData = await findHiroyukiByGuildId(interaction.guild.id);
 
     if (hiroyukiData) {
-      await prisma.hiroyuki.deleteMany({
-        where: {
-          guildId: interaction.guild.id,
-        },
-      });
+      await deleteManyHiroyukiByGuildId(interaction.guild.id);
 
       void deleteWebhook(hiroyukiData.webhookUrl);
 
@@ -118,12 +114,10 @@ class HiroyukiCommand implements Command {
           avatar: config.image.hiroyukiIcon,
         });
 
-        await prisma.hiroyuki.create({
-          data: {
-            channelId: interaction.channelId,
-            guildId: interaction.guildId,
-            webhookUrl: webhook.url,
-          },
+        await createHiroyuki({
+          channelId: interaction.channelId,
+          guildId: interaction.guildId,
+          webhookUrl: webhook.url,
         });
 
         await interaction.editReply({

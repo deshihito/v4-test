@@ -1,7 +1,7 @@
 import { Client, Message, Colors, PermissionFlagsBits, ChannelType } from "discord.js";
 import { MessageCreateEvent } from "@/@types/Util";
 import config from "@/config";
-import { prisma } from "@/Models/db";
+import { findBumpNoticeIgnore } from "@/Models/BoardNotice";
 import { NotificationQueueService } from "@/Models/NotificationQueue";
 import { NotificationType } from "@/generated";
 import { buildBumpRtaEmbed, finishBumpRtaRound, resolveBumpActorId } from "@/Models/bumpRta";
@@ -31,11 +31,7 @@ class BumpEvent implements MessageCreateEvent {
       (message.embeds[0]?.description.match(/表示順をアップしたよ/) ||
         message.embeds[0]?.description.match(/Bump done/))
     ) {
-      const bumpNoticeIgnoreData = await prisma.bumpNoticeIgnore.findUnique({
-        where: {
-          guildId: message.guild.id,
-        },
-      });
+      const bumpNoticeIgnoreData = await findBumpNoticeIgnore(message.guild.id);
 
       if (bumpNoticeIgnoreData) return;
 

@@ -12,7 +12,12 @@ import {
 import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
-import { prisma } from "@/Models/db";
+import {
+  createPublish,
+  deletePublish,
+  findPublish,
+  listPublishesByGuild,
+} from "@/Models/Publish";
 
 class PublishCommand implements Command {
   public readonly client: Client;
@@ -49,18 +54,10 @@ class PublishCommand implements Command {
     )
       return;
 
-    const publishData = await prisma.publish.findUnique({
-      where: {
-        channelId: interaction.channelId,
-      },
-    });
+    const publishData = await findPublish(interaction.channelId);
 
     if (publishData) {
-      await prisma.publish.delete({
-        where: {
-          channelId: interaction.channelId,
-        },
-      });
+      await deletePublish(interaction.channelId);
 
       await interaction.reply({
         embeds: [
@@ -74,11 +71,7 @@ class PublishCommand implements Command {
         ],
       });
     } else {
-      const publishGuilds = await prisma.publish.findMany({
-        where: {
-          guildId: interaction.guildId,
-        },
-      });
+      const publishGuilds = await listPublishesByGuild(interaction.guildId);
 
       if (publishGuilds.length >= 6)
         return await interaction.reply({
@@ -110,12 +103,7 @@ class PublishCommand implements Command {
           flags: MessageFlags.Ephemeral,
         });
 
-      await prisma.publish.create({
-        data: {
-          channelId: interaction.channelId,
-          guildId: interaction.guildId,
-        },
-      });
+      await createPublish(interaction.channelId, interaction.guildId);
 
       await interaction.reply({
         embeds: [

@@ -16,7 +16,7 @@ import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
 import calcBoost from "@/util/calcBoost";
-import { prisma } from "@/Models/db";
+import { findGuildStatistics } from "@/Models/GuildStatistics";
 
 class Serverommand implements Command {
   public readonly client: Client;
@@ -67,11 +67,7 @@ class Serverommand implements Command {
         ? `\nシャード:${ShardClientUtil.shardIdForGuildId(interaction.guild.id, config.shardCount)}番`
         : "";
 
-      const stats: guildStatistics | null = await prisma.guildStatistics.findUnique({
-        where: {
-          guildId: interaction.guild.id,
-        },
-      });
+      const stats: guildStatistics | null = await findGuildStatistics(interaction.guild.id);
 
       await interaction.editReply({
         embeds: [

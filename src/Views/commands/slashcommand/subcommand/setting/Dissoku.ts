@@ -9,7 +9,12 @@ import { SubCommand, ValidSubCommandInteraction } from "@/@types/Util";
 import CommandUtils from "@/Controllers/CommandUtils";
 import config from "@/config";
 import Fetch from "@/Models/Fetch";
-import { prisma } from "@/Models/db";
+import {
+  createDissokuNotice,
+  deleteDissokuNotice,
+  findDissokuNotice,
+  upsertDissokuNotice,
+} from "@/Models/BoardNotice";
 
 class DissokuSubCommand implements SubCommand {
   public readonly client: Client;
@@ -40,11 +45,7 @@ class DissokuSubCommand implements SubCommand {
 
     const role = interaction.options.getRole("role");
 
-    const dissokuNoticeData = await prisma.dissokuNotice.findUnique({
-      where: {
-        guildId: interaction.guildId,
-      },
-    });
+    const dissokuNoticeData = await findDissokuNotice(interaction.guildId);
 
     if (!dissokuNoticeData) {
       if (!role)
@@ -76,12 +77,7 @@ class DissokuSubCommand implements SubCommand {
           ],
         });
 
-      await prisma.dissokuNotice.create({
-        data: {
-          guildId: interaction.guildId,
-          roleId: role.id,
-        },
-      });
+      await createDissokuNotice(interaction.guildId, role.id);
 
       await interaction.reply({
         embeds: [
@@ -112,18 +108,7 @@ class DissokuSubCommand implements SubCommand {
             ],
           });
 
-        await prisma.dissokuNotice.upsert({
-          where: {
-            guildId: interaction.guildId,
-          },
-          update: {
-            roleId: role.id,
-          },
-          create: {
-            guildId: interaction.guildId,
-            roleId: role.id,
-          },
-        });
+        await upsertDissokuNotice(interaction.guildId, role.id);
 
         await interaction.reply({
           embeds: [
@@ -138,11 +123,7 @@ class DissokuSubCommand implements SubCommand {
           ],
         });
       } else {
-        await prisma.dissokuNotice.delete({
-          where: {
-            guildId: interaction.guildId,
-          },
-        });
+        await deleteDissokuNotice(interaction.guildId);
 
         await interaction.reply({
           embeds: [

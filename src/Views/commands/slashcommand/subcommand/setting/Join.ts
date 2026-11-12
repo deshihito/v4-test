@@ -13,7 +13,12 @@ import {
 import { SubCommand, ValidSubCommandInteraction } from "@/@types/Util";
 import CommandUtils from "@/Controllers/CommandUtils";
 import config from "@/config";
-import { prisma } from "@/Models/db";
+import {
+  createJoinNotice,
+  deleteJoinNotice,
+  findJoinNotice,
+  updateJoinNoticeMessage,
+} from "@/Models/BoardNotice";
 import deleteDuplicateWebhook from "@/Models/deleteDuplicateWebhook";
 import deleteWebhook from "@/Models/deleteWebhook";
 
@@ -48,11 +53,7 @@ class JoinSubCommand implements SubCommand {
 
     const message: string | null = interaction.options.getString("message");
 
-    const noticeData = await prisma.joinNotice.findUnique({
-      where: {
-        guildId: interaction.guildId,
-      },
-    });
+    const noticeData = await findJoinNotice(interaction.guildId);
 
     if (
       noticeData &&
@@ -73,14 +74,7 @@ class JoinSubCommand implements SubCommand {
             },
           ],
         });
-      await prisma.joinNotice.update({
-        where: {
-          guildId: interaction.guildId,
-        },
-        data: {
-          message: message,
-        },
-      });
+      await updateJoinNoticeMessage(interaction.guildId, message);
 
       return await interaction.reply({
         embeds: [
@@ -97,11 +91,7 @@ class JoinSubCommand implements SubCommand {
     }
 
     if (noticeData) {
-      const joinNotice = await prisma.joinNotice.delete({
-        where: {
-          guildId: interaction.guildId,
-        },
-      });
+      const joinNotice = await deleteJoinNotice(interaction.guildId);
 
       void deleteWebhook(joinNotice.webhookUrl);
 
@@ -176,14 +166,12 @@ class JoinSubCommand implements SubCommand {
         avatar: config.image.botIcon,
       });
 
-      await prisma.joinNotice.create({
-        data: {
-          guildId: interaction.guildId,
-          channelId: interaction.channelId,
-          webhookUrl: webhook.url,
-          message: message,
-        },
-      });
+      await createJoinNotice(
+        interaction.guildId,
+        interaction.channelId,
+        webhook.url,
+        message,
+      );
 
       await interaction.editReply({
         embeds: [

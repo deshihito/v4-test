@@ -16,7 +16,7 @@ import {
 import { Command, CommandType } from "@/@types/Util";
 import CommandUtils from "@/Controllers/CommandUtils";
 import config from "@/config";
-import { prisma } from "@/Models/db";
+import { deleteGuildBoard, findGuildBoard } from "@/Models/GuildBoard";
 
 class RegisterCommand implements Command {
   public readonly client: Client;
@@ -47,18 +47,10 @@ class RegisterCommand implements Command {
     )
       return;
 
-    const registerData = await prisma.guildBoard.findUnique({
-      where: {
-        guildId: interaction.guildId,
-      },
-    });
+    const registerData = await findGuildBoard(interaction.guildId);
 
     if (registerData) {
-      await prisma.guildBoard.delete({
-        where: {
-          guildId: interaction.guildId,
-        },
-      });
+      await deleteGuildBoard(interaction.guildId);
 
       await interaction.reply({
         embeds: [

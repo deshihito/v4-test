@@ -9,7 +9,7 @@ import {
 } from "discord.js";
 import { MessageUpdateEvent } from "@/@types/Util";
 import config from "@/config";
-import { prisma } from "@/Models/db";
+import { findDissokuNoticeIgnore } from "@/Models/BoardNotice";
 import { NotificationQueueService } from "@/Models/NotificationQueue";
 import { NotificationType } from "@/generated";
 import { buildBumpRtaEmbed, finishBumpRtaRound, resolveBumpActorId } from "@/Models/bumpRta";
@@ -44,11 +44,7 @@ class AfkEvent implements MessageUpdateEvent {
       (newMessage.embeds[0]?.fields[0]?.name.match(/をアップしたよ/) ||
         newMessage.embeds[0]?.fields[0]?.name.match(/I've bumped up/))
     ) {
-      const dissokuNoticeIgnoreData = await prisma.dissokuNoticeIgnore.findUnique({
-        where: {
-          guildId: newMessage.guild.id,
-        },
-      });
+      const dissokuNoticeIgnoreData = await findDissokuNoticeIgnore(newMessage.guild.id);
 
       if (dissokuNoticeIgnoreData) return;
 

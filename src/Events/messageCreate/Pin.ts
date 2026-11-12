@@ -2,7 +2,7 @@ import { Client, Message, ChannelType, WebhookClient } from "discord.js";
 import { MessageCreateEvent } from "@/@types/Util";
 import RateLimit from "@/Controllers/RateLimit";
 import sleep from "@/util/sleep";
-import { prisma } from "@/Models/db";
+import { deletePin, findPin, updatePinMessageId } from "@/Models/Pin";
 
 class PinEvent implements MessageCreateEvent {
   public readonly client: Client;
@@ -15,11 +15,7 @@ class PinEvent implements MessageCreateEvent {
   public async execute(message: Message): Promise<Message | void> {
     if (message.author.bot || message.channel.type === ChannelType.GroupDM) return;
 
-    const pinData = await prisma.pin.findUnique({
-      where: {
-        channelId: message.channel.id,
-      },
-    });
+    const pinData = await findPin(message.channel.id);
 
     if (!pinData) return;
 
@@ -37,18 +33,9 @@ class PinEvent implements MessageCreateEvent {
         embeds: beforeMsg.embeds,
       });
 
-      await prisma.pin.update({
-        where: { channelId: pinData.channelId },
-        data: {
-          messegeId: afterMsg.id,
-        },
-      });
+      await updatePinMessageId(pinData.channelId, afterMsg.id);
     } catch {
-      await prisma.pin.delete({
-        where: {
-          channelId: message.channel.id,
-        },
-      });
+      await deletePin(message.channel.id);
     }
   }
 }

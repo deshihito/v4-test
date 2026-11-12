@@ -15,7 +15,12 @@ import {
 import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
-import { prisma } from "@/Models/db";
+import {
+  findGlobalChatByGuildId,
+  createGlobalChat,
+  countGlobalChats,
+  deleteGlobalChatByGuildId,
+} from "@/Models/GlobalChat";
 import sendGlobalChat from "@/Models/sendGlobalChat";
 import deleteWebhook from "@/Models/deleteWebhook";
 import Random from "@/util/Random";
@@ -59,11 +64,7 @@ class GlobalchatCommand implements Command {
     )
       return;
 
-    const guildGlobalChatData = await prisma.globalChat.findUnique({
-      where: {
-        guildId: interaction.guildId,
-      },
-    });
+    const guildGlobalChatData = await findGlobalChatByGuildId(interaction.guildId);
 
     if (!guildGlobalChatData) {
       if (
@@ -123,12 +124,10 @@ class GlobalchatCommand implements Command {
           avatar: config.image.botIcon,
         });
 
-        await prisma.globalChat.create({
-          data: {
-            channelId: interaction.channelId,
-            guildId: interaction.guildId,
-            webhookUrl: webhook.url,
-          },
+        await createGlobalChat({
+          channelId: interaction.channelId,
+          guildId: interaction.guildId,
+          webhookUrl: webhook.url,
         });
 
         await interaction.editReply({
@@ -148,7 +147,7 @@ class GlobalchatCommand implements Command {
         await sendGlobalChat({
           title: `${interaction.guild.name}<${interaction.guild.id}>`,
           desc: "グローバルチャットに新しいサーバーが参加しました！\nみんなで挨拶しましょう!",
-          footerText: `登録数:${await prisma.globalChat.count()}`,
+          footerText: `登録数:${await countGlobalChats()}`,
           userName: "TakasumiBOT Global (System)",
           fromServerId: interaction.guild.id,
           thumbnailUrl:
@@ -184,11 +183,7 @@ class GlobalchatCommand implements Command {
         });
       }
     } else {
-      const gcData = await prisma.globalChat.delete({
-        where: {
-          guildId: interaction.guildId,
-        },
-      });
+      const gcData = await deleteGlobalChatByGuildId(interaction.guildId);
 
       void deleteWebhook(gcData.webhookUrl);
 

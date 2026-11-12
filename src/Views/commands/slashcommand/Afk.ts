@@ -10,7 +10,7 @@ import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
 import calcTime from "@/util/calcTime";
-import { prisma } from "@/Models/db";
+import { findAfk, deleteAfk, createAfk } from "@/Models/Afk";
 
 class AfkCommand implements Command {
   public readonly client: Client;
@@ -43,18 +43,10 @@ class AfkCommand implements Command {
 
     const message: string = interaction.options.getString("message") || "メッセージはありません";
 
-    const afkData = await prisma.afk.findUnique({
-      where: {
-        userId: interaction.user.id,
-      },
-    });
+    const afkData = await findAfk(interaction.user.id);
 
     if (afkData) {
-      await prisma.afk.delete({
-        where: {
-          userId: interaction.user.id,
-        },
-      });
+      await deleteAfk(interaction.user.id);
 
       await interaction.reply({
         embeds: [
@@ -69,12 +61,7 @@ class AfkCommand implements Command {
         ],
       });
     } else {
-      await prisma.afk.create({
-        data: {
-          userId: interaction.user.id,
-          message: message,
-        },
-      });
+      await createAfk(interaction.user.id, message);
 
       await interaction.reply({
         embeds: [

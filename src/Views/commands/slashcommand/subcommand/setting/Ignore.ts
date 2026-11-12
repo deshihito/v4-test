@@ -2,7 +2,17 @@ import { Client, InteractionResponse, Colors, SlashCommandSubcommandBuilder } fr
 import { SubCommand, ValidSubCommandInteraction } from "@/@types/Util";
 import CommandUtils from "@/Controllers/CommandUtils";
 import config from "@/config";
-import { prisma } from "@/Models/db";
+import {
+  createBumpNoticeIgnore,
+  createDissokuNoticeIgnore,
+  createUpNoticeIgnore,
+  deleteBumpNoticeIgnore,
+  deleteDissokuNoticeIgnore,
+  deleteUpNoticeIgnore,
+  findBumpNoticeIgnore,
+  findDissokuNoticeIgnore,
+  findUpNoticeIgnore,
+} from "@/Models/BoardNotice";
 
 class IgnoreSubCommand implements SubCommand {
   public readonly client: Client;
@@ -31,18 +41,10 @@ class IgnoreSubCommand implements SubCommand {
     const type = interaction.options.getString("type", true);
 
     if (type === "bump") {
-      const bumpNoticeIgnoreData = await prisma.bumpNoticeIgnore.findUnique({
-        where: {
-          guildId: interaction.guildId,
-        },
-      });
+      const bumpNoticeIgnoreData = await findBumpNoticeIgnore(interaction.guildId);
 
       if (!bumpNoticeIgnoreData) {
-        await prisma.bumpNoticeIgnore.create({
-          data: {
-            guildId: interaction.guildId,
-          },
-        });
+        await createBumpNoticeIgnore(interaction.guildId);
 
         await interaction.reply({
           embeds: [
@@ -56,11 +58,7 @@ class IgnoreSubCommand implements SubCommand {
           ],
         });
       } else {
-        await prisma.bumpNoticeIgnore.delete({
-          where: {
-            guildId: interaction.guildId,
-          },
-        });
+        await deleteBumpNoticeIgnore(interaction.guildId);
 
         await interaction.reply({
           embeds: [
@@ -75,18 +73,10 @@ class IgnoreSubCommand implements SubCommand {
         });
       }
     } else if (type === "dissoku") {
-      const dissokuNoticeIgnoreData = await prisma.dissokuNoticeIgnore.findUnique({
-        where: {
-          guildId: interaction.guildId,
-        },
-      });
+      const dissokuNoticeIgnoreData = await findDissokuNoticeIgnore(interaction.guildId);
 
       if (!dissokuNoticeIgnoreData) {
-        await prisma.dissokuNoticeIgnore.create({
-          data: {
-            guildId: interaction.guildId,
-          },
-        });
+        await createDissokuNoticeIgnore(interaction.guildId);
 
         await interaction.reply({
           embeds: [
@@ -100,11 +90,7 @@ class IgnoreSubCommand implements SubCommand {
           ],
         });
       } else {
-        await prisma.dissokuNoticeIgnore.delete({
-          where: {
-            guildId: interaction.guildId,
-          },
-        });
+        await deleteDissokuNoticeIgnore(interaction.guildId);
 
         await interaction.reply({
           embeds: [
@@ -119,18 +105,10 @@ class IgnoreSubCommand implements SubCommand {
         });
       }
     } else if (type === "up") {
-      const upNoticeIgnoreData = await prisma.upNoticeIgnore.findUnique({
-        where: {
-          guildId: interaction.guildId,
-        },
-      });
+      const upNoticeIgnoreData = await findUpNoticeIgnore(interaction.guildId);
 
       if (!upNoticeIgnoreData) {
-        await prisma.upNoticeIgnore.create({
-          data: {
-            guildId: interaction.guildId,
-          },
-        });
+        await createUpNoticeIgnore(interaction.guildId);
 
         await interaction.reply({
           embeds: [
@@ -144,11 +122,7 @@ class IgnoreSubCommand implements SubCommand {
           ],
         });
       } else {
-        await prisma.upNoticeIgnore.delete({
-          where: {
-            guildId: interaction.guildId,
-          },
-        });
+        await deleteUpNoticeIgnore(interaction.guildId);
 
         await interaction.reply({
           embeds: [

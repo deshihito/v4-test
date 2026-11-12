@@ -2,7 +2,15 @@ import { Client, InteractionResponse, Colors, SlashCommandSubcommandBuilder } fr
 import { SubCommand, ValidSubCommandInteraction } from "@/@types/Util";
 import CommandUtils from "@/Controllers/CommandUtils";
 import config from "@/config";
-import { prisma } from "@/Models/db";
+import {
+  findBumpNoticeIgnore,
+  findDissokuNoticeIgnore,
+  findJoinNotice,
+  findLeaveNotice,
+  findUpNoticeIgnore,
+} from "@/Models/BoardNotice";
+import { listPinsByGuild } from "@/Models/Pin";
+import { listPublishesByGuild } from "@/Models/Publish";
 
 class StatusSubCommand implements SubCommand {
   public readonly client: Client;
@@ -28,47 +36,19 @@ class StatusSubCommand implements SubCommand {
     )
       return;
 
-    const joinNoticeData = await prisma.joinNotice.findUnique({
-      where: {
-        guildId: interaction.guildId,
-      },
-    });
+    const joinNoticeData = await findJoinNotice(interaction.guildId);
 
-    const leaveNoticeData = await prisma.leaveNotice.findUnique({
-      where: {
-        guildId: interaction.guildId,
-      },
-    });
+    const leaveNoticeData = await findLeaveNotice(interaction.guildId);
 
-    const publishData = await prisma.publish.findMany({
-      where: {
-        guildId: interaction.guildId,
-      },
-    });
+    const publishData = await listPublishesByGuild(interaction.guildId);
 
-    const pinGuildsData = await prisma.pin.findMany({
-      where: {
-        guildId: interaction.guildId,
-      },
-    });
+    const pinGuildsData = await listPinsByGuild(interaction.guildId);
 
-    const bumpNoticeIgnoreData = await prisma.bumpNoticeIgnore.findUnique({
-      where: {
-        guildId: interaction.guildId,
-      },
-    });
+    const bumpNoticeIgnoreData = await findBumpNoticeIgnore(interaction.guildId);
 
-    const dissokuNoticeIgnoreData = await prisma.dissokuNoticeIgnore.findUnique({
-      where: {
-        guildId: interaction.guildId,
-      },
-    });
+    const dissokuNoticeIgnoreData = await findDissokuNoticeIgnore(interaction.guildId);
 
-    const upNoticeIgnoreData = await prisma.upNoticeIgnore.findUnique({
-      where: {
-        guildId: interaction.guildId,
-      },
-    });
+    const upNoticeIgnoreData = await findUpNoticeIgnore(interaction.guildId);
 
     await interaction.reply({
       embeds: [

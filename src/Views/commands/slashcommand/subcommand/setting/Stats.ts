@@ -2,7 +2,11 @@ import { Client, InteractionResponse, Colors, SlashCommandSubcommandBuilder } fr
 import { SubCommand, ValidSubCommandInteraction } from "@/@types/Util";
 import CommandUtils from "@/Controllers/CommandUtils";
 import config from "@/config";
-import { prisma } from "@/Models/db";
+import {
+  createGuildStatistics,
+  deleteGuildStatistics,
+  findGuildStatistics,
+} from "@/Models/GuildStatistics";
 
 class JoinSubCommand implements SubCommand {
   public readonly client: Client;
@@ -30,18 +34,10 @@ class JoinSubCommand implements SubCommand {
     )
       return;
 
-    const guildStatisticsData = await prisma.guildStatistics.findUnique({
-      where: {
-        guildId: interaction.guildId,
-      },
-    });
+    const guildStatisticsData = await findGuildStatistics(interaction.guildId);
 
     if (!guildStatisticsData) {
-      await prisma.guildStatistics.create({
-        data: {
-          guildId: interaction.guildId,
-        },
-      });
+      await createGuildStatistics(interaction.guildId);
 
       await interaction.reply({
         embeds: [
@@ -55,11 +51,7 @@ class JoinSubCommand implements SubCommand {
         ],
       });
     } else {
-      await prisma.guildStatistics.delete({
-        where: {
-          guildId: interaction.guildId,
-        },
-      });
+      await deleteGuildStatistics(interaction.guildId);
 
       await interaction.reply({
         embeds: [

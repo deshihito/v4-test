@@ -1,20 +1,12 @@
 import { ModalBuilder, TextInputBuilder, TextInputStyle, LabelBuilder } from "discord.js";
 import config from "@/config";
 import { ValidCommandInteraction } from "@/@types/Util";
-import { prisma } from "@/Models/db";
+import { findRecentCommandHistory } from "@/Models/CommandHistory";
+import { upsertCheckHuman, findCheckHuman } from "@/Models/CheckHuman";
 
 class AntiCheat {
   public static async checkAutomation(command: string, userId: string): Promise<boolean> {
-    const recentHistory = await prisma.commandHistory.findMany({
-      where: {
-        userId: userId,
-        name: command,
-      },
-      orderBy: {
-        executedAt: "desc",
-      },
-      take: 6,
-    });
+    const recentHistory = await findRecentCommandHistory(userId, command);
 
     if (recentHistory.length < 3) return false;
 
@@ -54,27 +46,13 @@ class AntiCheat {
       .setTitle("あなたは人間ですか？")
       .addLabelComponents(code);
 
-    await prisma.checkHuman.upsert({
-      where: {
-        userId: interaction.user.id,
-      },
-      update: {
-        createdAt: new Date(),
-      },
-      create: {
-        userId: interaction.user.id,
-      },
-    });
+    await upsertCheckHuman(interaction.user.id, new Date());
 
     await interaction.showModal(check);
   }
 
   public static async isCheckingHuman(interaction: ValidCommandInteraction): Promise<boolean> {
-    const checkData = await prisma.checkHuman.findUnique({
-      where: {
-        userId: interaction.user.id,
-      },
-    });
+    const checkData = await findCheckHuman(interaction.user.id);
 
     if (!checkData) return false;
 

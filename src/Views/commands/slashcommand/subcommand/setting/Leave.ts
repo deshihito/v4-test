@@ -13,7 +13,11 @@ import {
 import { SubCommand, ValidSubCommandInteraction } from "@/@types/Util";
 import CommandUtils from "@/Controllers/CommandUtils";
 import config from "@/config";
-import { prisma } from "@/Models/db";
+import {
+  createLeaveNotice,
+  deleteLeaveNotice,
+  findLeaveNotice,
+} from "@/Models/BoardNotice";
 import deleteDuplicateWebhook from "@/Models/deleteDuplicateWebhook";
 import deleteWebhook from "@/Models/deleteWebhook";
 
@@ -47,18 +51,10 @@ class LeaveSubCommand implements SubCommand {
 
     const message: string | null = interaction.options.getString("message");
 
-    const noticeData = await prisma.leaveNotice.findUnique({
-      where: {
-        guildId: interaction.guildId,
-      },
-    });
+    const noticeData = await findLeaveNotice(interaction.guildId);
 
     if (noticeData) {
-      const leaveNotice = await prisma.leaveNotice.delete({
-        where: {
-          guildId: interaction.guildId,
-        },
-      });
+      const leaveNotice = await deleteLeaveNotice(interaction.guildId);
 
       void deleteWebhook(leaveNotice.webhookUrl);
 
@@ -128,14 +124,12 @@ class LeaveSubCommand implements SubCommand {
           avatar: config.image.botIcon,
         });
 
-        await prisma.leaveNotice.create({
-          data: {
-            guildId: interaction.guildId,
-            channelId: interaction.channelId,
-            webhookUrl: webhook.url,
-            message: message,
-          },
-        });
+        await createLeaveNotice(
+          interaction.guildId,
+          interaction.channelId,
+          webhook.url,
+          message,
+        );
 
         await interaction.editReply({
           embeds: [

@@ -9,7 +9,12 @@ import { SubCommand, ValidSubCommandInteraction } from "@/@types/Util";
 import CommandUtils from "@/Controllers/CommandUtils";
 import config from "@/config";
 import Fetch from "@/Models/Fetch";
-import { prisma } from "@/Models/db";
+import {
+  createBumpNotice,
+  deleteBumpNotice,
+  findBumpNotice,
+  upsertBumpNotice,
+} from "@/Models/BoardNotice";
 
 class BumpSubCommand implements SubCommand {
   public readonly client: Client;
@@ -40,11 +45,7 @@ class BumpSubCommand implements SubCommand {
 
     const role = interaction.options.getRole("role");
 
-    const bumpNoticeData = await prisma.bumpNotice.findUnique({
-      where: {
-        guildId: interaction.guildId,
-      },
-    });
+    const bumpNoticeData = await findBumpNotice(interaction.guildId);
 
     if (!bumpNoticeData) {
       if (!role)
@@ -76,12 +77,7 @@ class BumpSubCommand implements SubCommand {
           ],
         });
 
-      await prisma.bumpNotice.create({
-        data: {
-          guildId: interaction.guildId,
-          roleId: role.id,
-        },
-      });
+      await createBumpNotice(interaction.guildId, role.id);
 
       await interaction.reply({
         embeds: [
@@ -112,18 +108,7 @@ class BumpSubCommand implements SubCommand {
             ],
           });
 
-        await prisma.bumpNotice.upsert({
-          where: {
-            guildId: interaction.guildId,
-          },
-          update: {
-            roleId: role.id,
-          },
-          create: {
-            guildId: interaction.guildId,
-            roleId: role.id,
-          },
-        });
+        await upsertBumpNotice(interaction.guildId, role.id);
 
         await interaction.reply({
           embeds: [
@@ -138,11 +123,7 @@ class BumpSubCommand implements SubCommand {
           ],
         });
       } else {
-        await prisma.bumpNotice.delete({
-          where: {
-            guildId: interaction.guildId,
-          },
-        });
+        await deleteBumpNotice(interaction.guildId);
 
         await interaction.reply({
           embeds: [

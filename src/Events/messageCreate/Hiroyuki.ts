@@ -12,7 +12,7 @@ import {
 import { MessageCreateEvent } from "@/@types/Util";
 import config from "@/config";
 import RateLimit from "@/Controllers/RateLimit";
-import { prisma } from "@/Models/db";
+import { findHiroyukiByChannelId, deleteHiroyukiByGuildId } from "@/Models/Hiroyuki";
 import Random from "@/util/Random";
 
 class HiroyukiEvent implements MessageCreateEvent {
@@ -27,11 +27,7 @@ class HiroyukiEvent implements MessageCreateEvent {
     if (message.author.bot || !message.inGuild() || message.channel.type !== ChannelType.GuildText)
       return;
 
-    const hiroyukiData = await prisma.hiroyuki.findFirst({
-      where: {
-        channelId: message.channel.id,
-      },
-    });
+    const hiroyukiData = await findHiroyukiByChannelId(message.channel.id);
 
     if (!hiroyukiData) return;
 
@@ -168,11 +164,7 @@ class HiroyukiEvent implements MessageCreateEvent {
 
       await webhook.send(messageData);
     } catch (error) {
-      await prisma.hiroyuki.delete({
-        where: {
-          guildId: message.guildId,
-        },
-      });
+      await deleteHiroyukiByGuildId(message.guildId);
 
       await message.channel
         .send({

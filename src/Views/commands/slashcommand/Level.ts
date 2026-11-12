@@ -10,7 +10,13 @@ import {
 import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
-import { prisma } from "@/Models/db";
+import {
+  findLevelUser,
+  countLevelUsersAboveExp,
+  queryLevelUserTotalExp,
+  countLevelUsersByTotalExpAbove,
+  findLevelSetting,
+} from "@/Models/Level";
 import calcLevel from "@/util/calcLevel";
 import { renderLevelCard } from "@/Views/levelCard";
 
@@ -43,14 +49,7 @@ class LevelCommand implements Command {
     )
       return;
 
-    const data = await prisma.levelUser.findUnique({
-      where: {
-        userId_guildId: {
-          userId: interaction.user.id,
-          guildId: interaction.guild.id,
-        },
-      },
-    });
+    const data = await findLevelUser(interaction.user.id, interaction.guild.id);
 
     if (!data) {
       return await interaction.reply({
@@ -70,34 +69,17 @@ class LevelCommand implements Command {
     const { level, current, next } = calcLevel(data.chatExp);
 
     const serverRank =
-      (await prisma.levelUser.count({
-        where: {
-          guildId: interaction.guild.id,
-          chatExp: { gt: data.chatExp },
-        },
-      })) + 1;
+      (await countLevelUsersAboveExp(interaction.guild.id, data.chatExp)) + 1;
 
     // 全体順位はユーザーごとの全サーバー合計同士で比べる。
     // 集計は DB 側で完結させ、全行をメモリに読み込まない。
-    const totalRows = await prisma.$queryRaw<{ total: number }[]>`
-      SELECT COALESCE(SUM("chatExp"), 0)::int AS "total"
-      FROM "levelUser"
-      WHERE "userId" = ${interaction.user.id}`;
+    const totalRows = await queryLevelUserTotalExp(interaction.user.id);
     const totalExp: number = totalRows[0]?.total ?? data.chatExp;
 
-    const rankRows = await prisma.$queryRaw<{ count: number }[]>`
-      SELECT COUNT(*)::int AS "count"
-      FROM (
-        SELECT "userId"
-        FROM "levelUser"
-        GROUP BY "userId"
-        HAVING SUM("chatExp") > ${totalExp}
-      ) AS "totals"`;
+    const rankRows = await countLevelUsersByTotalExpAbove(totalExp);
     const globalRank: number = (rankRows[0]?.count ?? 0) + 1;
 
-    const cardSetting = await prisma.levelSetting.findUnique({
-      where: { userId: interaction.user.id },
-    });
+    const cardSetting = await findLevelSetting(interaction.user.id);
     const card =
       cardSetting?.card === false
         ? null

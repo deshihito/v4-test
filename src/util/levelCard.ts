@@ -20,24 +20,39 @@ export interface LevelCardData {
 
 const W = 1000;
 const H = 360;
-const FONT = '"LevelCardFont", "Noto Sans CJK JP", sans-serif';
+// TakasumiBOT 公式サイトの書体に合わせ、欧文は Geist、日本語は Noto Sans CJK。
+// Geist に無い字形は後続フォントへフォールバックする。
+const FONT = '"Geist", "LevelCardFont", "Noto Sans CJK JP", sans-serif';
 
 let fontTried = false;
 
-// 日本語フォントを登録する (失敗してもデフォルトフォントで描画を続ける)
+// フォントを登録する (失敗してもデフォルトフォントで描画を続ける)
 function registerFont(GlobalFonts: {
   registerFromPath: (path: string, name?: string) => boolean;
 }): void {
   if (fontTried) return;
   fontTried = true;
-  const candidates = [
-    "/home/luna/BOT/font.ttf",
+  const latinCandidates = [
+    process.env.LEVEL_CARD_FONT_LATIN,
+    "/srv/supabase-data/v4test/fonts/Geist-Bold.ttf",
+  ];
+  for (const path of latinCandidates) {
+    if (!path) continue;
+    try {
+      if (GlobalFonts.registerFromPath(path, "Geist")) break;
+    } catch {
+      // 次の候補へ
+    }
+  }
+  const jpCandidates = [
+    process.env.LEVEL_CARD_FONT_JP,
     "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
     "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
   ];
-  for (const path of candidates) {
+  for (const path of jpCandidates) {
+    if (!path) continue;
     try {
-      if (GlobalFonts.registerFromPath(path, "LevelCardFont")) return;
+      if (GlobalFonts.registerFromPath(path, "LevelCardFont")) break;
     } catch {
       // 次の候補へ
     }

@@ -15,6 +15,7 @@ import config from "@/config";
 import { prisma } from "@/util/db";
 import { NotificationQueueService } from "@/util/NotificationQueue";
 import { NotificationType } from "@/generated";
+import { buildBumpRtaEmbed, finishBumpRtaRound } from "@/util/bumpRta";
 
 class UpCommand implements Command {
   public readonly client: Client;
@@ -167,6 +168,20 @@ class UpCommand implements Command {
       type: NotificationType.tksmup,
       delay: 3600000,
     });
+
+    // RTA: 通知からのラウンドがあれば、この UP を記録する
+    if (interaction.guildId && interaction.channel) {
+      const result = await finishBumpRtaRound(
+        interaction.guildId,
+        NotificationType.tksmup,
+        interaction.user.id,
+      );
+      if (result) {
+        await interaction.channel
+          .send({ embeds: [buildBumpRtaEmbed(NotificationType.tksmup, interaction.user.id, result)] })
+          .catch(() => {});
+      }
+    }
   }
 
   public build(): SlashCommandOptionsOnlyBuilder {

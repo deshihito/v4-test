@@ -282,6 +282,32 @@ model NotificationQueue {
   channelId   String
   type        NotificationType
   scheduledAt DateTime
+  claimedAt   DateTime?
+
+  @@unique([guildId, type])
+  @@index([scheduledAt])
+}
+
+model BumpRtaRound {
+  guildId    String
+  type       NotificationType
+  channelId  String
+  notifiedAt DateTime
+
+  @@id([guildId, type])
+}
+
+model BumpRtaRecord {
+  id         Int              @id @default(autoincrement())
+  guildId    String
+  userId     String
+  type       NotificationType
+  elapsedMs  Int
+  achievedAt DateTime         @default(now())
+
+  @@index([guildId, type, elapsedMs])
+  @@index([type, elapsedMs])
+  @@index([userId, type, elapsedMs])
 }
 
 model ShardStatus {

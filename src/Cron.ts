@@ -5,6 +5,7 @@ import Log from "@/util/Log";
 import getUserCount from "@/util/getUserCount";
 import getGuildCount from "@/util/getGuildCount";
 import { NotificationQueueService } from "@/util/NotificationQueue";
+import { startBumpRtaRound } from "@/util/bumpRta";
 import { NotificationType } from "@/generated";
 import { env } from "@/util/Env";
 import { getShardStatus } from "./util/getShardStatus";
@@ -126,95 +127,117 @@ class Cron {
     Log.debug(`1週間以上経過した${count}個のCommandCoolDownを削除しました`);
   }
 
+  private sendingNotifications = false;
+
   private async sendNotifications(): Promise<void> {
-    const notifications = await NotificationQueueService.getAll();
+    // 前回の送信が終わっていない間は新しい送信を始めない。
+    // 送信対象は claimDue がアトミックに占有するので、
+    // 万一ランナーが複数立っても同じ通知が二重に送られることはない。
+    if (this.sendingNotifications) return;
+    this.sendingNotifications = true;
 
-    const notificationsToSend = notifications.filter((n) => n.scheduledAt <= new Date());
+    try {
+      const notificationsToSend = await NotificationQueueService.claimDue(100);
 
-    const CHUNK_SIZE = 25;
+      const CHUNK_SIZE = 25;
 
-    for (let i = 0; i < notificationsToSend.length; i += CHUNK_SIZE) {
-      const chunk = notificationsToSend.slice(i, i + CHUNK_SIZE);
+      for (let i = 0; i < notificationsToSend.length; i += CHUNK_SIZE) {
+        const chunk = notificationsToSend.slice(i, i + CHUNK_SIZE);
 
-      await Promise.all(
-        chunk.map(async (notification) => {
-          const guild = await this.client.guilds.fetch(notification.guildId).catch(() => null);
-          if (!guild) {
+        await Promise.all(
+          chunk.map(async (notification) => {
+            const guild = await this.client.guilds.fetch(notification.guildId).catch(() => null);
+            if (!guild) {
+              await NotificationQueueService.remove(notification.id);
+              return;
+            }
+            const channel = await guild.channels.fetch(notification.channelId).catch(() => null);
+            if (!channel || !channel.isTextBased()) {
+              await NotificationQueueService.remove(notification.id);
+              return;
+            }
+
+            let sent = false;
+
+            if (notification.type === NotificationType.bump) {
+              const bumpNoticeData = await prisma.bumpNotice.findUnique({
+                where: {
+                  guildId: notification.guildId,
+                },
+              });
+
+              sent = await channel
+                .send({
+                  content: bumpNoticeData ? `<@&${bumpNoticeData.roleId}>` : "",
+                  embeds: [
+                    {
+                      color: Colors.White,
+                      title: "BUMP通知",
+                      description:
+                        "BUMPの時間です\n</bump:947088344167366698>でサーバーの表示順位を上げよう！",
+                    },
+                  ],
+                })
+                .then(() => true)
+                .catch(() => false);
+            } else if (notification.type === NotificationType.dissoku) {
+              const upNoticeData = await prisma.upNotice.findUnique({
+                where: {
+                  guildId: notification.guildId,
+                },
+              });
+              sent = await channel
+                .send({
+                  content: upNoticeData ? `<@&${upNoticeData.roleId}>` : "",
+                  embeds: [
+                    {
+                      color: Colors.Blue,
+                      title: "Dissoku UP通知",
+                      description:
+                        "UPの時間です\n</up:1363739182672904354>でサーバーの表示順位を上げよう！",
+                    },
+                  ],
+                })
+                .then(() => true)
+                .catch(() => false);
+            } else if (notification.type === NotificationType.tksmup) {
+              const upNoticeData = await prisma.upNotice.findUnique({
+                where: {
+                  guildId: notification.guildId,
+                },
+              });
+
+              sent = await channel
+                .send({
+                  content: upNoticeData ? `<@&${upNoticeData.roleId}>` : "",
+                  embeds: [
+                    {
+                      color: Colors.Green,
+                      title: "TakasumiBOT UP通知",
+                      description:
+                        "UPの時間です\n</up:1135405664852783157>でサーバーの表示順位を上げよう！",
+                    },
+                  ],
+                })
+                .then(() => true)
+                .catch(() => false);
+            }
+
+            // 通知が実際に届いたら RTA のラウンドを開始する
+            if (sent) {
+              await startBumpRtaRound(notification.guildId, notification.type, notification.channelId);
+            }
+
             await NotificationQueueService.remove(notification.id);
-            return;
-          }
-          const channel = await guild.channels.fetch(notification.channelId).catch(() => null);
-          if (!channel || !channel.isTextBased()) {
-            await NotificationQueueService.remove(notification.id);
-            return;
-          }
-          if (notification.type === NotificationType.bump) {
-            const bumpNoticeData = await prisma.bumpNotice.findUnique({
-              where: {
-                guildId: notification.guildId,
-              },
-            });
+          }),
+        );
 
-            await channel
-              .send({
-                content: bumpNoticeData ? `<@&${bumpNoticeData.roleId}>` : "",
-                embeds: [
-                  {
-                    color: Colors.White,
-                    title: "BUMP通知",
-                    description:
-                      "BUMPの時間です\n</bump:947088344167366698>でサーバーの表示順位を上げよう！",
-                  },
-                ],
-              })
-              .catch(() => {});
-          } else if (notification.type === NotificationType.dissoku) {
-            const upNoticeData = await prisma.upNotice.findUnique({
-              where: {
-                guildId: notification.guildId,
-              },
-            });
-            await channel
-              .send({
-                content: upNoticeData ? `<@&${upNoticeData.roleId}>` : "",
-                embeds: [
-                  {
-                    color: Colors.Blue,
-                    title: "Dissoku UP通知",
-                    description:
-                      "UPの時間です\n</up:1363739182672904354>でサーバーの表示順位を上げよう！",
-                  },
-                ],
-              })
-              .catch(() => {});
-          } else if (notification.type === NotificationType.tksmup) {
-            const upNoticeData = await prisma.upNotice.findUnique({
-              where: {
-                guildId: notification.guildId,
-              },
-            });
-
-            await channel
-              .send({
-                content: upNoticeData ? `<@&${upNoticeData.roleId}>` : "",
-                embeds: [
-                  {
-                    color: Colors.Green,
-                    title: "TakasumiBOT UP通知",
-                    description:
-                      "UPの時間です\n</up:1135405664852783157>でサーバーの表示順位を上げよう！",
-                  },
-                ],
-              })
-              .catch(() => {});
-          }
-          await NotificationQueueService.remove(notification.id);
-        }),
-      );
-
-      if (i + CHUNK_SIZE < notificationsToSend.length) {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        if (i + CHUNK_SIZE < notificationsToSend.length) {
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
       }
+    } finally {
+      this.sendingNotifications = false;
     }
   }
 }

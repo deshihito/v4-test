@@ -4,6 +4,7 @@ import config from "@/config";
 import { prisma } from "@/util/db";
 import { NotificationQueueService } from "@/util/NotificationQueue";
 import { NotificationType } from "@/generated";
+import { buildBumpRtaEmbed, finishBumpRtaRound, resolveBumpActorId } from "@/util/bumpRta";
 
 class BumpEvent implements MessageCreateEvent {
   public readonly client: Client;
@@ -38,24 +39,42 @@ class BumpEvent implements MessageCreateEvent {
 
       if (bumpNoticeIgnoreData) return;
 
-      await message.channel
-        .send({
-          embeds: [
-            {
-              color: Colors.White,
-              title: "BUMP通知",
-              description: `BUMPを受信しました\n2時間後に通知します`,
-            },
-          ],
-        })
-        .catch(() => {});
-
-      await NotificationQueueService.add({
+      // 既に同じ通知が予約済みなら、受信メッセージも含めて何もしない (重複防止)
+      const created = await NotificationQueueService.add({
         guildId: message.guild.id,
         channelId: message.channel.id,
         type: NotificationType.bump,
         delay: 7200000,
       });
+
+      if (created) {
+        await message.channel
+          .send({
+            embeds: [
+              {
+                color: Colors.White,
+                title: "BUMP通知",
+                description: `BUMPを受信しました\n2時間後に通知します`,
+              },
+            ],
+          })
+          .catch(() => {});
+      }
+
+      // RTA: 通知からのラウンドがあれば、この bump を記録する
+      const actorId = resolveBumpActorId(message);
+      if (actorId) {
+        const result = await finishBumpRtaRound(
+          message.guild.id,
+          NotificationType.bump,
+          actorId,
+        );
+        if (result) {
+          await message.channel
+            .send({ embeds: [buildBumpRtaEmbed(NotificationType.bump, actorId, result)] })
+            .catch(() => {});
+        }
+      }
     }
   }
 }

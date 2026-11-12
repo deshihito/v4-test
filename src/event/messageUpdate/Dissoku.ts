@@ -12,6 +12,7 @@ import config from "@/config";
 import { prisma } from "@/util/db";
 import { NotificationQueueService } from "@/util/NotificationQueue";
 import { NotificationType } from "@/generated";
+import { buildBumpRtaEmbed, finishBumpRtaRound, resolveBumpActorId } from "@/util/bumpRta";
 
 class AfkEvent implements MessageUpdateEvent {
   public readonly client: Client;
@@ -51,24 +52,43 @@ class AfkEvent implements MessageUpdateEvent {
 
       if (dissokuNoticeIgnoreData) return;
 
-      await newMessage.channel
-        .send({
-          embeds: [
-            {
-              color: Colors.Blue,
-              title: "Dissoku UP通知",
-              description: `Dissoku UPを受信しました\n2時間後に通知します`,
-            },
-          ],
-        })
-        .catch(() => {});
-
-      await NotificationQueueService.add({
+      // messageUpdate は同じメッセージで何度も発火しうるため、
+      // 既に同じ通知が予約済みなら受信メッセージも含めて何もしない (重複防止)
+      const created = await NotificationQueueService.add({
         guildId: newMessage.guild.id,
         channelId: newMessage.channel.id,
         type: NotificationType.dissoku,
         delay: 7200000,
       });
+
+      if (created) {
+        await newMessage.channel
+          .send({
+            embeds: [
+              {
+                color: Colors.Blue,
+                title: "Dissoku UP通知",
+                description: `Dissoku UPを受信しました\n2時間後に通知します`,
+              },
+            ],
+          })
+          .catch(() => {});
+      }
+
+      // RTA: 通知からのラウンドがあれば、この UP を記録する
+      const actorId = resolveBumpActorId(newMessage);
+      if (actorId) {
+        const result = await finishBumpRtaRound(
+          newMessage.guild.id,
+          NotificationType.dissoku,
+          actorId,
+        );
+        if (result) {
+          await newMessage.channel
+            .send({ embeds: [buildBumpRtaEmbed(NotificationType.dissoku, actorId, result)] })
+            .catch(() => {});
+        }
+      }
     }
   }
 }

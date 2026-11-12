@@ -94,6 +94,9 @@ class CommandUtils {
   }
 
   private static async getSubCommandFiles(dir: string): Promise<string[]> {
+    // サブコマンドを持たないコマンド (optout 等) はディレクトリ自体が無い
+    if (!fs.existsSync(dir)) return [];
+
     const files = fs.readdirSync(dir, { withFileTypes: true });
     const fileList: string[] = [];
 

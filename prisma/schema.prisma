@@ -312,6 +312,7 @@ model levelUser {
 
   @@unique([userId, guildId])
   @@index([guildId, chatExp])
+  @@index([userId, chatExp])
 }
 
 model levelGuildSetting {

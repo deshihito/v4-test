@@ -1,5 +1,5 @@
 import { prisma } from "@/Models/db";
-import type { LevelSettings } from "@/Views/commands/levelSettingsPanel";
+import type { LevelSettings } from "@/Views/levelSettingsPanel";
 
 /**
  * 付与間隔を過ぎている場合だけ EXP を加算する条件付き更新。

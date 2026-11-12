@@ -13,7 +13,7 @@ import { findLevelSetting, findLevelGuildSetting } from "@/Models/Level";
 import {
   buildLevelSettingsPanel,
   DEFAULT_LEVEL_SETTINGS,
-} from "@/Views/commands/levelSettingsPanel";
+} from "@/Views/levelSettingsPanel";
 
 class LevelSettingsCommand implements Command {
   public readonly client: Client;

@@ -13,7 +13,7 @@ import {
   buildLevelSettingsPanel,
   DEFAULT_LEVEL_SETTINGS,
   LevelSettings,
-} from "@/Views/commands/levelSettingsPanel";
+} from "@/Views/levelSettingsPanel";
 
 // customId のキー → DB カラム (ホワイトリスト。これ以外の文字列が SQL に入ることはない)
 export const COLUMNS = {

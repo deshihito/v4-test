@@ -5,14 +5,12 @@ import {
   SlashCommandOptionsOnlyBuilder,
   InteractionResponse,
   Colors,
-  AttachmentBuilder,
 } from "discord.js";
 import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/util/CommandUtils";
 import { prisma } from "@/util/db";
 import calcLevel from "@/util/calcLevel";
-import { renderLevelCard } from "@/util/levelCard";
 
 class LevelCommand implements Command {
   public readonly client: Client;
@@ -95,22 +93,10 @@ class LevelCommand implements Command {
       ) AS "totals"`;
     const globalRank: number = (rankRows[0]?.count ?? 0) + 1;
 
-    const card = await renderLevelCard({
-      name: interaction.user.displayName,
-      level,
-      current,
-      next,
-      total: totalExp,
-      serverRank,
-      globalRank,
-      avatarUrl: interaction.user.displayAvatarURL({ extension: "png", size: 256 }),
-    });
-
     const filled = Math.min(12, Math.floor((current / next) * 12));
     const bar = "█".repeat(filled) + "░".repeat(12 - filled);
 
     await interaction.reply({
-      files: card ? [new AttachmentBuilder(card, { name: "levelcard.png" })] : [],
       embeds: [
         {
           color: Colors.Green,
@@ -118,7 +104,6 @@ class LevelCommand implements Command {
             name: `${interaction.user.displayName}のレベル`,
             icon_url: config.image.successIcon,
           },
-          ...(card ? { image: { url: "attachment://levelcard.png" } } : {}),
           description: `**Lv.${level}**\n${bar} ${current}/${next} EXP`,
           fields: [
             {

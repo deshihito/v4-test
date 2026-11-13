@@ -1,3 +1,5 @@
+import { invalidateAutoReactGuild } from "@/Models/AutoReact";
+import { invalidateBinjou } from "@/Models/Binjou";
 import { prisma } from "@/Models/db";
 
 export async function deleteGuildData(guildId: string): Promise<number> {
@@ -170,6 +172,7 @@ export async function deleteGuildData(guildId: string): Promise<number> {
       guildId: guildId,
     },
   });
+  invalidateAutoReactGuild(guildId);
 
   await prisma.binjouSetting.deleteMany({
     where: {
@@ -182,6 +185,7 @@ export async function deleteGuildData(guildId: string): Promise<number> {
       guildId: guildId,
     },
   });
+  invalidateBinjou(guildId);
 
   await prisma.commandControlSetting.deleteMany({
     where: {

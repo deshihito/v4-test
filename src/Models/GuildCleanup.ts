@@ -213,5 +213,11 @@ export async function deleteGuildData(guildId: string): Promise<number> {
     },
   });
 
+  await prisma.omikujiResult.deleteMany({
+    where: {
+      guildId: guildId,
+    },
+  });
+
   return count;
 }

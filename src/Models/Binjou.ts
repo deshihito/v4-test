@@ -1,4 +1,13 @@
 import { prisma } from "@/Models/db";
+import TtlCache from "@/util/ttlCache";
+
+const settingCache = new TtlCache<BinjouSettings>(60_000);
+const rulesCache = new TtlCache<BinjouRule[]>(60_000);
+
+export function invalidateBinjou(guildId: string): void {
+  settingCache.delete(guildId);
+  rulesCache.delete(guildId);
+}
 
 export interface BinjouSettings {
   thinking: boolean;
@@ -37,11 +46,13 @@ export function emojiKey(value: string): string {
 }
 
 export async function findBinjouSetting(guildId: string): Promise<BinjouSettings> {
-  const row = await prisma.binjouSetting.findUnique({ where: { guildId } });
-  return {
-    thinking: row?.thinking ?? true,
-    thumbsup: row?.thumbsup ?? true,
-  };
+  return settingCache.getOrLoad(guildId, async () => {
+    const row = await prisma.binjouSetting.findUnique({ where: { guildId } });
+    return {
+      thinking: row?.thinking ?? true,
+      thumbsup: row?.thumbsup ?? true,
+    };
+  });
 }
 
 export async function setBinjouEnabled(
@@ -54,18 +65,21 @@ export async function setBinjouEnabled(
     create: { guildId, [key]: enabled },
     update: { [key]: enabled },
   });
+  invalidateBinjou(guildId);
 }
 
 export async function listBinjouRules(guildId: string): Promise<BinjouRule[]> {
-  const rows = await prisma.binjouRule.findMany({
-    where: { guildId },
-    orderBy: { id: "asc" },
+  return rulesCache.getOrLoad(guildId, async () => {
+    const rows = await prisma.binjouRule.findMany({
+      where: { guildId },
+      orderBy: { id: "asc" },
+    });
+    return rows.map((row) => ({
+      source: row.source,
+      sourceKey: row.sourceKey,
+      target: row.target,
+    }));
   });
-  return rows.map((row) => ({
-    source: row.source,
-    sourceKey: row.sourceKey,
-    target: row.target,
-  }));
 }
 
 export async function upsertBinjouRule(
@@ -87,8 +101,10 @@ export async function upsertBinjouRule(
     create: { guildId, source: source.display, sourceKey: source.key, target: target.display },
     update: { source: source.display, target: target.display },
   });
+  invalidateBinjou(guildId);
 }
 
 export async function deleteBinjouRule(guildId: string, sourceKey: string): Promise<void> {
   await prisma.binjouRule.deleteMany({ where: { guildId, sourceKey } });
+  invalidateBinjou(guildId);
 }

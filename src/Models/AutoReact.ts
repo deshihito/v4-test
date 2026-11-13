@@ -1,4 +1,19 @@
 import { prisma } from "@/Models/db";
+import TtlCache from "@/util/ttlCache";
+
+const emojisCache = new TtlCache<string[]>(60_000);
+
+function emojisCacheKey(guildId: string, channelId: string): string {
+  return `${guildId}:${channelId}`;
+}
+
+export function invalidateAutoReactEmojis(guildId: string, channelId: string): void {
+  emojisCache.delete(emojisCacheKey(guildId, channelId));
+}
+
+export function invalidateAutoReactGuild(guildId: string): void {
+  emojisCache.deletePrefix(`${guildId}:`);
+}
 
 export function parseEmojis(json: string): string[] {
   try {
@@ -24,10 +39,12 @@ export async function findAutoReactEmojis(
   guildId: string,
   channelId: string,
 ): Promise<string[]> {
-  const row = await prisma.autoReactChannel.findUnique({
-    where: { guildId_channelId: { guildId, channelId } },
+  return emojisCache.getOrLoad(emojisCacheKey(guildId, channelId), async () => {
+    const row = await prisma.autoReactChannel.findUnique({
+      where: { guildId_channelId: { guildId, channelId } },
+    });
+    return row ? parseEmojis(row.emojis) : [];
   });
-  return row ? parseEmojis(row.emojis) : [];
 }
 
 export async function setAutoReactEmojis(
@@ -37,12 +54,13 @@ export async function setAutoReactEmojis(
 ): Promise<void> {
   if (emojis.length === 0) {
     await prisma.autoReactChannel.deleteMany({ where: { guildId, channelId } });
-    return;
+  } else {
+    const json = JSON.stringify(emojis);
+    await prisma.autoReactChannel.upsert({
+      where: { guildId_channelId: { guildId, channelId } },
+      create: { guildId, channelId, emojis: json },
+      update: { emojis: json },
+    });
   }
-  const json = JSON.stringify(emojis);
-  await prisma.autoReactChannel.upsert({
-    where: { guildId_channelId: { guildId, channelId } },
-    create: { guildId, channelId, emojis: json },
-    update: { emojis: json },
-  });
+  invalidateAutoReactEmojis(guildId, channelId);
 }

@@ -22,6 +22,11 @@ import {
   ChannelSelectMenuInteraction,
   ModalSubmitInteraction,
   AutocompleteInteraction,
+  MessageReaction,
+  PartialMessageReaction,
+  User,
+  PartialUser,
+  UserSelectMenuInteraction,
 } from "discord.js";
 
 type ErrorLogData = {
@@ -122,6 +127,14 @@ interface InteractionCreateEvent {
   execute(interaction: BaseInteraction): Promise<InteractionResponse<boolean> | void>;
 }
 
+interface MessageReactionAddEvent {
+  readonly client: Client;
+  execute(
+    reaction: MessageReaction | PartialMessageReaction,
+    user: User | PartialUser,
+  ): Promise<void>;
+}
+
 interface ButtonController {
   readonly client: Client;
   readonly kind: "button";
@@ -154,6 +167,14 @@ interface ModalController {
   execute(interaction: ModalSubmitInteraction): Promise<InteractionResponse<boolean> | void>;
 }
 
+interface UserSelectController {
+  readonly client: Client;
+  readonly kind: "userSelect";
+  readonly customId: string;
+  readonly prefix: boolean;
+  execute(interaction: UserSelectMenuInteraction): Promise<InteractionResponse<boolean> | void>;
+}
+
 interface AutocompleteController {
   readonly client: Client;
   readonly kind: "autocomplete";
@@ -166,6 +187,7 @@ type ComponentController =
   | SelectController
   | ChannelSelectController
   | ModalController
+  | UserSelectController
   | AutocompleteController;
 
 interface GuildCreateEvent {
@@ -288,10 +310,12 @@ export {
   MessageCreateEvent,
   ValidSubCommandInteraction,
   InteractionCreateEvent,
+  MessageReactionAddEvent,
   ButtonController,
   SelectController,
   ChannelSelectController,
   ModalController,
+  UserSelectController,
   AutocompleteController,
   ComponentController,
   CommandData,

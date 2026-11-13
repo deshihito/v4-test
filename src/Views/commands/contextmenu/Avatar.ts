@@ -13,6 +13,7 @@ import {
 import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
+import { v2 } from "@/util/v2";
 class AvatarContextMenu implements Command {
   public readonly client: Client;
 
@@ -45,7 +46,7 @@ class AvatarContextMenu implements Command {
     const member = interaction.options.getMember("user");
 
     if (!member || !("user" in member))
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -57,10 +58,10 @@ class AvatarContextMenu implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     try {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -78,9 +79,9 @@ class AvatarContextMenu implements Command {
             },
           },
         ],
-      });
+      }));
     } catch (error) {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -105,7 +106,7 @@ class AvatarContextMenu implements Command {
           ),
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 

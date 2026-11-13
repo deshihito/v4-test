@@ -14,6 +14,7 @@ import {
   deleteGlobalChatTransferHistoryBySourceId,
 } from "@/Models/GlobalChat";
 import crypto from "crypto";
+import { v2 } from "@/util/v2";
 
 class DeleteSubCommand implements SubCommand {
   public readonly client: Client;
@@ -44,7 +45,7 @@ class DeleteSubCommand implements SubCommand {
     const allTransferData = await listGlobalChatTransferHistoryBySourceId(id);
 
     if (allTransferData.length === 0)
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -56,10 +57,10 @@ class DeleteSubCommand implements SubCommand {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     await interaction.deferReply();
-    await interaction.editReply({
+    await interaction.editReply(v2({
       embeds: [
         {
           color: Colors.Yellow,
@@ -70,7 +71,7 @@ class DeleteSubCommand implements SubCommand {
           description: `推定所要時間: ${Math.round((allTransferData.length * 18) / 100) / 10}秒`,
         },
       ],
-    });
+    }));
     const startTime = Date.now();
 
     let Success = 0;
@@ -151,7 +152,7 @@ class DeleteSubCommand implements SubCommand {
 
     const time = Math.round((Date.now() - startTime) / 100) / 10;
 
-    await interaction.editReply({
+    await interaction.editReply(v2({
       embeds: [
         {
           color: Colors.Green,
@@ -162,7 +163,7 @@ class DeleteSubCommand implements SubCommand {
           description: `送信元ID: ${id}\n成功件数: ${Success}\n> 再送件数: ${RetrySuccess}\n> 総件数: ${allTransferData.length}\n-# 所要時間:${time}秒;`,
         },
       ],
-    });
+    }));
   }
 
   public build(): SlashCommandSubcommandBuilder {

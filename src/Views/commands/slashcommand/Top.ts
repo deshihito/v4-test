@@ -14,6 +14,7 @@ import {
 import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
+import { v2 } from "@/util/v2";
 
 class TopCommand implements Command {
   public readonly client: Client;
@@ -50,18 +51,18 @@ class TopCommand implements Command {
     const channel = interaction.options.getChannel("channel");
 
     await interaction.deferReply();
-    await interaction.editReply({
+    await interaction.editReply(v2({
       embeds: [
         {
           color: Colors.Green,
           description: "取得中...",
         },
       ],
-    });
+    }));
 
     if (channel) {
       if (!("messages" in channel))
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -73,11 +74,11 @@ class TopCommand implements Command {
             },
           ],
           flags: MessageFlags.Ephemeral,
-        });
+        }));
 
       const msg = (await channel.messages.fetch({ after: "0", limit: 1 })).first();
       if (!msg)
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -89,9 +90,9 @@ class TopCommand implements Command {
             },
           ],
           flags: MessageFlags.Ephemeral,
-        });
+        }));
 
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -107,11 +108,11 @@ class TopCommand implements Command {
               .setStyle(ButtonStyle.Link),
           ),
         ],
-      });
+      }));
     } else {
       const msg = (await interaction.channel.messages.fetch({ after: "0", limit: 1 })).first();
       if (!msg)
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -123,9 +124,9 @@ class TopCommand implements Command {
             },
           ],
           flags: MessageFlags.Ephemeral,
-        });
+        }));
 
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -141,7 +142,7 @@ class TopCommand implements Command {
               .setStyle(ButtonStyle.Link),
           ),
         ],
-      });
+      }));
     }
   }
 

@@ -10,6 +10,7 @@ import {
 import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
+import { v2 } from "@/util/v2";
 const eUC = encodeURIComponent;
 
 class ChoyenCommand implements Command {
@@ -53,7 +54,7 @@ class ChoyenCommand implements Command {
         `https://gsapi.cbrx.io/image?top=${eUC(top)}&bottom=${eUC(bottom)}&type=png&p=100${hoshii ? "&hoshii=true" : ""}${noalpha ? "&noalpha=true" : ""}${rainbow ? "&rainbow=true" : ""}`,
       ).then((res) => res.arrayBuffer());
 
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -67,9 +68,9 @@ class ChoyenCommand implements Command {
           },
         ],
         files: [new AttachmentBuilder(Buffer.from(image)).setName("5000.png")],
-      });
+      }));
     } catch {
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -80,7 +81,7 @@ class ChoyenCommand implements Command {
             description: "もう一度やり直してください",
           },
         ],
-      });
+      }));
     }
   }
 

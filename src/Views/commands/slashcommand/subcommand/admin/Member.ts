@@ -10,6 +10,7 @@ import CommandUtils from "@/Controllers/CommandUtils";
 import config from "@/config";
 import Fetch from "@/Models/Fetch";
 import { findAdminByUserId, createAdmin, deleteAdminByUserId } from "@/Models/Admin";
+import { v2 } from "@/util/v2";
 
 class MemberSubCommand implements SubCommand {
   public readonly client: Client;
@@ -39,7 +40,7 @@ class MemberSubCommand implements SubCommand {
 
     const user = await Fetch.user(interaction.client, id);
     if (!user)
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -51,14 +52,14 @@ class MemberSubCommand implements SubCommand {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     const adminData = await findAdminByUserId(user.id);
 
     if (adminData) {
       await deleteAdminByUserId(user.id);
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -68,11 +69,11 @@ class MemberSubCommand implements SubCommand {
             },
           },
         ],
-      });
+      }));
     } else {
       await createAdmin(user.id);
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -82,7 +83,7 @@ class MemberSubCommand implements SubCommand {
             },
           },
         ],
-      });
+      }));
     }
   }
 

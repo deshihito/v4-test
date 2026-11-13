@@ -13,6 +13,7 @@ import { Command, CommandType } from "@/@types/Util";
 import CommandUtils from "@/Controllers/CommandUtils";
 import config from "@/config";
 import getParseCommands from "@/Controllers/parseCommand";
+import { v2 } from "@/util/v2";
 
 class HelpCommand implements Command {
   public readonly client: Client;
@@ -46,7 +47,7 @@ class HelpCommand implements Command {
     const command = interaction.options.getString("command");
 
     if (!command) {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -84,12 +85,12 @@ class HelpCommand implements Command {
               ]),
           ),
         ],
-      });
+      }));
     } else {
       const commandData = getParseCommands().find((com) => com.name === command);
 
       if (!commandData)
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -101,9 +102,9 @@ class HelpCommand implements Command {
             },
           ],
           flags: MessageFlags.Ephemeral,
-        });
+        }));
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -129,7 +130,7 @@ class HelpCommand implements Command {
             ],
           },
         ],
-      });
+      }));
     }
   }
 

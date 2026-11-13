@@ -14,6 +14,7 @@ import { createHash, Hash } from "crypto";
 import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
+import { v2 } from "@/util/v2";
 
 class HashCommand implements Command {
   public readonly client: Client;
@@ -51,7 +52,7 @@ class HashCommand implements Command {
       const hash: Hash = createHash(type);
       hash.update(text);
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -62,9 +63,9 @@ class HashCommand implements Command {
             description: hash.digest("hex"),
           },
         ],
-      });
+      }));
     } catch (error) {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -89,7 +90,7 @@ class HashCommand implements Command {
           ),
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 

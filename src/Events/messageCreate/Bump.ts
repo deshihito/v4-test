@@ -5,6 +5,7 @@ import { findBumpNoticeIgnore } from "@/Models/BoardNotice";
 import { NotificationQueueService } from "@/Models/NotificationQueue";
 import { NotificationType } from "@/generated";
 import { buildBumpRtaEmbed, finishBumpRtaRound, resolveBumpActorId } from "@/Models/bumpRta";
+import { v2 } from "@/util/v2";
 
 class BumpEvent implements MessageCreateEvent {
   public readonly client: Client;
@@ -44,7 +45,7 @@ class BumpEvent implements MessageCreateEvent {
 
       if (created) {
         await message.channel
-          .send({
+          .send(v2({
             embeds: [
               {
                 color: Colors.White,
@@ -52,7 +53,7 @@ class BumpEvent implements MessageCreateEvent {
                 description: `BUMPを受信しました\n2時間後に通知します`,
               },
             ],
-          })
+          }))
           .catch(() => {});
       }
 
@@ -65,7 +66,7 @@ class BumpEvent implements MessageCreateEvent {
         );
         if (result) {
           await message.channel
-            .send({ embeds: [buildBumpRtaEmbed(NotificationType.bump, actorId, result)] })
+            .send(v2({ embeds: [buildBumpRtaEmbed(NotificationType.bump, actorId, result)] }))
             .catch(() => {});
         }
       }

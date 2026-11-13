@@ -10,6 +10,7 @@ import {
 } from "discord.js";
 import { GuildCreateEvent } from "@/@types/Util";
 import config from "@/config";
+import { v2 } from "@/util/v2";
 
 class AddEvent implements GuildCreateEvent {
   public readonly client: Client;
@@ -30,7 +31,7 @@ class AddEvent implements GuildCreateEvent {
           guild.members.me.permissionsIn(channel).has(PermissionFlagsBits.SendMessages)
         ) {
           channel
-            .send({
+            .send(v2({
               embeds: [
                 {
                   color: Colors.Green,
@@ -50,7 +51,7 @@ class AddEvent implements GuildCreateEvent {
                     .setStyle(ButtonStyle.Link),
                 ),
               ],
-            })
+            }))
             .catch(() => {});
 
           return (find = 1);

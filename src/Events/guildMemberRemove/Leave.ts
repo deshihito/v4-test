@@ -13,6 +13,7 @@ import { deleteLeaveNotice, findLeaveNotice } from "@/Models/BoardNotice";
 import config from "@/config";
 import { relative } from "path";
 import Fetch from "@/Models/Fetch";
+import { v2 } from "@/util/v2";
 
 class LeaveEvent implements GuildMemberAddEvent {
   public readonly client: Client;
@@ -51,7 +52,7 @@ class LeaveEvent implements GuildMemberAddEvent {
       if (!channel || !channel.isTextBased()) return;
 
       try {
-        await channel.send({
+        await channel.send(v2({
           embeds: [
             {
               author: {
@@ -76,7 +77,7 @@ class LeaveEvent implements GuildMemberAddEvent {
                 .setStyle(ButtonStyle.Link),
             ),
           ],
-        });
+        }));
       } catch {
         return;
       }

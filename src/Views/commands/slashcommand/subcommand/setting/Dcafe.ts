@@ -15,6 +15,7 @@ import {
   findDcafeNotice,
   upsertDcafeNotice,
 } from "@/Models/BoardNotice";
+import { v2 } from "@/util/v2";
 
 class DcafeSubCommand implements SubCommand {
   public readonly client: Client;
@@ -49,7 +50,7 @@ class DcafeSubCommand implements SubCommand {
 
     if (!dcafeNoticeData) {
       if (!role)
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -60,11 +61,11 @@ class DcafeSubCommand implements SubCommand {
               description: "ロールを選択してください",
             },
           ],
-        });
+        }));
 
       const botData = await Fetch.member(interaction.guild, config.bot.dcafeId);
       if (!botData)
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -75,11 +76,11 @@ class DcafeSubCommand implements SubCommand {
               description: "このサーバーにDiscord Cafeが参加していません",
             },
           ],
-        });
+        }));
 
       await createDcafeNotice(interaction.guildId, role.id);
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -90,12 +91,12 @@ class DcafeSubCommand implements SubCommand {
             description: `<@&${role.id}>`,
           },
         ],
-      });
+      }));
     } else {
       if (role) {
         const botData = await Fetch.member(interaction.guild, config.bot.dcafeId);
         if (!botData)
-          return await interaction.reply({
+          return await interaction.reply(v2({
             embeds: [
               {
                 color: Colors.Red,
@@ -106,11 +107,11 @@ class DcafeSubCommand implements SubCommand {
                 description: "このサーバーにDiscord Cafeが参加していません",
               },
             ],
-          });
+          }));
 
         await upsertDcafeNotice(interaction.guildId, role.id);
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -121,11 +122,11 @@ class DcafeSubCommand implements SubCommand {
               description: `<@&${role.id}>`,
             },
           ],
-        });
+        }));
       } else {
         await deleteDcafeNotice(interaction.guildId);
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -135,7 +136,7 @@ class DcafeSubCommand implements SubCommand {
               },
             },
           ],
-        });
+        }));
       }
     }
   }

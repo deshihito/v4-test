@@ -20,6 +20,7 @@ import {
 import { NotificationQueueService } from "@/Models/NotificationQueue";
 import { NotificationType } from "@/generated";
 import { buildBumpRtaEmbed, finishBumpRtaRound } from "@/Models/bumpRta";
+import { v2 } from "@/util/v2";
 
 class UpCommand implements Command {
   public readonly client: Client;
@@ -53,7 +54,7 @@ class UpCommand implements Command {
     const registerData = await findGuildBoard(interaction.guildId);
 
     if (!registerData)
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -65,10 +66,10 @@ class UpCommand implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     if (new Date().getTime() - registerData.updatedAt.getTime() < 3600000)
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -80,7 +81,7 @@ class UpCommand implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     if (
       interaction.channel.type !== ChannelType.GuildText &&
@@ -88,7 +89,7 @@ class UpCommand implements Command {
       interaction.channel.type !== ChannelType.GuildAnnouncement &&
       interaction.channel.type !== ChannelType.GuildStageVoice
     )
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -100,7 +101,7 @@ class UpCommand implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     if (!interaction.guild.invites.cache.get(registerData.inviteUrl)) {
       const invite = await interaction.channel
@@ -111,7 +112,7 @@ class UpCommand implements Command {
         .catch(() => {});
 
       if (!invite)
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -124,14 +125,14 @@ class UpCommand implements Command {
             },
           ],
           flags: MessageFlags.Ephemeral,
-        });
+        }));
 
       await updateGuildBoardInviteUrl(interaction.guildId, invite.url);
     }
 
     await updateGuildBoardUpdatedAt(interaction.guildId, new Date());
 
-    await interaction.reply({
+    await interaction.reply(v2({
       embeds: [
         {
           color: Colors.Green,
@@ -146,7 +147,7 @@ class UpCommand implements Command {
             "表示順位が更新されました\n[サーバー掲示板](https://servers.takasumibot.com/)で確認してね!\n1時間後に通知します",
         },
       ],
-    });
+    }));
 
     await NotificationQueueService.add({
       guildId: interaction.guild.id,
@@ -164,7 +165,7 @@ class UpCommand implements Command {
       );
       if (result) {
         await interaction.channel
-          .send({ embeds: [buildBumpRtaEmbed(NotificationType.tksmup, interaction.user.id, result)] })
+          .send(v2({ embeds: [buildBumpRtaEmbed(NotificationType.tksmup, interaction.user.id, result)] }))
           .catch(() => {});
       }
     }

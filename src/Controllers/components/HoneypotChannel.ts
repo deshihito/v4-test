@@ -10,6 +10,7 @@ import { ChannelSelectController } from "@/@types/Util";
 import config from "@/config";
 import { findHoneypotSetting, sendHoneypotWarning, setHoneypotChannel } from "@/Models/Honeypot";
 import { buildHoneypotPanel } from "@/Views/honeypotPanel";
+import { v2 } from "@/util/v2";
 
 class HoneypotChannelController implements ChannelSelectController {
   public readonly client: Client;
@@ -29,7 +30,7 @@ class HoneypotChannelController implements ChannelSelectController {
       !interaction.memberPermissions?.has(PermissionFlagsBits.ManageGuild) &&
       !interaction.memberPermissions?.has(PermissionFlagsBits.Administrator)
     ) {
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -38,7 +39,7 @@ class HoneypotChannelController implements ChannelSelectController {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
 
     const channel = interaction.channels.first();

@@ -11,6 +11,7 @@ import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import translate from "@/Models/translate";
 import CommandUtils from "@/Controllers/CommandUtils";
+import { v2 } from "@/util/v2";
 
 class TranslateCommand implements Command {
   public readonly client: Client;
@@ -47,7 +48,7 @@ class TranslateCommand implements Command {
     try {
       const data = await translate(text, "auto", lang);
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Blue,
@@ -59,9 +60,9 @@ class TranslateCommand implements Command {
             },
           },
         ],
-      });
+      }));
     } catch {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -77,7 +78,7 @@ class TranslateCommand implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 

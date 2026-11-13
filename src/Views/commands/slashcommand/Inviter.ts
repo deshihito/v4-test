@@ -14,6 +14,7 @@ import {
 import { Command, CommandType, ValidInvite } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
+import { v2 } from "@/util/v2";
 
 class InviterCommand implements Command {
   public readonly client: Client;
@@ -61,7 +62,7 @@ class InviterCommand implements Command {
         })
         .sort((i1, i2) => i2.uses - i1.uses);
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -74,9 +75,9 @@ class InviterCommand implements Command {
               .join("\n"),
           },
         ],
-      });
+      }));
     } catch (error) {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -101,7 +102,7 @@ class InviterCommand implements Command {
           ),
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 

@@ -18,6 +18,7 @@ import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
 import Report from "@/util/Report";
 import { relative } from "path";
+import { v2 } from "@/util/v2";
 
 class ResetCommand implements Command {
   public readonly client: Client;
@@ -52,7 +53,7 @@ class ResetCommand implements Command {
     )
       return;
 
-    await interaction.reply({
+    await interaction.reply(v2({
       embeds: [
         {
           color: Colors.Yellow,
@@ -70,7 +71,7 @@ class ResetCommand implements Command {
             .setStyle(ButtonStyle.Danger),
         ),
       ],
-    });
+    }));
   }
 
   public build(): SlashCommandOptionsOnlyBuilder {

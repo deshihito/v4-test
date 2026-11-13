@@ -14,6 +14,7 @@ import {
 import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
+import { v2 } from "@/util/v2";
 
 class MiqContextMenu implements Command {
   public readonly client: Client;
@@ -47,7 +48,7 @@ class MiqContextMenu implements Command {
     const message = interaction.options.getMessage("message");
 
     if (!message?.cleanContent || !message.guild)
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             author: {
@@ -59,7 +60,7 @@ class MiqContextMenu implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     await interaction.deferReply();
     await interaction.editReply("生成中...");
@@ -68,7 +69,7 @@ class MiqContextMenu implements Command {
         `${config.api.miqUrl}/?name=${encodeURIComponent(message.author.username)}&id=${message.author.id}&content=${encodeURIComponent(message.cleanContent)}&icon=${message.author.avatarURL({ extension: "png", size: 1024 }) || message.author.defaultAvatarURL}`,
       ).then((res) => res.arrayBuffer());
 
-      await interaction.editReply({
+      await interaction.editReply(v2({
         content: `[生成元](https://discord.com/channels/${message.guild.id}/${message.channel.id}/${message.id})`,
         files: [new AttachmentBuilder(Buffer.from(image)).setName("TakasumiBOT_MIQ.png")],
         components: [
@@ -95,9 +96,9 @@ class MiqContextMenu implements Command {
               .setEmoji("1131190834843353158"),
           ),
         ],
-      });
+      }));
     } catch (error) {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -122,7 +123,7 @@ class MiqContextMenu implements Command {
           ),
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 

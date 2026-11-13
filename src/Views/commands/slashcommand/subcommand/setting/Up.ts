@@ -14,6 +14,7 @@ import {
   findUpNotice,
   upsertUpNotice,
 } from "@/Models/BoardNotice";
+import { v2 } from "@/util/v2";
 
 class UpSubCommand implements SubCommand {
   public readonly client: Client;
@@ -48,7 +49,7 @@ class UpSubCommand implements SubCommand {
 
     if (!upNoticeData) {
       if (!role)
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -59,11 +60,11 @@ class UpSubCommand implements SubCommand {
               description: "ロールを選択してください",
             },
           ],
-        });
+        }));
 
       await createUpNotice(interaction.guildId, role.id);
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -74,12 +75,12 @@ class UpSubCommand implements SubCommand {
             description: `<@&${role.id}>`,
           },
         ],
-      });
+      }));
     } else {
       if (role) {
         await upsertUpNotice(interaction.guildId, role.id);
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -90,11 +91,11 @@ class UpSubCommand implements SubCommand {
               description: `<@&${role.id}>`,
             },
           ],
-        });
+        }));
       } else {
         await deleteUpNotice(interaction.guildId);
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -104,7 +105,7 @@ class UpSubCommand implements SubCommand {
               },
             },
           ],
-        });
+        }));
       }
     }
   }

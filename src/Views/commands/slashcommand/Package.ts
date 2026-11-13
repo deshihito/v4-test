@@ -10,6 +10,7 @@ import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
 import { npmPackageResponse, PypiPackageResponse } from "@/@types/Api";
+import { v2 } from "@/util/v2";
 
 class PackageCommand implements Command {
   public readonly client: Client;
@@ -52,7 +53,7 @@ class PackageCommand implements Command {
 
         const pkg = res.results[0].package;
 
-        await interaction.editReply({
+        await interaction.editReply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -86,13 +87,13 @@ class PackageCommand implements Command {
               ],
             },
           ],
-        });
+        }));
       } else if (type === "pypi") {
         const pkg: PypiPackageResponse = await fetch(
           `https://pypi.org/pypi/${encodeURIComponent(name)}/json`,
         ).then((res) => res.json());
 
-        await interaction.editReply({
+        await interaction.editReply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -131,10 +132,10 @@ class PackageCommand implements Command {
               ],
             },
           ],
-        });
+        }));
       }
     } catch {
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -145,7 +146,7 @@ class PackageCommand implements Command {
             description: "検索ワードを変えてやり直してください",
           },
         ],
-      });
+      }));
     }
   }
 

@@ -9,6 +9,7 @@ import {
   findLevelGuildSetting,
 } from "@/Models/Level";
 import calcLevel from "@/util/calcLevel";
+import { v2 } from "@/util/v2";
 
 const GRANT_EXP = 5;
 const GRANT_INTERVAL = 5 * 60 * 1000;
@@ -75,7 +76,7 @@ class LevelEvent implements MessageCreateEvent {
     }
 
     await target
-      .send({
+      .send(v2({
         ...(setting?.mention === false ? {} : { content: `<@${userId}>` }),
         embeds: [
           {
@@ -87,7 +88,7 @@ class LevelEvent implements MessageCreateEvent {
             description: `Lv.${oldLevel}からLv.${newLevel}に上がりました\n現在のEXPは${after.chatExp}です`,
           },
         ],
-      })
+      }))
       .catch(() => {});
   }
 }

@@ -14,6 +14,7 @@ import config from "@/config";
 import RateLimit from "@/Controllers/RateLimit";
 import { findHiroyukiByChannelId, deleteHiroyukiByGuildId } from "@/Models/Hiroyuki";
 import Random from "@/util/Random";
+import { v2 } from "@/util/v2";
 
 class HiroyukiEvent implements MessageCreateEvent {
   public readonly client: Client;
@@ -167,7 +168,7 @@ class HiroyukiEvent implements MessageCreateEvent {
       await deleteHiroyukiByGuildId(message.guildId);
 
       await message.channel
-        .send({
+        .send(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -193,7 +194,7 @@ class HiroyukiEvent implements MessageCreateEvent {
                 .setStyle(ButtonStyle.Link),
             ),
           ],
-        })
+        }))
         .catch(() => {});
     }
   }

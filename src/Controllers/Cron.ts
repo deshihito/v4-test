@@ -17,6 +17,7 @@ import { startBumpRtaRound } from "@/Models/bumpRta";
 import { NotificationType } from "@/generated";
 import { env } from "@/util/Env";
 import { getShardStatus } from "@/Models/getShardStatus";
+import { v2 } from "@/util/v2";
 
 class Cron {
   public readonly client: Client;
@@ -133,7 +134,7 @@ class Cron {
               const bumpNoticeData = await findBumpNotice(notification.guildId);
 
               sent = await channel
-                .send({
+                .send(v2({
                   content: bumpNoticeData ? `<@&${bumpNoticeData.roleId}>` : "",
                   embeds: [
                     {
@@ -143,13 +144,13 @@ class Cron {
                         "BUMPの時間です\n</bump:947088344167366698>でサーバーの表示順位を上げよう！",
                     },
                   ],
-                })
+                }))
                 .then(() => true)
                 .catch(() => false);
             } else if (notification.type === NotificationType.dissoku) {
               const upNoticeData = await findUpNotice(notification.guildId);
               sent = await channel
-                .send({
+                .send(v2({
                   content: upNoticeData ? `<@&${upNoticeData.roleId}>` : "",
                   embeds: [
                     {
@@ -159,14 +160,14 @@ class Cron {
                         "UPの時間です\n</up:1363739182672904354>でサーバーの表示順位を上げよう！",
                     },
                   ],
-                })
+                }))
                 .then(() => true)
                 .catch(() => false);
             } else if (notification.type === NotificationType.tksmup) {
               const upNoticeData = await findUpNotice(notification.guildId);
 
               sent = await channel
-                .send({
+                .send(v2({
                   content: upNoticeData ? `<@&${upNoticeData.roleId}>` : "",
                   embeds: [
                     {
@@ -176,7 +177,7 @@ class Cron {
                         "UPの時間です\n</up:1135405664852783157>でサーバーの表示順位を上げよう！",
                     },
                   ],
-                })
+                }))
                 .then(() => true)
                 .catch(() => false);
             } else {
@@ -185,7 +186,7 @@ class Cron {
                 const boardNoticeData = await boardService.findNotice(notification.guildId);
 
                 sent = await channel
-                  .send({
+                  .send(v2({
                     content: boardNoticeData ? `<@&${boardNoticeData.roleId}>` : "",
                     embeds: [
                       {
@@ -194,7 +195,7 @@ class Cron {
                         description: boardService.notifyDescription,
                       },
                     ],
-                  })
+                  }))
                   .then(() => true)
                   .catch(() => false);
               }

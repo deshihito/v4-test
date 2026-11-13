@@ -31,6 +31,7 @@ import {
   deleteDiscomNoticeIgnore,
   findDiscomNoticeIgnore,
 } from "@/Models/BoardNotice";
+import { v2 } from "@/util/v2";
 
 class IgnoreSubCommand implements SubCommand {
   public readonly client: Client;
@@ -64,7 +65,7 @@ class IgnoreSubCommand implements SubCommand {
       if (!bumpNoticeIgnoreData) {
         await createBumpNoticeIgnore(interaction.guildId);
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -74,11 +75,11 @@ class IgnoreSubCommand implements SubCommand {
               },
             },
           ],
-        });
+        }));
       } else {
         await deleteBumpNoticeIgnore(interaction.guildId);
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -88,7 +89,7 @@ class IgnoreSubCommand implements SubCommand {
               },
             },
           ],
-        });
+        }));
       }
     } else if (type === "dissoku") {
       const dissokuNoticeIgnoreData = await findDissokuNoticeIgnore(interaction.guildId);
@@ -96,7 +97,7 @@ class IgnoreSubCommand implements SubCommand {
       if (!dissokuNoticeIgnoreData) {
         await createDissokuNoticeIgnore(interaction.guildId);
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -106,11 +107,11 @@ class IgnoreSubCommand implements SubCommand {
               },
             },
           ],
-        });
+        }));
       } else {
         await deleteDissokuNoticeIgnore(interaction.guildId);
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -120,7 +121,7 @@ class IgnoreSubCommand implements SubCommand {
               },
             },
           ],
-        });
+        }));
       }
     } else if (type === "up") {
       const upNoticeIgnoreData = await findUpNoticeIgnore(interaction.guildId);
@@ -128,7 +129,7 @@ class IgnoreSubCommand implements SubCommand {
       if (!upNoticeIgnoreData) {
         await createUpNoticeIgnore(interaction.guildId);
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -138,11 +139,11 @@ class IgnoreSubCommand implements SubCommand {
               },
             },
           ],
-        });
+        }));
       } else {
         await deleteUpNoticeIgnore(interaction.guildId);
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -152,7 +153,7 @@ class IgnoreSubCommand implements SubCommand {
               },
             },
           ],
-        });
+        }));
       }
     } else if (type === "vote") {
       const voteNoticeIgnoreData = await findVoteNoticeIgnore(interaction.guildId);
@@ -160,7 +161,7 @@ class IgnoreSubCommand implements SubCommand {
       if (!voteNoticeIgnoreData) {
         await createVoteNoticeIgnore(interaction.guildId);
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -170,11 +171,11 @@ class IgnoreSubCommand implements SubCommand {
               },
             },
           ],
-        });
+        }));
       } else {
         await deleteVoteNoticeIgnore(interaction.guildId);
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -184,7 +185,7 @@ class IgnoreSubCommand implements SubCommand {
               },
             },
           ],
-        });
+        }));
       }
     } else if (type === "dicoall") {
       const dicoallNoticeIgnoreData = await findDicoallNoticeIgnore(interaction.guildId);
@@ -192,7 +193,7 @@ class IgnoreSubCommand implements SubCommand {
       if (!dicoallNoticeIgnoreData) {
         await createDicoallNoticeIgnore(interaction.guildId);
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -202,11 +203,11 @@ class IgnoreSubCommand implements SubCommand {
               },
             },
           ],
-        });
+        }));
       } else {
         await deleteDicoallNoticeIgnore(interaction.guildId);
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -216,7 +217,7 @@ class IgnoreSubCommand implements SubCommand {
               },
             },
           ],
-        });
+        }));
       }
     } else if (type === "dcafe") {
       const dcafeNoticeIgnoreData = await findDcafeNoticeIgnore(interaction.guildId);
@@ -224,7 +225,7 @@ class IgnoreSubCommand implements SubCommand {
       if (!dcafeNoticeIgnoreData) {
         await createDcafeNoticeIgnore(interaction.guildId);
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -234,11 +235,11 @@ class IgnoreSubCommand implements SubCommand {
               },
             },
           ],
-        });
+        }));
       } else {
         await deleteDcafeNoticeIgnore(interaction.guildId);
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -248,7 +249,7 @@ class IgnoreSubCommand implements SubCommand {
               },
             },
           ],
-        });
+        }));
       }
     } else if (type === "sharkbot") {
       const sharkbotNoticeIgnoreData = await findSharkbotNoticeIgnore(interaction.guildId);
@@ -256,7 +257,7 @@ class IgnoreSubCommand implements SubCommand {
       if (!sharkbotNoticeIgnoreData) {
         await createSharkbotNoticeIgnore(interaction.guildId);
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -266,11 +267,11 @@ class IgnoreSubCommand implements SubCommand {
               },
             },
           ],
-        });
+        }));
       } else {
         await deleteSharkbotNoticeIgnore(interaction.guildId);
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -280,7 +281,7 @@ class IgnoreSubCommand implements SubCommand {
               },
             },
           ],
-        });
+        }));
       }
     } else if (type === "dsio") {
       const dsioNoticeIgnoreData = await findDsioNoticeIgnore(interaction.guildId);
@@ -288,7 +289,7 @@ class IgnoreSubCommand implements SubCommand {
       if (!dsioNoticeIgnoreData) {
         await createDsioNoticeIgnore(interaction.guildId);
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -298,11 +299,11 @@ class IgnoreSubCommand implements SubCommand {
               },
             },
           ],
-        });
+        }));
       } else {
         await deleteDsioNoticeIgnore(interaction.guildId);
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -312,7 +313,7 @@ class IgnoreSubCommand implements SubCommand {
               },
             },
           ],
-        });
+        }));
       }
     } else if (type === "discom") {
       const discomNoticeIgnoreData = await findDiscomNoticeIgnore(interaction.guildId);
@@ -320,7 +321,7 @@ class IgnoreSubCommand implements SubCommand {
       if (!discomNoticeIgnoreData) {
         await createDiscomNoticeIgnore(interaction.guildId);
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -330,11 +331,11 @@ class IgnoreSubCommand implements SubCommand {
               },
             },
           ],
-        });
+        }));
       } else {
         await deleteDiscomNoticeIgnore(interaction.guildId);
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -344,10 +345,10 @@ class IgnoreSubCommand implements SubCommand {
               },
             },
           ],
-        });
+        }));
       }
     } else {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -358,7 +359,7 @@ class IgnoreSubCommand implements SubCommand {
             description: "存在しない設定です",
           },
         ],
-      });
+      }));
     }
   }
 

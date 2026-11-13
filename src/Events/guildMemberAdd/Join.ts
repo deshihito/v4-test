@@ -11,6 +11,7 @@ import { GuildMemberAddEvent } from "@/@types/Util";
 import { deleteJoinNotice, findJoinNotice } from "@/Models/BoardNotice";
 import config from "@/config";
 import Fetch from "@/Models/Fetch";
+import { v2 } from "@/util/v2";
 
 class JoinEvent implements GuildMemberAddEvent {
   public readonly client: Client;
@@ -49,7 +50,7 @@ class JoinEvent implements GuildMemberAddEvent {
       if (!channel || !channel.isTextBased()) return;
 
       try {
-        await channel.send({
+        await channel.send(v2({
           embeds: [
             {
               author: {
@@ -74,7 +75,7 @@ class JoinEvent implements GuildMemberAddEvent {
                 .setStyle(ButtonStyle.Link),
             ),
           ],
-        });
+        }));
       } catch {
         return;
       }

@@ -11,6 +11,7 @@ import { Command, CommandType } from "@/@types/Util";
 import { NslookupResponse } from "@/@types/Api";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
+import { v2 } from "@/util/v2";
 
 class NslookupCommand implements Command {
   public readonly client: Client;
@@ -49,7 +50,7 @@ class NslookupCommand implements Command {
       ).then((res) => res.json());
 
       if (!data.Answer)
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -61,9 +62,9 @@ class NslookupCommand implements Command {
             },
           ],
           flags: MessageFlags.Ephemeral,
-        });
+        }));
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -74,9 +75,9 @@ class NslookupCommand implements Command {
             description: `\`${data.Answer.map((address) => address.data).join("\n")}\``,
           },
         ],
-      });
+      }));
     } catch {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -88,7 +89,7 @@ class NslookupCommand implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 

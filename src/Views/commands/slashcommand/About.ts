@@ -8,6 +8,7 @@ import {
 } from "discord.js";
 import { Command, CommandType } from "@/@types/Util";
 import CommandUtils from "@/Controllers/CommandUtils";
+import { v2 } from "@/util/v2";
 
 class AboutCommand implements Command {
   public readonly client: Client;
@@ -38,7 +39,7 @@ class AboutCommand implements Command {
     )
       return;
 
-    await interaction.reply({
+    await interaction.reply(v2({
       embeds: [
         {
           color: Colors.Green,
@@ -47,7 +48,7 @@ class AboutCommand implements Command {
             "便利な多機能BOTを目指して開発されています\nサポートサーバーへの参加もよろしくお願いします\n開発:[@taka005](https://discord.com/users/790489873957781536)\n\n関連リンク\n[公式サイト](https://www.takasumibot.com/)",
         },
       ],
-    });
+    }));
   }
 
   public build(): SlashCommandOptionsOnlyBuilder {

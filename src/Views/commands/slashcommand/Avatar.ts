@@ -15,6 +15,7 @@ import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
 import matchId from "@/util/matchId";
 import Fetch from "@/Models/Fetch";
+import { v2 } from "@/util/v2";
 
 class AvatarCommand implements Command {
   public readonly client: Client;
@@ -49,7 +50,7 @@ class AvatarCommand implements Command {
 
     try {
       if (!id) {
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -67,11 +68,11 @@ class AvatarCommand implements Command {
               },
             },
           ],
-        });
+        }));
       } else {
         const userId = matchId(id);
         if (!userId)
-          return await interaction.reply({
+          return await interaction.reply(v2({
             embeds: [
               {
                 color: Colors.Red,
@@ -83,12 +84,12 @@ class AvatarCommand implements Command {
               },
             ],
             flags: MessageFlags.Ephemeral,
-          });
+          }));
 
         const user = await Fetch.user(this.client, userId);
         const member = await Fetch.member(interaction.guild, userId);
         if (!user)
-          return await interaction.reply({
+          return await interaction.reply(v2({
             embeds: [
               {
                 color: Colors.Red,
@@ -100,9 +101,9 @@ class AvatarCommand implements Command {
               },
             ],
             flags: MessageFlags.Ephemeral,
-          });
+          }));
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -118,10 +119,10 @@ class AvatarCommand implements Command {
               },
             },
           ],
-        });
+        }));
       }
     } catch (error) {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -146,7 +147,7 @@ class AvatarCommand implements Command {
           ),
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 

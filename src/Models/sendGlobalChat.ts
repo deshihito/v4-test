@@ -4,6 +4,7 @@ import { Colors } from "discord.js";
 import { APIMessage } from "discord.js";
 import crypto from "node:crypto";
 import { SendGlobalChatOptions } from "@/@types/Util";
+import { v2Json } from "@/util/v2";
 
 // 送信機能のみ持つユーティリティです
 // 【注意】送信条件の検証は別途行うこと
@@ -38,10 +39,11 @@ async function sendGlobalChat({
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        username: userName ?? "TakasumiBOT Global",
-        avatar_url: config.image.botIcon,
-        embeds: [
+      body: JSON.stringify(
+        v2Json({
+          username: userName ?? "TakasumiBOT Global",
+          avatar_url: config.image.botIcon,
+          embeds: [
           {
             color: Colors.Green,
             title: title,
@@ -54,8 +56,9 @@ async function sendGlobalChat({
             },
             timestamp: new Date().toISOString(),
           },
-        ],
-      }),
+          ],
+        }),
+      ),
     };
 
     let isResend = false;

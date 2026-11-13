@@ -14,6 +14,7 @@ import Config from "@/config";
 import crypto from "node:crypto";
 import config from "@/config";
 import { findRecentWebauthSession, createWebauth } from "@/Models/Webauth";
+import { v2 } from "@/util/v2";
 
 class WebAuthEvent implements ButtonController {
   public readonly client: Client;
@@ -30,7 +31,7 @@ class WebAuthEvent implements ButtonController {
     const data = interaction.customId.split("_");
 
     if (!interaction.member || !(interaction.member.roles instanceof GuildMemberRoleManager))
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -41,10 +42,10 @@ class WebAuthEvent implements ButtonController {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     if (interaction.member.roles.cache.has(data[1]))
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -55,7 +56,7 @@ class WebAuthEvent implements ButtonController {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     const currentSession = await findRecentWebauthSession(
       interaction.user.id,
@@ -63,7 +64,7 @@ class WebAuthEvent implements ButtonController {
     );
 
     if (currentSession)
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -75,7 +76,7 @@ class WebAuthEvent implements ButtonController {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
@@ -89,7 +90,7 @@ class WebAuthEvent implements ButtonController {
       interactionWebhookId: `https://discord.com/api/webhooks/${interaction.applicationId}/${interaction.token}/messages/@original`,
     });
 
-    await interaction.editReply({
+    await interaction.editReply(v2({
       embeds: [
         {
           color: Colors.Green,
@@ -108,7 +109,7 @@ class WebAuthEvent implements ButtonController {
             .setURL(`${Config.api.webauthUrl}/${authSession.id}`),
         ),
       ],
-    });
+    }));
   }
 }
 

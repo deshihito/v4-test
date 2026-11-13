@@ -20,6 +20,7 @@ import {
 } from "@/Models/BoardNotice";
 import deleteDuplicateWebhook from "@/Models/deleteDuplicateWebhook";
 import deleteWebhook from "@/Models/deleteWebhook";
+import { v2 } from "@/util/v2";
 
 class LeaveSubCommand implements SubCommand {
   public readonly client: Client;
@@ -58,7 +59,7 @@ class LeaveSubCommand implements SubCommand {
 
       void deleteWebhook(leaveNotice.webhookUrl);
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -68,10 +69,10 @@ class LeaveSubCommand implements SubCommand {
             },
           },
         ],
-      });
+      }));
     } else {
       if (!message)
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -83,10 +84,10 @@ class LeaveSubCommand implements SubCommand {
             },
           ],
           flags: MessageFlags.Ephemeral,
-        });
+        }));
 
       if (message.length > 100)
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -98,10 +99,10 @@ class LeaveSubCommand implements SubCommand {
             },
           ],
           flags: MessageFlags.Ephemeral,
-        });
+        }));
 
       if (interaction.channel.type !== ChannelType.GuildText)
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -113,7 +114,7 @@ class LeaveSubCommand implements SubCommand {
             },
           ],
           flags: MessageFlags.Ephemeral,
-        });
+        }));
 
       await interaction.deferReply();
       await deleteDuplicateWebhook(interaction.channel, ["TakasumiBOT", "TakasumiBOT leaveNotice"]);
@@ -131,7 +132,7 @@ class LeaveSubCommand implements SubCommand {
           message,
         );
 
-        await interaction.editReply({
+        await interaction.editReply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -142,9 +143,9 @@ class LeaveSubCommand implements SubCommand {
               description: `送信メッセージ: ${message}`,
             },
           ],
-        });
+        }));
       } catch (error) {
-        await interaction.editReply({
+        await interaction.editReply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -169,7 +170,7 @@ class LeaveSubCommand implements SubCommand {
                 .setStyle(ButtonStyle.Link),
             ),
           ],
-        });
+        }));
       }
     }
   }

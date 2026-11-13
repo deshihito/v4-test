@@ -8,6 +8,7 @@ import {
 import { ModalController } from "@/@types/Util";
 import config from "@/config";
 import { deleteCheckHuman } from "@/Models/CheckHuman";
+import { v2 } from "@/util/v2";
 
 class CheckHumanEvent implements ModalController {
   public readonly client: Client;
@@ -25,7 +26,7 @@ class CheckHumanEvent implements ModalController {
     const code = interaction.fields.getTextInputValue("code");
 
     if (isNaN(Number(code)))
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -37,10 +38,10 @@ class CheckHumanEvent implements ModalController {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     if (code !== data[1])
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -52,11 +53,11 @@ class CheckHumanEvent implements ModalController {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     await deleteCheckHuman(interaction.user.id);
 
-    await interaction.reply({
+    await interaction.reply(v2({
       embeds: [
         {
           color: Colors.Green,
@@ -68,7 +69,7 @@ class CheckHumanEvent implements ModalController {
         },
       ],
       flags: MessageFlags.Ephemeral,
-    });
+    }));
   }
 }
 

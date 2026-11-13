@@ -11,6 +11,7 @@ import { Command, CommandType, SubCommand } from "@/@types/Util";
 import CommandUtils from "@/Controllers/CommandUtils";
 import config from "@/config";
 import isAdmin from "@/Models/isAdmin";
+import { v2 } from "@/util/v2";
 
 class AdminCommand implements Command {
   public readonly client: Client;
@@ -48,7 +49,7 @@ class AdminCommand implements Command {
       return;
 
     if (!(await isAdmin(interaction.user.id)))
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -60,7 +61,7 @@ class AdminCommand implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     Promise.all(this.subcommands.map((command) => command.execute(interaction)));
   }

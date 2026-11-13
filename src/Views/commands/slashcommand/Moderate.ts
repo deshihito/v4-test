@@ -17,6 +17,7 @@ import {
 import { Command, CommandType, ModerateType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
+import { v2 } from "@/util/v2";
 
 class ModerateCommand implements Command {
   public readonly client: Client;
@@ -160,7 +161,7 @@ class ModerateCommand implements Command {
     try {
       await interaction.guild.autoModerationRules.create(options[type]);
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -170,9 +171,9 @@ class ModerateCommand implements Command {
             },
           },
         ],
-      });
+      }));
     } catch (error) {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -197,7 +198,7 @@ class ModerateCommand implements Command {
           ),
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 

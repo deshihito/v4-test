@@ -12,6 +12,7 @@ import config from "@/config";
 import Fetch from "@/Models/Fetch";
 import CommandUtils from "@/Controllers/CommandUtils";
 import matchId from "@/util/matchId";
+import { v2 } from "@/util/v2";
 
 class UserCommand implements Command {
   public readonly client: Client;
@@ -49,7 +50,7 @@ class UserCommand implements Command {
         ? `${interaction.member.joinedAt.toLocaleString("ja-JP")}\n(${Math.floor((new Date().getTime() - interaction.member.joinedAt.getTime()) / 86400000)}日前)`
         : "不明";
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -96,11 +97,11 @@ class UserCommand implements Command {
             ],
           },
         ],
-      });
+      }));
     } else {
       const userId = matchId(id);
       if (!userId)
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -112,7 +113,7 @@ class UserCommand implements Command {
             },
           ],
           flags: MessageFlags.Ephemeral,
-        });
+        }));
 
       const member = await Fetch.member(interaction.guild, userId);
       if (member) {
@@ -120,7 +121,7 @@ class UserCommand implements Command {
           ? `${member.joinedAt.toLocaleString("ja-JP")}\n(${Math.floor((new Date().getTime() - member.joinedAt.getTime()) / 86400000)}日前)`
           : "不明";
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -167,11 +168,11 @@ class UserCommand implements Command {
               ],
             },
           ],
-        });
+        }));
       } else {
         const user = await Fetch.user(interaction.client, userId);
         if (!user)
-          return await interaction.reply({
+          return await interaction.reply(v2({
             embeds: [
               {
                 color: Colors.Red,
@@ -183,9 +184,9 @@ class UserCommand implements Command {
               },
             ],
             flags: MessageFlags.Ephemeral,
-          });
+          }));
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -216,7 +217,7 @@ class UserCommand implements Command {
               ],
             },
           ],
-        });
+        }));
       }
     }
   }

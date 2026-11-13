@@ -14,6 +14,7 @@ import {
 import { ButtonController } from "@/@types/Util";
 import config from "@/config";
 import { findTmpReport } from "@/Models/Report";
+import { v2 } from "@/util/v2";
 
 class ReportModalEvent implements ButtonController {
   public readonly client: Client;
@@ -34,7 +35,7 @@ class ReportModalEvent implements ButtonController {
     const reportData = await findTmpReport(data[2]);
 
     if (!reportData)
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -46,7 +47,7 @@ class ReportModalEvent implements ButtonController {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     const title = new LabelBuilder()
       .setLabel("用件")

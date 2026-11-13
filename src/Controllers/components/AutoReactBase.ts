@@ -11,6 +11,7 @@ import {
 import config from "@/config";
 import { listAutoReactChannels } from "@/Models/AutoReact";
 import { buildAutoReactPanel } from "@/Views/autoReactPanel";
+import { v2 } from "@/util/v2";
 
 export type AutoReactPanelInteraction =
   | ButtonInteraction
@@ -29,7 +30,7 @@ abstract class AutoReactBase {
   protected async deny(
     interaction: AutoReactPanelInteraction,
   ): Promise<InteractionResponse<boolean>> {
-    return await interaction.reply({
+    return await interaction.reply(v2({
       embeds: [
         {
           color: Colors.Red,
@@ -38,7 +39,7 @@ abstract class AutoReactBase {
         },
       ],
       flags: MessageFlags.Ephemeral,
-    });
+    }));
   }
 
   protected async buildPanel(

@@ -15,6 +15,7 @@ import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
 import { ScriptResponse } from "@/@types/Api";
+import { v2 } from "@/util/v2";
 
 class ScriptCommand implements Command {
   public readonly client: Client;
@@ -53,7 +54,7 @@ class ScriptCommand implements Command {
 
     const data = langData.find((data) => data.name === lang);
     if (!data)
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -65,7 +66,7 @@ class ScriptCommand implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     const code = new LabelBuilder()
       .setLabel(`${data.language}(${data.name})を実行`)

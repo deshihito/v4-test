@@ -17,6 +17,7 @@ import { Command, CommandType } from "@/@types/Util";
 import CommandUtils from "@/Controllers/CommandUtils";
 import config from "@/config";
 import { deleteGuildBoard, findGuildBoard } from "@/Models/GuildBoard";
+import { v2 } from "@/util/v2";
 
 class RegisterCommand implements Command {
   public readonly client: Client;
@@ -52,7 +53,7 @@ class RegisterCommand implements Command {
     if (registerData) {
       await deleteGuildBoard(interaction.guildId);
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -62,13 +63,13 @@ class RegisterCommand implements Command {
             },
           },
         ],
-      });
+      }));
     } else {
       if (
         interaction.guild.members.me.joinedAt &&
         Date.now() - interaction.guild.members.me.joinedAt.getTime() < 86400000 * 3
       )
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -81,10 +82,10 @@ class RegisterCommand implements Command {
             },
           ],
           flags: MessageFlags.Ephemeral,
-        });
+        }));
 
       if ((await interaction.guild.members.fetch()).filter((m) => !m.user.bot).size < 15)
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -96,7 +97,7 @@ class RegisterCommand implements Command {
             },
           ],
           flags: MessageFlags.Ephemeral,
-        });
+        }));
 
       if (
         interaction.channel.type !== ChannelType.GuildText &&
@@ -104,7 +105,7 @@ class RegisterCommand implements Command {
         interaction.channel.type !== ChannelType.GuildAnnouncement &&
         interaction.channel.type !== ChannelType.GuildStageVoice
       )
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -116,7 +117,7 @@ class RegisterCommand implements Command {
             },
           ],
           flags: MessageFlags.Ephemeral,
-        });
+        }));
 
       const description = new LabelBuilder()
         .setLabel("サーバーの説明文")

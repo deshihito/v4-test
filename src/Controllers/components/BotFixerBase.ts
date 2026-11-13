@@ -30,6 +30,7 @@ import {
   type BotFixerUiState,
   type CatalogEntry,
 } from "@/Views/botFixerPanel";
+import { v2 } from "@/util/v2";
 
 export const MANAGE_REQUIRED = "サーバーの管理権限が必要です";
 
@@ -141,7 +142,7 @@ export abstract class BotFixerBase {
 
   public async denyManage(interaction: RepliableInteraction): Promise<void> {
     await interaction
-      .reply({
+      .reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -153,7 +154,7 @@ export abstract class BotFixerBase {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      })
+      }))
       .catch(() => {});
   }
 

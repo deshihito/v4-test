@@ -18,6 +18,7 @@ import CommandUtils from "@/Controllers/CommandUtils";
 import { countPinsByGuild, createPin, deletePin, findPin } from "@/Models/Pin";
 import deleteDuplicateWebhook from "@/Models/deleteDuplicateWebhook";
 import deleteWebhook from "@/Models/deleteWebhook";
+import { v2 } from "@/util/v2";
 
 class PinContextMenu implements Command {
   public readonly client: Client;
@@ -61,7 +62,7 @@ class PinContextMenu implements Command {
 
     if (!pinChannelData) {
       if (interaction.channel.type !== ChannelType.GuildText)
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -73,10 +74,10 @@ class PinContextMenu implements Command {
             },
           ],
           flags: MessageFlags.Ephemeral,
-        });
+        }));
 
       if (!message?.content)
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -88,12 +89,12 @@ class PinContextMenu implements Command {
             },
           ],
           flags: MessageFlags.Ephemeral,
-        });
+        }));
 
       const pinGuildCount = await countPinsByGuild(interaction.guild.id);
 
       if (pinGuildCount >= 6)
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -105,7 +106,7 @@ class PinContextMenu implements Command {
             },
           ],
           flags: MessageFlags.Ephemeral,
-        });
+        }));
 
       try {
         await interaction.deferReply().then(() => interaction.deleteReply());
@@ -116,7 +117,7 @@ class PinContextMenu implements Command {
           avatar: config.image.botIcon,
         });
 
-        const msg = await webhook.send({
+        const msg = await webhook.send(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -130,11 +131,11 @@ class PinContextMenu implements Command {
               },
             },
           ],
-        });
+        }));
 
         await createPin(interaction.channelId, msg.id, interaction.guildId, webhook.url);
       } catch (error) {
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -159,14 +160,14 @@ class PinContextMenu implements Command {
             ),
           ],
           flags: MessageFlags.Ephemeral,
-        });
+        }));
       }
     } else {
       const pin = await deletePin(interaction.channel.id);
 
       void deleteWebhook(pin.webhookUrl);
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -177,7 +178,7 @@ class PinContextMenu implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 

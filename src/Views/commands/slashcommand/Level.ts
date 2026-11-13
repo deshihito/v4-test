@@ -19,6 +19,7 @@ import {
 } from "@/Models/Level";
 import calcLevel from "@/util/calcLevel";
 import { renderLevelCard } from "@/Views/levelCard";
+import { v2 } from "@/util/v2";
 
 class LevelCommand implements Command {
   public readonly client: Client;
@@ -52,7 +53,7 @@ class LevelCommand implements Command {
     const data = await findLevelUser(interaction.user.id, interaction.guild.id);
 
     if (!data) {
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Yellow,
@@ -63,7 +64,7 @@ class LevelCommand implements Command {
             description: "サーバーで発言するとEXPが貯まります",
           },
         ],
-      });
+      }));
     }
 
     const { level, current, next } = calcLevel(data.chatExp);
@@ -95,7 +96,7 @@ class LevelCommand implements Command {
     const filled = Math.min(12, Math.floor((current / next) * 12));
     const bar = "█".repeat(filled) + "░".repeat(12 - filled);
 
-    await interaction.reply({
+    await interaction.reply(v2({
       files: card ? [new AttachmentBuilder(card, { name: "levelcard.png" })] : [],
       embeds: [
         {
@@ -125,7 +126,7 @@ class LevelCommand implements Command {
           ],
         },
       ],
-    });
+    }));
   }
 
   public build(): SlashCommandOptionsOnlyBuilder {

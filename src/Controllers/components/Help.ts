@@ -11,6 +11,7 @@ import {
 import { CommandType, SelectController } from "@/@types/Util";
 import config from "@/config";
 import getParseCommands from "@/Controllers/parseCommand";
+import { v2 } from "@/util/v2";
 
 class HelpEvent implements SelectController {
   public readonly client: Client;
@@ -45,7 +46,7 @@ class HelpEvent implements SelectController {
     };
 
     if (data[1] !== interaction.user.id)
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -57,10 +58,10 @@ class HelpEvent implements SelectController {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     try {
-      await interaction.message.edit({
+      await interaction.message.edit(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -73,11 +74,11 @@ class HelpEvent implements SelectController {
               })),
           },
         ],
-      });
+      }));
 
       await interaction.deferUpdate({});
     } catch (error) {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -103,7 +104,7 @@ class HelpEvent implements SelectController {
           ),
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 }

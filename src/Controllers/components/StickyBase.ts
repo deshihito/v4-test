@@ -11,6 +11,7 @@ import {
 import config from "@/config";
 import { findStickySetting } from "@/Models/Sticky";
 import { buildStickyPanel } from "@/Views/stickyPanel";
+import { v2 } from "@/util/v2";
 
 export type StickyPanelInteraction =
   | ButtonInteraction
@@ -29,7 +30,7 @@ abstract class StickyBase {
   protected async deny(
     interaction: StickyPanelInteraction,
   ): Promise<InteractionResponse<boolean>> {
-    return await interaction.reply({
+    return await interaction.reply(v2({
       embeds: [
         {
           color: Colors.Red,
@@ -38,7 +39,7 @@ abstract class StickyBase {
         },
       ],
       flags: MessageFlags.Ephemeral,
-    });
+    }));
   }
 
   protected async buildPanel(

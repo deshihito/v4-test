@@ -13,6 +13,7 @@ import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import iconv from "iconv-lite";
 import CommandUtils from "@/Controllers/CommandUtils";
+import { v2 } from "@/util/v2";
 
 class CharCommand implements Command {
   public readonly client: Client;
@@ -50,7 +51,7 @@ class CharCommand implements Command {
       if (type === "encode") {
         const buffer = iconv.encode(text, "UTF-8");
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -61,11 +62,11 @@ class CharCommand implements Command {
               description: `\`\`\`${iconv.decode(buffer, "Shift_JIS")}\`\`\``,
             },
           ],
-        });
+        }));
       } else {
         const buffer = iconv.encode(text, "Shift_JIS");
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -76,10 +77,10 @@ class CharCommand implements Command {
               description: `\`\`\`${iconv.decode(buffer, "UTF-8")}\`\`\``,
             },
           ],
-        });
+        }));
       }
     } catch (error) {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -103,7 +104,7 @@ class CharCommand implements Command {
               .setStyle(ButtonStyle.Link),
           ),
         ],
-      });
+      }));
     }
   }
 

@@ -10,6 +10,7 @@ import {
 } from "discord.js";
 import { ModalController } from "@/@types/Util";
 import config from "@/config";
+import { v2 } from "@/util/v2";
 
 class GuidelineEvent implements ModalController {
   public readonly client: Client;
@@ -27,7 +28,7 @@ class GuidelineEvent implements ModalController {
     const text = interaction.fields.getTextInputValue("text");
 
     if (!interaction.channel || interaction.channel.isDMBased())
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -39,10 +40,10 @@ class GuidelineEvent implements ModalController {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     try {
-      await interaction.channel.send({
+      await interaction.channel.send(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -66,11 +67,11 @@ class GuidelineEvent implements ModalController {
               .setLabel("同意します"),
           ),
         ],
-      });
+      }));
 
       await interaction.deferUpdate({});
     } catch (error) {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -96,7 +97,7 @@ class GuidelineEvent implements ModalController {
           ),
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 }

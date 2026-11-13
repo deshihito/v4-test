@@ -11,6 +11,7 @@ import {
 } from "discord.js";
 import { ButtonController } from "@/@types/Util";
 import config from "@/config";
+import { v2 } from "@/util/v2";
 class NormalAuthEvent implements ButtonController {
   public readonly client: Client;
   public readonly kind = "button" as const;
@@ -26,7 +27,7 @@ class NormalAuthEvent implements ButtonController {
     const data = interaction.customId.split("_");
 
     if (!interaction.member || !(interaction.member.roles instanceof GuildMemberRoleManager))
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -37,10 +38,10 @@ class NormalAuthEvent implements ButtonController {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     if (interaction.member.roles.cache.has(data[1]))
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -51,12 +52,12 @@ class NormalAuthEvent implements ButtonController {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     try {
       await interaction.member.roles.add(data[1]);
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -67,9 +68,9 @@ class NormalAuthEvent implements ButtonController {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     } catch (error) {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -95,7 +96,7 @@ class NormalAuthEvent implements ButtonController {
           ),
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 }

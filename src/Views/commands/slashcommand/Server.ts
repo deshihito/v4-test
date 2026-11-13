@@ -17,6 +17,7 @@ import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
 import calcBoost from "@/util/calcBoost";
 import { findGuildStatistics } from "@/Models/GuildStatistics";
+import { v2 } from "@/util/v2";
 
 class Serverommand implements Command {
   public readonly client: Client;
@@ -69,7 +70,7 @@ class Serverommand implements Command {
 
       const stats: guildStatistics | null = await findGuildStatistics(interaction.guild.id);
 
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -110,9 +111,9 @@ class Serverommand implements Command {
             ],
           },
         ],
-      });
+      }));
     } catch (error) {
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -136,7 +137,7 @@ class Serverommand implements Command {
               .setStyle(ButtonStyle.Link),
           ),
         ],
-      });
+      }));
     }
   }
 

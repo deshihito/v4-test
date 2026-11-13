@@ -16,6 +16,7 @@ import matchId from "@/util/matchId";
 import config from "@/config";
 import Fetch from "@/Models/Fetch";
 import CommandUtils from "@/Controllers/CommandUtils";
+import { v2 } from "@/util/v2";
 
 class BanCommand implements Command {
   public readonly client: Client;
@@ -56,7 +57,7 @@ class BanCommand implements Command {
 
     const userId = matchId(id);
     if (!userId)
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -68,11 +69,11 @@ class BanCommand implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     const user = await Fetch.user(interaction.client, userId);
     if (!user)
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -84,10 +85,10 @@ class BanCommand implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     if (user.id === interaction.user.id)
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -99,7 +100,7 @@ class BanCommand implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     await interaction.deferReply();
     try {
@@ -108,7 +109,7 @@ class BanCommand implements Command {
         deleteMessageDays: days || undefined,
       });
 
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -118,9 +119,9 @@ class BanCommand implements Command {
             },
           },
         ],
-      });
+      }));
     } catch (error) {
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -145,7 +146,7 @@ class BanCommand implements Command {
               .setStyle(ButtonStyle.Link),
           ),
         ],
-      });
+      }));
     }
   }
 

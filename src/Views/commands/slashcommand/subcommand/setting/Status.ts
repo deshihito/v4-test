@@ -11,6 +11,7 @@ import {
 } from "@/Models/BoardNotice";
 import { listPinsByGuild } from "@/Models/Pin";
 import { listPublishesByGuild } from "@/Models/Publish";
+import { v2 } from "@/util/v2";
 
 class StatusSubCommand implements SubCommand {
   public readonly client: Client;
@@ -50,7 +51,7 @@ class StatusSubCommand implements SubCommand {
 
     const upNoticeIgnoreData = await findUpNoticeIgnore(interaction.guildId);
 
-    await interaction.reply({
+    await interaction.reply(v2({
       embeds: [
         {
           color: Colors.Green,
@@ -82,7 +83,7 @@ class StatusSubCommand implements SubCommand {
           ],
         },
       ],
-    });
+    }));
   }
 
   public build(): SlashCommandSubcommandBuilder {

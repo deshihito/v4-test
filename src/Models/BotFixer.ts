@@ -1,4 +1,5 @@
 import { prisma } from "@/Models/db";
+import TtlCache from "@/util/ttlCache";
 
 export const COMMAND_CONTROL_MODES = ["off", "deny", "allow"] as const;
 export type CommandControlMode = (typeof COMMAND_CONTROL_MODES)[number];
@@ -49,24 +50,34 @@ export class RateCounter {
 const commandCounter = new RateCounter();
 const botCounter = new RateCounter();
 
+const commandControlCache = new TtlCache<CommandControlData>(60_000);
+const botControlCache = new TtlCache<BotControlEntry[]>(60_000);
+
+export function invalidateBotFixer(guildId: string): void {
+  commandControlCache.delete(guildId);
+  botControlCache.delete(guildId);
+}
+
 export async function getCommandControl(guildId: string): Promise<CommandControlData> {
-  const [setting, actionRows, rateRows] = await Promise.all([
-    prisma.commandControlSetting.findUnique({ where: { guildId } }),
-    prisma.commandControlAction.findMany({ where: { guildId }, orderBy: { id: "asc" } }),
-    prisma.commandControlRate.findMany({ where: { guildId } }),
-  ]);
-  const mode = COMMAND_CONTROL_MODES.includes(setting?.mode as CommandControlMode)
-    ? (setting!.mode as CommandControlMode)
-    : "off";
-  const rates: Record<string, RateRule> = {};
-  for (const row of rateRows) {
-    rates[row.command] = { count: row.count, windowSeconds: row.windowSeconds };
-  }
-  return {
-    mode,
-    actions: actionRows.map((row) => row.command).filter((name) => name !== SELF_COMMAND),
-    rates,
-  };
+  return commandControlCache.getOrLoad(guildId, async () => {
+    const [setting, actionRows, rateRows] = await Promise.all([
+      prisma.commandControlSetting.findUnique({ where: { guildId } }),
+      prisma.commandControlAction.findMany({ where: { guildId }, orderBy: { id: "asc" } }),
+      prisma.commandControlRate.findMany({ where: { guildId } }),
+    ]);
+    const mode = COMMAND_CONTROL_MODES.includes(setting?.mode as CommandControlMode)
+      ? (setting!.mode as CommandControlMode)
+      : "off";
+    const rates: Record<string, RateRule> = {};
+    for (const row of rateRows) {
+      rates[row.command] = { count: row.count, windowSeconds: row.windowSeconds };
+    }
+    return {
+      mode,
+      actions: actionRows.map((row) => row.command).filter((name) => name !== SELF_COMMAND),
+      rates,
+    };
+  });
 }
 
 export async function setCommandControlMode(
@@ -78,6 +89,7 @@ export async function setCommandControlMode(
     create: { guildId, mode },
     update: { mode },
   });
+  invalidateBotFixer(guildId);
 }
 
 export async function toggleCommandControlAction(
@@ -89,9 +101,11 @@ export async function toggleCommandControlAction(
   });
   if (existing) {
     await prisma.commandControlAction.delete({ where: { id: existing.id } });
+    invalidateBotFixer(guildId);
     return false;
   }
   await prisma.commandControlAction.create({ data: { guildId, command } });
+  invalidateBotFixer(guildId);
   return true;
 }
 
@@ -102,6 +116,7 @@ export async function setCommandControlRate(
 ): Promise<void> {
   if (!rule) {
     await prisma.commandControlRate.deleteMany({ where: { guildId, command } });
+    invalidateBotFixer(guildId);
     return;
   }
   await prisma.commandControlRate.upsert({
@@ -109,6 +124,7 @@ export async function setCommandControlRate(
     create: { guildId, command, count: rule.count, windowSeconds: rule.windowSeconds },
     update: { count: rule.count, windowSeconds: rule.windowSeconds },
   });
+  invalidateBotFixer(guildId);
 }
 
 export function modeBlocks(data: CommandControlData, command: string): boolean {
@@ -156,30 +172,32 @@ export interface BotControlEntry {
 }
 
 export async function getBotControl(guildId: string): Promise<BotControlEntry[]> {
-  const [settings, channels] = await Promise.all([
-    prisma.botControlSetting.findMany({ where: { guildId }, orderBy: { id: "asc" } }),
-    prisma.botControlChannel.findMany({ where: { guildId }, orderBy: { id: "asc" } }),
-  ]);
-  const byBot = new Map<string, string[]>();
-  for (const row of channels) {
-    const list = byBot.get(row.botId) ?? [];
-    list.push(row.channelId);
-    byBot.set(row.botId, list);
-  }
-  const entries: BotControlEntry[] = [];
-  for (const row of settings) {
-    const channelIds = byBot.get(row.botId) ?? [];
-    if (channelIds.length === 0) continue;
-    entries.push({
-      botId: row.botId,
-      channelIds,
-      rate:
-        row.rateCount !== null && row.rateWindowSeconds !== null
-          ? { count: row.rateCount, windowSeconds: row.rateWindowSeconds }
-          : null,
-    });
-  }
-  return entries;
+  return botControlCache.getOrLoad(guildId, async () => {
+    const [settings, channels] = await Promise.all([
+      prisma.botControlSetting.findMany({ where: { guildId }, orderBy: { id: "asc" } }),
+      prisma.botControlChannel.findMany({ where: { guildId }, orderBy: { id: "asc" } }),
+    ]);
+    const byBot = new Map<string, string[]>();
+    for (const row of channels) {
+      const list = byBot.get(row.botId) ?? [];
+      list.push(row.channelId);
+      byBot.set(row.botId, list);
+    }
+    const entries: BotControlEntry[] = [];
+    for (const row of settings) {
+      const channelIds = byBot.get(row.botId) ?? [];
+      if (channelIds.length === 0) continue;
+      entries.push({
+        botId: row.botId,
+        channelIds,
+        rate:
+          row.rateCount !== null && row.rateWindowSeconds !== null
+            ? { count: row.rateCount, windowSeconds: row.rateWindowSeconds }
+            : null,
+      });
+    }
+    return entries;
+  });
 }
 
 export async function setBotControlChannels(
@@ -196,6 +214,7 @@ export async function setBotControlChannels(
   await prisma.botControlChannel.createMany({
     data: channelIds.map((channelId) => ({ guildId, botId, channelId })),
   });
+  invalidateBotFixer(guildId);
 }
 
 export async function setBotControlRate(
@@ -210,11 +229,13 @@ export async function setBotControlRate(
       rateWindowSeconds: rule?.windowSeconds ?? null,
     },
   });
+  invalidateBotFixer(guildId);
 }
 
 export async function removeBotControl(guildId: string, botId: string): Promise<void> {
   await prisma.botControlChannel.deleteMany({ where: { guildId, botId } });
   await prisma.botControlSetting.deleteMany({ where: { guildId, botId } });
+  invalidateBotFixer(guildId);
 }
 
 export function planBotControl(

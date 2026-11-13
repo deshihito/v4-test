@@ -3,7 +3,10 @@ import cron from "node-cron";
 import { countCommandHistorySince } from "@/Models/CommandHistory";
 import { createSystemLog } from "@/Models/SystemLog";
 import { createShardStatus } from "@/Models/ShardStatus";
-import { resetAllGuildStatistics } from "@/Models/GuildStatistics";
+import {
+  flushGuildStatisticsMessages,
+  resetAllGuildStatistics,
+} from "@/Models/GuildStatistics";
 import { deleteExpiredMuteIp } from "@/Models/MuteIp";
 import { deleteExpiredWebauth } from "@/Models/Webauth";
 import { deleteExpiredCommandCooldown } from "@/Models/CommandCooldown";
@@ -43,6 +46,7 @@ class Cron {
       this.deleteExpiredAuth();
       this.sendNotifications();
       this.recordShardStatus();
+      this.flushGuildStatistics();
     });
   }
 
@@ -74,6 +78,10 @@ class Cron {
     await resetAllGuildStatistics();
 
     Log.debug(`サーバー統計情報を削除しました`);
+  }
+
+  private async flushGuildStatistics(): Promise<void> {
+    await flushGuildStatisticsMessages().catch(() => {});
   }
 
   private async deleteMuteIp(): Promise<void> {

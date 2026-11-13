@@ -4,6 +4,7 @@ import { Colors } from "discord.js";
 import { APIMessage } from "discord.js";
 import crypto from "node:crypto";
 import { SendGlobalChatOptions } from "@/@types/Util";
+import { invalidateGlobalChats } from "@/Models/GlobalChat";
 import { v2Json } from "@/util/v2";
 
 // 送信機能のみ持つユーティリティです
@@ -100,6 +101,7 @@ async function sendGlobalChat({
               guildId: gcData.guildId,
             },
           });
+          invalidateGlobalChats();
 
           gcerror404(gcData.guildId);
         } else if (response.status === 429) {

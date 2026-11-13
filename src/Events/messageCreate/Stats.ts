@@ -1,8 +1,8 @@
 import { Client, Message } from "discord.js";
 import { MessageCreateEvent } from "@/@types/Util";
 import {
-  findGuildStatistics,
-  incrementGuildStatisticsTotalMessage,
+  existsGuildStatistics,
+  queueGuildStatisticsMessage,
 } from "@/Models/GuildStatistics";
 
 class StatsEvent implements MessageCreateEvent {
@@ -15,11 +15,9 @@ class StatsEvent implements MessageCreateEvent {
   public async execute(message: Message): Promise<Message | void> {
     if (message.author.bot || !message.inGuild()) return;
 
-    const stats = await findGuildStatistics(message.guild.id);
+    if (!(await existsGuildStatistics(message.guild.id))) return;
 
-    if (!stats) return;
-
-    await incrementGuildStatisticsTotalMessage(message.guild.id);
+    queueGuildStatisticsMessage(message.guild.id);
   }
 }
 

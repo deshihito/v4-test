@@ -1,6 +1,7 @@
 import { prisma } from "@/Models/db";
+import TtlCache from "@/util/ttlCache";
 
-export async function findGlobalChatByChannelId(channelId: string) {
+async function loadGlobalChatByChannelId(channelId: string) {
   return await prisma.globalChat.findFirst({
     where: {
       channelId,
@@ -8,7 +9,7 @@ export async function findGlobalChatByChannelId(channelId: string) {
   });
 }
 
-export async function findGlobalChatByGuildId(guildId: string) {
+async function loadGlobalChatByGuildId(guildId: string) {
   return await prisma.globalChat.findUnique({
     where: {
       guildId,
@@ -16,8 +17,35 @@ export async function findGlobalChatByGuildId(guildId: string) {
   });
 }
 
-export async function listGlobalChats() {
+async function loadGlobalChats() {
   return await prisma.globalChat.findMany();
+}
+
+type GlobalChatRow = Awaited<ReturnType<typeof loadGlobalChatByChannelId>>;
+type GlobalChatRows = Awaited<ReturnType<typeof loadGlobalChats>>;
+
+const LIST_KEY = "all";
+
+const byChannelCache = new TtlCache<GlobalChatRow>(60_000);
+const byGuildCache = new TtlCache<GlobalChatRow>(60_000);
+const listCache = new TtlCache<GlobalChatRows>(60_000);
+
+export function invalidateGlobalChats(): void {
+  byChannelCache.clear();
+  byGuildCache.clear();
+  listCache.clear();
+}
+
+export async function findGlobalChatByChannelId(channelId: string) {
+  return byChannelCache.getOrLoad(channelId, () => loadGlobalChatByChannelId(channelId));
+}
+
+export async function findGlobalChatByGuildId(guildId: string) {
+  return byGuildCache.getOrLoad(guildId, () => loadGlobalChatByGuildId(guildId));
+}
+
+export async function listGlobalChats() {
+  return listCache.getOrLoad(LIST_KEY, () => loadGlobalChats());
 }
 
 export async function createGlobalChat(data: {
@@ -25,7 +53,9 @@ export async function createGlobalChat(data: {
   guildId: string;
   webhookUrl: string;
 }) {
-  return await prisma.globalChat.create({ data });
+  const created = await prisma.globalChat.create({ data });
+  invalidateGlobalChats();
+  return created;
 }
 
 export async function countGlobalChats() {
@@ -33,11 +63,13 @@ export async function countGlobalChats() {
 }
 
 export async function deleteGlobalChatByGuildId(guildId: string) {
-  return await prisma.globalChat.delete({
+  const deleted = await prisma.globalChat.delete({
     where: {
       guildId,
     },
   });
+  invalidateGlobalChats();
+  return deleted;
 }
 
 export async function createGlobalChatHistory(data: {

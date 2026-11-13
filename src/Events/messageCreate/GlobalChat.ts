@@ -32,14 +32,15 @@ class GlobalChatEvent implements MessageCreateEvent {
   }
 
   public async execute(message: Message): Promise<Message | void> {
-    const isAdm = await isAdmin(message.author.id);
     if (
       message.author.bot ||
       !message.inGuild() ||
-      message.channel.type !== ChannelType.GuildText ||
-      message.content.length > (isAdm ? 1500 : 300)
+      message.channel.type !== ChannelType.GuildText
     )
       return;
+
+    const isAdm = await isAdmin(message.author.id);
+    if (message.content.length > (isAdm ? 1500 : 300)) return;
 
     const guildGlobalChatData = await findGlobalChatByChannelId(message.channel.id);
 

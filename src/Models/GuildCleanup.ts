@@ -1,5 +1,12 @@
 import { invalidateAutoReactGuild } from "@/Models/AutoReact";
 import { invalidateBinjou } from "@/Models/Binjou";
+import { invalidateBotFixer } from "@/Models/BotFixer";
+import { invalidateGlobalChats } from "@/Models/GlobalChat";
+import { invalidateGuildStatistics } from "@/Models/GuildStatistics";
+import { invalidateHiroyuki } from "@/Models/Hiroyuki";
+import { invalidateHoneypot } from "@/Models/Honeypot";
+import { invalidateAllPins } from "@/Models/Pin";
+import { invalidateSticky } from "@/Models/Sticky";
 import { prisma } from "@/Models/db";
 
 export async function deleteGuildData(guildId: string): Promise<number> {
@@ -20,6 +27,7 @@ export async function deleteGuildData(guildId: string): Promise<number> {
       guildId: guildId,
     },
   });
+  invalidateGuildStatistics(guildId);
 
   const count = (
     await prisma.globalChat.deleteMany({
@@ -28,12 +36,14 @@ export async function deleteGuildData(guildId: string): Promise<number> {
       },
     })
   ).count;
+  invalidateGlobalChats();
 
   await prisma.hiroyuki.deleteMany({
     where: {
       guildId: guildId,
     },
   });
+  invalidateHiroyuki();
 
   await prisma.publish.deleteMany({
     where: {
@@ -46,6 +56,7 @@ export async function deleteGuildData(guildId: string): Promise<number> {
       guildId: guildId,
     },
   });
+  invalidateAllPins();
 
   await prisma.bumpNotice.deleteMany({
     where: {
@@ -160,12 +171,14 @@ export async function deleteGuildData(guildId: string): Promise<number> {
       guildId: guildId,
     },
   });
+  invalidateHoneypot(guildId);
 
   await prisma.stickySetting.deleteMany({
     where: {
       guildId: guildId,
     },
   });
+  invalidateSticky(guildId);
 
   await prisma.autoReactChannel.deleteMany({
     where: {
@@ -216,6 +229,7 @@ export async function deleteGuildData(guildId: string): Promise<number> {
       guildId: guildId,
     },
   });
+  invalidateBotFixer(guildId);
 
   await prisma.omikujiResult.deleteMany({
     where: {

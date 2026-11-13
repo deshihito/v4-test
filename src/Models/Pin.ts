@@ -1,12 +1,29 @@
 import { prisma } from "@/Models/db";
+import TtlCache from "@/util/ttlCache";
 
-/** ピン設定をチャンネルIDで取得する */
-export async function findPin(channelId: string) {
+async function loadPin(channelId: string) {
   return await prisma.pin.findUnique({
     where: {
       channelId: channelId,
     },
   });
+}
+
+type PinRow = Awaited<ReturnType<typeof loadPin>>;
+
+const pinCache = new TtlCache<PinRow>(60_000);
+
+export function invalidatePin(channelId: string): void {
+  pinCache.delete(channelId);
+}
+
+export function invalidateAllPins(): void {
+  pinCache.clear();
+}
+
+/** ピン設定をチャンネルIDで取得する */
+export async function findPin(channelId: string) {
+  return pinCache.getOrLoad(channelId, () => loadPin(channelId));
 }
 
 /** ピン設定を作成する */
@@ -16,7 +33,7 @@ export async function createPin(
   guildId: string,
   webhookUrl: string,
 ) {
-  return await prisma.pin.create({
+  const created = await prisma.pin.create({
     data: {
       channelId: channelId,
       messegeId: messegeId,
@@ -24,25 +41,32 @@ export async function createPin(
       webhookUrl: webhookUrl,
     },
   });
+  invalidatePin(channelId);
+  return created;
 }
 
 /** ピン設定のメッセージIDを更新する */
 export async function updatePinMessageId(channelId: string, messegeId: string) {
-  return await prisma.pin.update({
+  const updated = await prisma.pin.update({
     where: { channelId: channelId },
     data: {
       messegeId: messegeId,
     },
   });
+  const cached = pinCache.get(channelId);
+  if (cached) pinCache.set(channelId, { ...cached, messegeId });
+  return updated;
 }
 
 /** ピン設定を削除する */
 export async function deletePin(channelId: string) {
-  return await prisma.pin.delete({
+  const deleted = await prisma.pin.delete({
     where: {
       channelId: channelId,
     },
   });
+  invalidatePin(channelId);
+  return deleted;
 }
 
 /** サーバーのピン設定数を取得する */

@@ -1,5 +1,6 @@
 import { Client, MessageFlags } from "discord.js";
 import { prisma } from "@/Models/db";
+import TtlCache from "@/util/ttlCache";
 import { buildHoneypotWarning } from "@/Views/honeypotPanel";
 
 export interface HoneypotSettings {
@@ -8,13 +9,21 @@ export interface HoneypotSettings {
   messageId: string | null;
 }
 
+const settingCache = new TtlCache<HoneypotSettings>(60_000);
+
+export function invalidateHoneypot(guildId: string): void {
+  settingCache.delete(guildId);
+}
+
 export async function findHoneypotSetting(guildId: string): Promise<HoneypotSettings> {
-  const row = await prisma.honeypotSetting.findUnique({ where: { guildId } });
-  return {
-    enabled: row?.enabled ?? false,
-    channelId: row?.channelId ?? null,
-    messageId: row?.messageId ?? null,
-  };
+  return settingCache.getOrLoad(guildId, async () => {
+    const row = await prisma.honeypotSetting.findUnique({ where: { guildId } });
+    return {
+      enabled: row?.enabled ?? false,
+      channelId: row?.channelId ?? null,
+      messageId: row?.messageId ?? null,
+    };
+  });
 }
 
 export async function setHoneypotChannel(guildId: string, channelId: string): Promise<void> {
@@ -23,6 +32,7 @@ export async function setHoneypotChannel(guildId: string, channelId: string): Pr
     create: { guildId, channelId, messageId: null, enabled: true },
     update: { channelId, messageId: null, enabled: true },
   });
+  invalidateHoneypot(guildId);
 }
 
 export async function setHoneypotMessageId(guildId: string, messageId: string): Promise<void> {
@@ -30,6 +40,8 @@ export async function setHoneypotMessageId(guildId: string, messageId: string): 
     where: { guildId },
     data: { messageId },
   });
+  const cached = settingCache.get(guildId);
+  if (cached) settingCache.set(guildId, { ...cached, messageId });
 }
 
 export async function sendHoneypotWarning(client: Client, guildId: string): Promise<void> {

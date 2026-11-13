@@ -1,5 +1,7 @@
 import { Client } from "discord.js";
 import { prisma } from "@/Models/db";
+import InFlight from "@/util/inFlight";
+import TtlCache from "@/util/ttlCache";
 
 export interface StickySettings {
   enabled: boolean;
@@ -8,14 +10,22 @@ export interface StickySettings {
   content: string;
 }
 
+const settingCache = new TtlCache<StickySettings>(60_000);
+
+export function invalidateSticky(guildId: string): void {
+  settingCache.delete(guildId);
+}
+
 export async function findStickySetting(guildId: string): Promise<StickySettings> {
-  const row = await prisma.stickySetting.findUnique({ where: { guildId } });
-  return {
-    enabled: row?.enabled ?? false,
-    channelId: row?.channelId ?? null,
-    messageId: row?.messageId ?? null,
-    content: row?.content ?? "",
-  };
+  return settingCache.getOrLoad(guildId, async () => {
+    const row = await prisma.stickySetting.findUnique({ where: { guildId } });
+    return {
+      enabled: row?.enabled ?? false,
+      channelId: row?.channelId ?? null,
+      messageId: row?.messageId ?? null,
+      content: row?.content ?? "",
+    };
+  });
 }
 
 export async function setStickyChannel(guildId: string, channelId: string): Promise<void> {
@@ -24,6 +34,7 @@ export async function setStickyChannel(guildId: string, channelId: string): Prom
     create: { guildId, channelId, messageId: null },
     update: { channelId, messageId: null },
   });
+  invalidateSticky(guildId);
 }
 
 export async function setStickyContent(guildId: string, content: string): Promise<void> {
@@ -32,6 +43,7 @@ export async function setStickyContent(guildId: string, content: string): Promis
     create: { guildId, content, enabled: true },
     update: { content, enabled: true },
   });
+  invalidateSticky(guildId);
 }
 
 export async function setStickyEnabled(guildId: string, enabled: boolean): Promise<void> {
@@ -40,6 +52,7 @@ export async function setStickyEnabled(guildId: string, enabled: boolean): Promi
     create: { guildId, enabled },
     update: { enabled },
   });
+  invalidateSticky(guildId);
 }
 
 export async function setStickyMessageId(guildId: string, messageId: string): Promise<void> {
@@ -47,15 +60,14 @@ export async function setStickyMessageId(guildId: string, messageId: string): Pr
     where: { guildId },
     data: { messageId },
   });
+  const cached = settingCache.get(guildId);
+  if (cached) settingCache.set(guildId, { ...cached, messageId });
 }
 
-const stickyLocks = new Map<string, Promise<void>>();
+const resendGuard = new InFlight();
 
 export async function resendStickyPanel(client: Client, guildId: string): Promise<void> {
-  const previous = stickyLocks.get(guildId) ?? Promise.resolve();
-  const run = previous.then(() => resendStickyPanelLocked(client, guildId)).catch(() => {});
-  stickyLocks.set(guildId, run);
-  await run;
+  await resendGuard.runExclusive(guildId, () => resendStickyPanelLocked(client, guildId));
 }
 
 async function resendStickyPanelLocked(client: Client, guildId: string): Promise<void> {

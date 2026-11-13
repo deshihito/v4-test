@@ -9,10 +9,13 @@ import {
   findLevelGuildSetting,
 } from "@/Models/Level";
 import calcLevel from "@/util/calcLevel";
+import LevelGrantStore from "@/util/levelGrantStore";
 import { v2 } from "@/util/v2";
 
 const GRANT_EXP = 5;
 const GRANT_INTERVAL = 5 * 60 * 1000;
+
+const grantStore = new LevelGrantStore(GRANT_INTERVAL);
 
 class LevelEvent implements MessageCreateEvent {
   public readonly client: Client;
@@ -28,24 +31,35 @@ class LevelEvent implements MessageCreateEvent {
     const guildId: string = message.guild.id;
     const now = new Date();
 
+    if (grantStore.isThrottled(userId, guildId)) return;
+
     // 付与間隔のチェックと加算を条件付き更新でアトミックに行う
     // (チェックと加算の間に別の発言が割り込んでも二重付与しない)。
     const grant = () => grantLevelChatExp(userId, guildId, now, GRANT_EXP, GRANT_INTERVAL);
 
     const updated = await grant();
 
-    if (updated.count === 0) {
+    if (updated.count > 0) {
+      grantStore.record(userId, guildId, now.getTime());
+    } else {
       const existing = await findLevelUser(userId, guildId);
 
-      if (existing) return;
+      if (existing) {
+        if (existing.lastChatGrant) {
+          grantStore.record(userId, guildId, existing.lastChatGrant.getTime());
+        }
+        return;
+      }
 
       try {
         await createLevelUser({ userId, guildId, chatExp: GRANT_EXP, lastChatGrant: now });
+        grantStore.record(userId, guildId, now.getTime());
       } catch {
         // 同時に作成されていた場合は、勝った側の付与が立っているので
         // 条件付き更新をやり直して間隔内なら何もしない。
         const retried = await grant();
         if (retried.count === 0) return;
+        grantStore.record(userId, guildId, now.getTime());
       }
     }
 

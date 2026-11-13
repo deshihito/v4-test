@@ -6,6 +6,7 @@ import Log from "@/util/Log";
 import {
   ComponentController,
   MessageCreateEvent,
+  MessageReactionAddEvent,
   ReadyEvent,
   GuildCreateEvent,
   GuildDeleteEvent,
@@ -19,6 +20,7 @@ class EventLoader {
   public readonly readyEvents: ReadyEvent[] = [];
   public readonly messageCreateEvent: MessageCreateEvent[] = [];
   public readonly messageUpdateEvent: MessageUpdateEvent[] = [];
+  public readonly messageReactionAddEvent: MessageReactionAddEvent[] = [];
   public readonly componentControllers: ComponentController[] = [];
   public readonly guildCreateEvent: GuildCreateEvent[] = [];
   public readonly guildDeleteEvent: GuildDeleteEvent[] = [];
@@ -33,6 +35,7 @@ class EventLoader {
     await this.loadReadyEvent();
     await this.loadMessageCreateEvent();
     await this.loadMessageUpdateEvent();
+    await this.loadMessageReactionAddEvent();
     await this.loadComponentControllers();
     await this.loadGuildCreateEvent();
     await this.loadGuildDeleteEvent();
@@ -72,6 +75,18 @@ class EventLoader {
     }
 
     Log.debug("MessageUpdateイベントをロードしました");
+  }
+
+  private async loadMessageReactionAddEvent(): Promise<void> {
+    for (const filePath of await this.getFiles("./src/Events/messageReactionAdd")) {
+      const moduleURL = pathToFileURL(filePath).href;
+      const module = (await import(moduleURL)) as {
+        default: new (client: Client) => MessageReactionAddEvent;
+      };
+      this.messageReactionAddEvent.push(new module.default(this.client));
+    }
+
+    Log.debug("MessageReactionAddイベントをロードしました");
   }
 
   private async loadComponentControllers(): Promise<void> {

@@ -21,8 +21,20 @@ import {
   PartialMessage,
   GuildMember,
   PrimaryEntryPointCommandInteraction,
+  MessageReaction,
+  PartialMessageReaction,
+  User,
+  PartialUser,
+  PermissionFlagsBits,
 } from "discord.js";
 import { createCommandHistory } from "@/Models/CommandHistory";
+import {
+  RESTRICTED_MESSAGE,
+  SELF_COMMAND,
+  checkCommandControl,
+  formatRetryAfter,
+  getCommandControl,
+} from "@/Models/BotFixer";
 import { findDisableCommandStateByName } from "@/Models/DisableCommand";
 import { disableCommand } from "@/generated";
 import EventLoader from "@/Events/EventLoader";
@@ -50,6 +62,7 @@ class Handler {
     this.client.once(Events.ClientReady, this.onReady.bind(this));
     this.client.on(Events.MessageCreate, this.onMessageCreate.bind(this));
     this.client.on(Events.MessageUpdate, this.onMessageUpdate.bind(this));
+    this.client.on(Events.MessageReactionAdd, this.onMessageReactionAdd.bind(this));
     this.client.on(Events.InteractionCreate, this.onInteractionCreate.bind(this));
     this.client.on(Events.GuildCreate, this.onGuildCreate.bind(this));
     this.client.on(Events.GuildDelete, this.onGuildDelete.bind(this));
@@ -99,6 +112,15 @@ class Handler {
   ): Promise<void> {
     Promise.all(
       this.loader.messageUpdateEvent.map((event) => event.execute(oldMessage, newMessage)),
+    );
+  }
+
+  private async onMessageReactionAdd(
+    reaction: MessageReaction | PartialMessageReaction,
+    user: User | PartialUser,
+  ): Promise<void> {
+    Promise.all(
+      this.loader.messageReactionAddEvent.map((event) => event.execute(reaction, user)),
     );
   }
 
@@ -203,6 +225,22 @@ class Handler {
           flags: MessageFlags.Ephemeral,
         });
 
+      const restrictedDescription = await this.commandRestriction(interaction);
+      if (restrictedDescription)
+        return await interaction.reply({
+          embeds: [
+            {
+              color: Colors.Red,
+              author: {
+                name: "コマンドが実行できません",
+                icon_url: config.image.errorIcon,
+              },
+              description: restrictedDescription,
+            },
+          ],
+          flags: MessageFlags.Ephemeral,
+        });
+
       Promise.all(this.commands.map((command) => command.execute(interaction)));
 
       this.addHisotry(interaction);
@@ -236,6 +274,12 @@ class Handler {
       } else if (
         controller.kind === "channelSelect" &&
         interaction.isChannelSelectMenu() &&
+        this.matchCustomId(controller, interaction.customId)
+      ) {
+        void controller.execute(interaction);
+      } else if (
+        controller.kind === "userSelect" &&
+        interaction.isUserSelectMenu() &&
         this.matchCustomId(controller, interaction.customId)
       ) {
         void controller.execute(interaction);
@@ -300,6 +344,36 @@ class Handler {
             .join(" ")
         : "",
     });
+  }
+
+  private async commandRestriction(interaction: BaseInteraction): Promise<string | null> {
+    if (!interaction.isChatInputCommand() || !interaction.guildId) return null;
+    if (interaction.commandName === SELF_COMMAND) return null;
+
+    const permissions = interaction.memberPermissions;
+    if (
+      permissions?.has(PermissionFlagsBits.Administrator) ||
+      permissions?.has(PermissionFlagsBits.ManageGuild)
+    )
+      return null;
+
+    try {
+      const data = await getCommandControl(interaction.guildId);
+      if (data.mode === "off" && Object.keys(data.rates).length === 0) return null;
+      const verdict = checkCommandControl(
+        data,
+        interaction.commandName,
+        interaction.guildId,
+        interaction.user.id,
+      );
+      if (verdict.allowed) return null;
+      if (verdict.reason === "rate" && verdict.retryAfter !== undefined) {
+        return `${RESTRICTED_MESSAGE}（目安: ${formatRetryAfter(verdict.retryAfter)}後に再試行できます）`;
+      }
+      return RESTRICTED_MESSAGE;
+    } catch {
+      return null;
+    }
   }
 
   private async isDisableCommand(

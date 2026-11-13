@@ -153,5 +153,65 @@ export async function deleteGuildData(guildId: string): Promise<number> {
     },
   });
 
+  await prisma.honeypotSetting.deleteMany({
+    where: {
+      guildId: guildId,
+    },
+  });
+
+  await prisma.stickySetting.deleteMany({
+    where: {
+      guildId: guildId,
+    },
+  });
+
+  await prisma.autoReactChannel.deleteMany({
+    where: {
+      guildId: guildId,
+    },
+  });
+
+  await prisma.binjouSetting.deleteMany({
+    where: {
+      guildId: guildId,
+    },
+  });
+
+  await prisma.binjouRule.deleteMany({
+    where: {
+      guildId: guildId,
+    },
+  });
+
+  await prisma.commandControlSetting.deleteMany({
+    where: {
+      guildId: guildId,
+    },
+  });
+
+  await prisma.commandControlAction.deleteMany({
+    where: {
+      guildId: guildId,
+    },
+  });
+
+  await prisma.commandControlRate.deleteMany({
+    where: {
+      guildId: guildId,
+    },
+  });
+
+  await prisma.botControlSetting.deleteMany({
+    where: {
+      guildId: guildId,
+    },
+  });
+
+  await prisma.botControlChannel.deleteMany({
+    where: {
+      guildId: guildId,
+    },
+  });
+
   return count;
 }

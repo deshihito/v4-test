@@ -428,3 +428,93 @@ model levelSetting {
   updatedAt    DateTime @updatedAt
   registeredAt DateTime @default(now())
 }
+
+model honeypotSetting {
+  guildId      String   @id
+  channelId    String?
+  messageId    String?
+  enabled      Boolean  @default(false)
+  updatedAt    DateTime @updatedAt
+  registeredAt DateTime @default(now())
+}
+
+model stickySetting {
+  guildId      String   @id
+  channelId    String?
+  messageId    String?
+  content      String   @default("")
+  enabled      Boolean  @default(false)
+  updatedAt    DateTime @updatedAt
+  registeredAt DateTime @default(now())
+}
+
+model autoReactChannel {
+  id        Int    @id @default(autoincrement())
+  guildId   String
+  channelId String
+  emojis    String @default("[]")
+
+  @@unique([guildId, channelId])
+}
+
+model binjouSetting {
+  guildId      String   @id
+  thinking     Boolean  @default(true)
+  thumbsup     Boolean  @default(true)
+  updatedAt    DateTime @updatedAt
+  registeredAt DateTime @default(now())
+}
+
+model binjouRule {
+  id       Int    @id @default(autoincrement())
+  guildId  String
+  source   String
+  sourceKey String
+  target   String
+
+  @@unique([guildId, sourceKey])
+}
+
+model commandControlSetting {
+  guildId      String   @id
+  mode         String   @default("off")
+  updatedAt    DateTime @updatedAt
+  registeredAt DateTime @default(now())
+}
+
+model commandControlAction {
+  id      Int    @id @default(autoincrement())
+  guildId String
+  command String
+
+  @@unique([guildId, command])
+}
+
+model commandControlRate {
+  id            Int    @id @default(autoincrement())
+  guildId       String
+  command       String
+  count         Int
+  windowSeconds Int
+
+  @@unique([guildId, command])
+}
+
+model botControlSetting {
+  id                Int    @id @default(autoincrement())
+  guildId           String
+  botId             String
+  rateCount         Int?
+  rateWindowSeconds Int?
+
+  @@unique([guildId, botId])
+}
+
+model botControlChannel {
+  id        Int    @id @default(autoincrement())
+  guildId   String
+  botId     String
+  channelId String
+
+  @@unique([guildId, botId, channelId])
+}

@@ -518,3 +518,21 @@ model botControlChannel {
 
   @@unique([guildId, botId, channelId])
 }
+
+model omikujiResult {
+  id           Int      @id @default(autoincrement())
+  userId       String
+  guildId      String
+  date         String
+  format       String
+  number       Int
+  rank         String
+  wakaIndex    Int
+  summaryIndex Int
+  itemIndices  String
+  updatedAt    DateTime @updatedAt
+  registeredAt DateTime @default(now())
+
+  @@unique([userId, guildId, date])
+  @@index([guildId, date])
+}

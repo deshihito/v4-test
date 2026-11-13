@@ -11,6 +11,7 @@ import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
 import { MCServerResponse } from "@/@types/Api";
+import { v2 } from "@/util/v2";
 
 class McCommand implements Command {
   public readonly client: Client;
@@ -52,7 +53,7 @@ class McCommand implements Command {
         ).then((res) => res.json());
 
         if (!server.online)
-          return await interaction.editReply({
+          return await interaction.editReply(v2({
             embeds: [
               {
                 color: Colors.Green,
@@ -64,10 +65,10 @@ class McCommand implements Command {
                 description: "🔴 オフライン",
               },
             ],
-          });
+          }));
 
         if (!server.debug.ping)
-          return await interaction.editReply({
+          return await interaction.editReply(v2({
             embeds: [
               {
                 color: Colors.Red,
@@ -78,9 +79,9 @@ class McCommand implements Command {
                 description: "無効なホスト名です",
               },
             ],
-          });
+          }));
 
-        await interaction.editReply({
+        await interaction.editReply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -119,14 +120,14 @@ class McCommand implements Command {
               ],
             },
           ],
-        });
+        }));
       } else {
         const server: MCServerResponse = await fetch(
           `https://api.mcsrvstat.us/bedrock/2/${encodeURIComponent(address)}`,
         ).then((res) => res.json());
 
         if (!server.online)
-          return await interaction.editReply({
+          return await interaction.editReply(v2({
             embeds: [
               {
                 color: Colors.Green,
@@ -138,10 +139,10 @@ class McCommand implements Command {
                 description: "🔴 オフライン",
               },
             ],
-          });
+          }));
 
         if (!server.debug.ping)
-          return await interaction.editReply({
+          return await interaction.editReply(v2({
             embeds: [
               {
                 color: Colors.Red,
@@ -152,9 +153,9 @@ class McCommand implements Command {
                 description: "無効なホスト名です",
               },
             ],
-          });
+          }));
 
-        await interaction.editReply({
+        await interaction.editReply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -193,10 +194,10 @@ class McCommand implements Command {
               ],
             },
           ],
-        });
+        }));
       }
     } catch {
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -207,7 +208,7 @@ class McCommand implements Command {
             description: "指定したアドレスが間違っている可能性があります",
           },
         ],
-      });
+      }));
     }
   }
 

@@ -15,6 +15,7 @@ import {
   findBumpNotice,
   upsertBumpNotice,
 } from "@/Models/BoardNotice";
+import { v2 } from "@/util/v2";
 
 class BumpSubCommand implements SubCommand {
   public readonly client: Client;
@@ -49,7 +50,7 @@ class BumpSubCommand implements SubCommand {
 
     if (!bumpNoticeData) {
       if (!role)
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -60,11 +61,11 @@ class BumpSubCommand implements SubCommand {
               description: "ロールを選択してください",
             },
           ],
-        });
+        }));
 
       const botData = await Fetch.member(interaction.guild, "302050872383242240");
       if (!botData)
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -75,11 +76,11 @@ class BumpSubCommand implements SubCommand {
               description: "このサーバーにDisboardが参加していません",
             },
           ],
-        });
+        }));
 
       await createBumpNotice(interaction.guildId, role.id);
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -90,12 +91,12 @@ class BumpSubCommand implements SubCommand {
             description: `<@&${role.id}>`,
           },
         ],
-      });
+      }));
     } else {
       if (role) {
         const botData = await Fetch.member(interaction.guild, config.bot.disboardId);
         if (!botData)
-          return await interaction.reply({
+          return await interaction.reply(v2({
             embeds: [
               {
                 color: Colors.Red,
@@ -106,11 +107,11 @@ class BumpSubCommand implements SubCommand {
                 description: "このサーバーにDisboardが参加していません",
               },
             ],
-          });
+          }));
 
         await upsertBumpNotice(interaction.guildId, role.id);
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -121,11 +122,11 @@ class BumpSubCommand implements SubCommand {
               description: `<@&${role.id}>`,
             },
           ],
-        });
+        }));
       } else {
         await deleteBumpNotice(interaction.guildId);
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -135,7 +136,7 @@ class BumpSubCommand implements SubCommand {
               },
             },
           ],
-        });
+        }));
       }
     }
   }

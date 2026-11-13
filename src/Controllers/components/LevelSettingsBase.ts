@@ -14,6 +14,7 @@ import {
   DEFAULT_LEVEL_SETTINGS,
   LevelSettings,
 } from "@/Views/levelSettingsPanel";
+import { v2 } from "@/util/v2";
 
 export const COLUMNS = {
   notify: '"notify"',
@@ -55,7 +56,7 @@ abstract class LevelSettingsBase {
   protected async deny(
     interaction: PanelInteraction,
   ): Promise<InteractionResponse<boolean>> {
-    return await interaction.reply({
+    return await interaction.reply(v2({
       embeds: [
         {
           color: Colors.Red,
@@ -67,7 +68,7 @@ abstract class LevelSettingsBase {
         },
       ],
       flags: MessageFlags.Ephemeral,
-    });
+    }));
   }
 }
 

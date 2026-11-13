@@ -12,6 +12,7 @@ import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
 import isUrl from "@/util/isUrl";
 import isTimePassed from "@/Models/isTimePassed";
+import { v2 } from "@/util/v2";
 
 class ShortCommand implements Command {
   public readonly client: Client;
@@ -46,7 +47,7 @@ class ShortCommand implements Command {
     const url: string = interaction.options.getString("url", true);
 
     if (!isUrl(url))
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -58,10 +59,10 @@ class ShortCommand implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     if (!(await isTimePassed(interaction.user.id, this.name, 10)))
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -73,7 +74,7 @@ class ShortCommand implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     try {
       const data = await fetch("https://short.neody.land/api/shorten", {
@@ -88,7 +89,7 @@ class ShortCommand implements Command {
         content: data.shorturl,
       });
     } catch (error) {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -106,7 +107,7 @@ class ShortCommand implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 

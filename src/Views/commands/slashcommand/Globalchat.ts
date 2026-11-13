@@ -25,6 +25,7 @@ import sendGlobalChat from "@/Models/sendGlobalChat";
 import deleteWebhook from "@/Models/deleteWebhook";
 import Random from "@/util/Random";
 import deleteDuplicateWebhook from "@/Models/deleteDuplicateWebhook";
+import { v2 } from "@/util/v2";
 
 class GlobalchatCommand implements Command {
   public readonly client: Client;
@@ -71,7 +72,7 @@ class GlobalchatCommand implements Command {
         interaction.guild.memberCount < 20 ||
         (await interaction.guild.members.fetch()).filter((m) => !m.user.bot).size < 10
       )
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -89,10 +90,10 @@ class GlobalchatCommand implements Command {
             },
           ],
           flags: MessageFlags.Ephemeral,
-        });
+        }));
 
       if (interaction.channel.type !== ChannelType.GuildText)
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -104,17 +105,17 @@ class GlobalchatCommand implements Command {
             },
           ],
           flags: MessageFlags.Ephemeral,
-        });
+        }));
 
       await interaction.deferReply();
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Green,
             description: "登録中....",
           },
         ],
-      });
+      }));
 
       await deleteDuplicateWebhook(interaction.channel, ["TakasumiBOT Global"]);
 
@@ -130,7 +131,7 @@ class GlobalchatCommand implements Command {
           webhookUrl: webhook.url,
         });
 
-        await interaction.editReply({
+        await interaction.editReply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -142,7 +143,7 @@ class GlobalchatCommand implements Command {
                 "グローバルチャットに参加しました\nみんなに挨拶してみましょう!\n\nこのチャンネルに入力されたメッセージは、グローバルチャットに登録するすべてのチャンネルに送信されます\n個人情報の取り扱い、言葉遣いには十分気を付けてくださいね。\n\n※チャットを利用した場合、[TakasumiBOT利用規約](https://www.takasumibot.com/terms.html)に同意したものとみなされます。必ずご確認ください",
             },
           ],
-        });
+        }));
 
         await sendGlobalChat({
           title: `${interaction.guild.name}<${interaction.guild.id}>`,
@@ -155,7 +156,7 @@ class GlobalchatCommand implements Command {
             "https://cdn.discordapp.com/embed/avatars/0.png",
         });
       } catch (error) {
-        await interaction.editReply({
+        await interaction.editReply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -180,14 +181,14 @@ class GlobalchatCommand implements Command {
                 .setStyle(ButtonStyle.Link),
             ),
           ],
-        });
+        }));
       }
     } else {
       const gcData = await deleteGlobalChatByGuildId(interaction.guildId);
 
       void deleteWebhook(gcData.webhookUrl);
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -199,7 +200,7 @@ class GlobalchatCommand implements Command {
               "TakasumiBOT グローバルチャットのご利用ありがとうございました。\nこれからも、TakasumiBOTをよろしくお願いします。",
           },
         ],
-      });
+      }));
 
       sendGlobalChat({
         title: ":wave: グローバルチャットから1つのサーバーが離脱しました",

@@ -13,6 +13,7 @@ import {
 import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
+import { v2 } from "@/util/v2";
 
 class MemberContextMenu implements Command {
   public readonly client: Client;
@@ -46,7 +47,7 @@ class MemberContextMenu implements Command {
     const member = interaction.options.getMember("user");
 
     if (!member || !("user" in member))
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -58,14 +59,14 @@ class MemberContextMenu implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     try {
       const joinData = member.joinedAt
         ? `${member.joinedAt.toLocaleString("ja-JP")}\n(${Math.floor((new Date().getTime() - member.joinedAt.getTime()) / 86400000)}日前)`
         : "不明";
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -112,9 +113,9 @@ class MemberContextMenu implements Command {
             ],
           },
         ],
-      });
+      }));
     } catch (error) {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -139,7 +140,7 @@ class MemberContextMenu implements Command {
           ),
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 

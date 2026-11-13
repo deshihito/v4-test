@@ -15,6 +15,7 @@ import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
 import Permission from "@/util/Permission";
 import Fetch from "@/Models/Fetch";
+import { v2 } from "@/util/v2";
 
 class PermissionCommand implements Command {
   public readonly client: Client;
@@ -49,7 +50,7 @@ class PermissionCommand implements Command {
 
     try {
       if (!user) {
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -63,11 +64,11 @@ class PermissionCommand implements Command {
                 .join("`,`")}\``,
             },
           ],
-        });
+        }));
       } else {
         const member = await Fetch.member(interaction.guild, user.id);
         if (!member)
-          return await interaction.reply({
+          return await interaction.reply(v2({
             embeds: [
               {
                 color: Colors.Red,
@@ -79,9 +80,9 @@ class PermissionCommand implements Command {
               },
             ],
             flags: MessageFlags.Ephemeral,
-          });
+          }));
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -95,10 +96,10 @@ class PermissionCommand implements Command {
                 .join("`,`")}\``,
             },
           ],
-        });
+        }));
       }
     } catch (error) {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -123,7 +124,7 @@ class PermissionCommand implements Command {
           ),
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 

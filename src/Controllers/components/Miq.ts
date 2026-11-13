@@ -12,6 +12,7 @@ import {
 import { ButtonController } from "@/@types/Util";
 import config from "@/config";
 import Fetch from "@/Models/Fetch";
+import { v2 } from "@/util/v2";
 
 class MiqEvent implements ButtonController {
   public readonly client: Client;
@@ -28,7 +29,7 @@ class MiqEvent implements ButtonController {
     const data = interaction.customId.split("_");
 
     if (interaction.user.id !== data[2])
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -40,10 +41,10 @@ class MiqEvent implements ButtonController {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     if (!interaction.channel)
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -55,11 +56,11 @@ class MiqEvent implements ButtonController {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     const message = await Fetch.message(interaction.channel, data[3]);
     if (!message)
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -71,22 +72,31 @@ class MiqEvent implements ButtonController {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     const image = await fetch(
       `${config.api.miqUrl}/?type=${data[1]}&name=${message.author.username}&id=${message.author.id}&content=${message.cleanContent.replace("#", "＃")}&icon=${message.author.avatarURL({ extension: "png", size: 1024 }) || message.author.defaultAvatarURL}`,
     ).then((res) => res.arrayBuffer());
 
     try {
-      await interaction.message.edit({
-        content: interaction.message.content,
-        files: [new AttachmentBuilder(Buffer.from(image)).setName("TakasumiBOT_MIQ.png")],
-        components: interaction.message.components,
-      });
+      const files = [new AttachmentBuilder(Buffer.from(image)).setName("TakasumiBOT_MIQ.png")];
+      await interaction.message.edit(
+        interaction.message.flags.has(MessageFlags.IsComponentsV2)
+          ? {
+              files: files,
+              components: interaction.message.components,
+              flags: MessageFlags.IsComponentsV2,
+            }
+          : v2({
+              content: interaction.message.content,
+              files: files,
+              components: interaction.message.components,
+            }),
+      );
 
       await interaction.deferUpdate({});
     } catch (error) {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -111,7 +121,7 @@ class MiqEvent implements ButtonController {
           ),
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 }

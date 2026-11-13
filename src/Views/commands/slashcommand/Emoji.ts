@@ -14,6 +14,7 @@ import {
 import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
+import { v2 } from "@/util/v2";
 
 class EmojiCommand implements Command {
   public readonly client: Client;
@@ -49,7 +50,7 @@ class EmojiCommand implements Command {
     const emojiId: RegExpMatchArray | null = name.match(/<a?:[^:]+:(\d+)>/);
 
     if (!emojiId)
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -61,13 +62,13 @@ class EmojiCommand implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     try {
       const emoji: GuildEmoji = await interaction.guild.emojis.fetch(emojiId[1]);
       const createdAt = Math.floor(emoji.createdAt.getTime() / 1000);
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -102,9 +103,9 @@ class EmojiCommand implements Command {
             ],
           },
         ],
-      });
+      }));
     } catch (error) {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -129,7 +130,7 @@ class EmojiCommand implements Command {
           ),
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 

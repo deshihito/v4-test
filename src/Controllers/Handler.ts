@@ -49,6 +49,7 @@ import Permission from "@/util/Permission";
 import DBCache from "@/Models/DBCache";
 import isAdmin from "@/Models/isAdmin";
 import { env } from "@/util/Env";
+import { v2 } from "@/util/v2";
 
 class Handler {
   public readonly client: Client;
@@ -131,7 +132,7 @@ class Handler {
   > {
     if (interaction.isRepliable()) {
       if (!interaction.guild)
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -150,10 +151,10 @@ class Handler {
                 .setStyle(ButtonStyle.Link),
             ),
           ],
-        });
+        }));
 
       if (await Mute.isMuteGuild(interaction.guild.id))
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -173,10 +174,10 @@ class Handler {
             ),
           ],
           flags: MessageFlags.Ephemeral,
-        });
+        }));
 
       if (await Mute.isMuteUser(interaction.user.id))
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -196,14 +197,14 @@ class Handler {
             ),
           ],
           flags: MessageFlags.Ephemeral,
-        });
+        }));
 
       if (
         "commandName" in interaction &&
         (await this.isDisableCommand(interaction)) &&
         !(await isAdmin(interaction.user.id))
       )
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -223,11 +224,11 @@ class Handler {
             ),
           ],
           flags: MessageFlags.Ephemeral,
-        });
+        }));
 
       const restrictedDescription = await this.commandRestriction(interaction);
       if (restrictedDescription)
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -239,7 +240,7 @@ class Handler {
             },
           ],
           flags: MessageFlags.Ephemeral,
-        });
+        }));
 
       Promise.all(this.commands.map((command) => command.execute(interaction)));
 

@@ -10,6 +10,7 @@ import {
 } from "discord.js";
 import { ButtonController } from "@/@types/Util";
 import config from "@/config";
+import { v2 } from "@/util/v2";
 
 class ResetEvent implements ButtonController {
   public readonly client: Client;
@@ -26,7 +27,7 @@ class ResetEvent implements ButtonController {
     const data = interaction.customId.split("_");
 
     if (data[1] !== interaction.user.id)
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             author: {
@@ -38,10 +39,10 @@ class ResetEvent implements ButtonController {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     if (!interaction.channel || interaction.channel.isDMBased() || interaction.channel.isThread())
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             author: {
@@ -53,7 +54,7 @@ class ResetEvent implements ButtonController {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     try {
       const channel = await interaction.channel.clone();
@@ -62,7 +63,7 @@ class ResetEvent implements ButtonController {
 
       await interaction.deferUpdate({});
       await channel
-        .send({
+        .send(v2({
           content: `<@${interaction.user.id}>`,
           embeds: [
             {
@@ -73,10 +74,10 @@ class ResetEvent implements ButtonController {
               },
             },
           ],
-        })
+        }))
         .catch(() => {});
     } catch (error) {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -101,7 +102,7 @@ class ResetEvent implements ButtonController {
           ),
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 }

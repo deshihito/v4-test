@@ -10,6 +10,7 @@ import { SubCommand, ValidSubCommandInteraction } from "@/@types/Util";
 import CommandUtils from "@/Controllers/CommandUtils";
 import config from "@/config";
 import Fetch from "@/Models/Fetch";
+import { v2 } from "@/util/v2";
 
 class LeaveSubCommand implements SubCommand {
   public readonly client: Client;
@@ -39,7 +40,7 @@ class LeaveSubCommand implements SubCommand {
 
     const guild: Guild | null = await Fetch.guild(interaction.client, id);
     if (!guild)
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -51,12 +52,12 @@ class LeaveSubCommand implements SubCommand {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     try {
       await guild.leave();
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -66,9 +67,9 @@ class LeaveSubCommand implements SubCommand {
             },
           },
         ],
-      });
+      }));
     } catch (error) {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -85,7 +86,7 @@ class LeaveSubCommand implements SubCommand {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 

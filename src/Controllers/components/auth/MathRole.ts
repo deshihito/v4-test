@@ -11,6 +11,7 @@ import {
 } from "discord.js";
 import { ModalController } from "@/@types/Util";
 import config from "@/config";
+import { v2 } from "@/util/v2";
 
 class MathRoleAuthEvent implements ModalController {
   public readonly client: Client;
@@ -28,7 +29,7 @@ class MathRoleAuthEvent implements ModalController {
     const code = interaction.fields.getTextInputValue("code");
 
     if (!interaction.member || !(interaction.member.roles instanceof GuildMemberRoleManager))
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -39,10 +40,10 @@ class MathRoleAuthEvent implements ModalController {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     if (interaction.member.roles.cache.has(data[1]))
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -53,10 +54,10 @@ class MathRoleAuthEvent implements ModalController {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     if (isNaN(Number(code)))
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -68,10 +69,10 @@ class MathRoleAuthEvent implements ModalController {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     if (code !== data[2])
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -83,12 +84,12 @@ class MathRoleAuthEvent implements ModalController {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     try {
       await interaction.member.roles.add(data[1]);
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -99,9 +100,9 @@ class MathRoleAuthEvent implements ModalController {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     } catch (error) {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -127,7 +128,7 @@ class MathRoleAuthEvent implements ModalController {
           ),
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 }

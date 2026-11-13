@@ -14,6 +14,7 @@ import {
   createDisableCommand,
   deleteDisableCommandByName,
 } from "@/Models/DisableCommand";
+import { v2 } from "@/util/v2";
 
 class CommandSubCommand implements SubCommand {
   public readonly client: Client;
@@ -42,7 +43,7 @@ class CommandSubCommand implements SubCommand {
     const name: string = interaction.options.getString("name", true);
 
     if (!commands.find((command) => command.name === name))
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -54,14 +55,14 @@ class CommandSubCommand implements SubCommand {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     const commandData = await findDisableCommandByName(name);
 
     if (commandData) {
       await deleteDisableCommandByName(name);
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -71,11 +72,11 @@ class CommandSubCommand implements SubCommand {
             },
           },
         ],
-      });
+      }));
     } else {
       await createDisableCommand(name);
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -85,7 +86,7 @@ class CommandSubCommand implements SubCommand {
             },
           },
         ],
-      });
+      }));
     }
   }
 

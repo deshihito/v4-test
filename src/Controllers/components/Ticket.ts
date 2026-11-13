@@ -11,6 +11,7 @@ import {
 } from "discord.js";
 import { ButtonController } from "@/@types/Util";
 import config from "@/config";
+import { v2 } from "@/util/v2";
 
 class TicketEvent implements ButtonController {
   public readonly client: Client;
@@ -27,7 +28,7 @@ class TicketEvent implements ButtonController {
     const data = interaction.customId.split("_");
 
     if (!interaction.guild)
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -39,14 +40,14 @@ class TicketEvent implements ButtonController {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     if (
       interaction.guild.channels.cache.find(
         (channel) => channel.parentId === data[1] && channel.name === interaction.user.id,
       )
     )
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -58,11 +59,11 @@ class TicketEvent implements ButtonController {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     const channel = interaction.guild.channels.cache.find((name) => name.id === data[1]);
     if (!channel)
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -74,7 +75,7 @@ class TicketEvent implements ButtonController {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     try {
       const ch = await interaction.guild.channels.create({
@@ -92,7 +93,7 @@ class TicketEvent implements ButtonController {
         ViewChannel: true,
       });
 
-      await ch.send({
+      await ch.send(v2({
         content: `<@${interaction.user.id}>`,
         embeds: [
           {
@@ -108,9 +109,9 @@ class TicketEvent implements ButtonController {
               .setLabel("閉じる"),
           ),
         ],
-      });
+      }));
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -122,9 +123,9 @@ class TicketEvent implements ButtonController {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     } catch (error) {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -149,7 +150,7 @@ class TicketEvent implements ButtonController {
           ),
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 }

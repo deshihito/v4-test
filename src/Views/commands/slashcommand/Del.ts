@@ -15,6 +15,7 @@ import {
 import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
+import { v2 } from "@/util/v2";
 
 class DelCommand implements Command {
   public readonly client: Client;
@@ -56,7 +57,7 @@ class DelCommand implements Command {
     if (!isSameUser && !(await CommandUtils.hasPermissions(this, interaction))) return;
 
     if (number < 1 || number > 100) {
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -68,7 +69,7 @@ class DelCommand implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
 
     try {
@@ -78,7 +79,7 @@ class DelCommand implements Command {
           .first(number);
 
         if (!messages[0])
-          return await interaction.reply({
+          return await interaction.reply(v2({
             embeds: [
               {
                 color: Colors.Red,
@@ -91,11 +92,11 @@ class DelCommand implements Command {
               },
             ],
             flags: MessageFlags.Ephemeral,
-          });
+          }));
 
         await interaction.channel.bulkDelete(messages, true);
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -108,13 +109,13 @@ class DelCommand implements Command {
           flags: isSameUser ? MessageFlags.Ephemeral : undefined,
           // 削除したことが知られると、当事者間で余計な問題を誘発しかねない利用場面が想定されるため、一律で非表示にしています。
           // (お願い)このコメントおよびフラグは削除しないでください。
-        });
+        }));
       } else {
         const messages = await interaction.channel.messages.fetch({ limit: number });
 
         await interaction.channel.bulkDelete(messages, true);
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -124,10 +125,10 @@ class DelCommand implements Command {
               },
             },
           ],
-        });
+        }));
       }
     } catch (error) {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -153,7 +154,7 @@ class DelCommand implements Command {
           ),
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 

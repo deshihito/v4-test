@@ -15,6 +15,7 @@ import {
 import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
+import { v2 } from "@/util/v2";
 
 class GuidelineCommand implements Command {
   public readonly client: Client;
@@ -52,7 +53,7 @@ class GuidelineCommand implements Command {
     const role = interaction.options.getRole("role", true);
 
     if (!("editable" in role))
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -64,7 +65,7 @@ class GuidelineCommand implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     const text = new LabelBuilder()
       .setLabel("テンプレートを編集してガイドラインを作成してください")

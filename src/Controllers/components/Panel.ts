@@ -12,6 +12,7 @@ import {
 import { SelectController } from "@/@types/Util";
 import config from "@/config";
 import sleep from "@/util/sleep";
+import { v2 } from "@/util/v2";
 
 class PanelEvent implements SelectController {
   public readonly client: Client;
@@ -34,14 +35,14 @@ class PanelEvent implements SelectController {
       );
       const remove = interaction.values.filter((role) => !add.includes(role));
 
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Green,
             description: "ロールを変更中...",
           },
         ],
-      });
+      }));
 
       await Promise.all(
         add.map(async (role) => {
@@ -65,7 +66,7 @@ class PanelEvent implements SelectController {
         }),
       );
 
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -85,9 +86,9 @@ class PanelEvent implements SelectController {
             ],
           },
         ],
-      });
+      }));
     } catch (error) {
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -112,7 +113,7 @@ class PanelEvent implements SelectController {
               .setStyle(ButtonStyle.Link),
           ),
         ],
-      });
+      }));
     }
   }
 }

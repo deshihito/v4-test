@@ -10,6 +10,7 @@ import {
 } from "discord.js";
 import { ButtonController } from "@/@types/Util";
 import Random from "@/util/Random";
+import { v2 } from "@/util/v2";
 
 class ImageAuthEvent implements ButtonController {
   public readonly client: Client;
@@ -42,7 +43,7 @@ class ImageAuthEvent implements ButtonController {
 
     const image = await fetch(key.url).then((res) => res.arrayBuffer());
 
-    await interaction.editReply({
+    await interaction.editReply(v2({
       embeds: [
         {
           color: Colors.Green,
@@ -70,7 +71,7 @@ class ImageAuthEvent implements ButtonController {
             ),
         ),
       ],
-    });
+    }));
   }
 }
 

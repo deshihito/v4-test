@@ -10,6 +10,7 @@ import {
 } from "discord.js";
 import { ButtonController } from "@/@types/Util";
 import config from "@/config";
+import { v2 } from "@/util/v2";
 
 class TicketCloseEvent implements ButtonController {
   public readonly client: Client;
@@ -24,7 +25,7 @@ class TicketCloseEvent implements ButtonController {
   public async execute(interaction: ButtonInteraction): Promise<InteractionResponse<boolean> | void> {
 
     if (!interaction.channel)
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -36,12 +37,12 @@ class TicketCloseEvent implements ButtonController {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     try {
       await interaction.channel.delete();
     } catch (error) {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -66,7 +67,7 @@ class TicketCloseEvent implements ButtonController {
           ),
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 }

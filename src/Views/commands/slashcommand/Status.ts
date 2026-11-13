@@ -16,6 +16,7 @@ import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
 import { env } from "@/util/Env";
 import calcTime from "@/util/calcTime";
+import { v2 } from "@/util/v2";
 
 class StatusCommand implements Command {
   public readonly client: Client;
@@ -48,16 +49,16 @@ class StatusCommand implements Command {
 
     await interaction.deferReply();
     try {
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Blue,
             description: "計測中...",
           },
         ],
-      });
+      }));
 
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Blue,
@@ -86,9 +87,9 @@ class StatusCommand implements Command {
               .setStyle(ButtonStyle.Link),
           ),
         ],
-      });
+      }));
     } catch (error) {
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -112,7 +113,7 @@ class StatusCommand implements Command {
               .setStyle(ButtonStyle.Link),
           ),
         ],
-      });
+      }));
     }
   }
 

@@ -12,6 +12,7 @@ import {
 import { ModalController } from "@/@types/Util";
 import config from "@/config";
 import { createGuildBoard } from "@/Models/GuildBoard";
+import { v2 } from "@/util/v2";
 
 class RegisterEvent implements ModalController {
   public readonly client: Client;
@@ -29,7 +30,7 @@ class RegisterEvent implements ModalController {
 
     try {
       if (!interaction.channel || !interaction.guild)
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -41,7 +42,7 @@ class RegisterEvent implements ModalController {
             },
           ],
           flags: MessageFlags.Ephemeral,
-        });
+        }));
 
       if (
         interaction.channel.type !== ChannelType.GuildText &&
@@ -49,7 +50,7 @@ class RegisterEvent implements ModalController {
         interaction.channel.type !== ChannelType.GuildAnnouncement &&
         interaction.channel.type !== ChannelType.GuildStageVoice
       )
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -61,7 +62,7 @@ class RegisterEvent implements ModalController {
             },
           ],
           flags: MessageFlags.Ephemeral,
-        });
+        }));
 
       const invite = await interaction.channel.createInvite({
         unique: true,
@@ -70,7 +71,7 @@ class RegisterEvent implements ModalController {
 
       await createGuildBoard(interaction.guild.id, description, invite.url);
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -80,9 +81,9 @@ class RegisterEvent implements ModalController {
             },
           },
         ],
-      });
+      }));
     } catch (error) {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -107,7 +108,7 @@ class RegisterEvent implements ModalController {
           ),
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 }

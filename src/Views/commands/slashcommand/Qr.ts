@@ -14,6 +14,7 @@ import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
 import { QrReadResponse } from "@/@types/Api";
 import isUrl from "@/util/isUrl";
+import { v2 } from "@/util/v2";
 
 class QrCommand implements Command {
   public readonly client: Client;
@@ -53,20 +54,20 @@ class QrCommand implements Command {
 
     if (type === "generate") {
       await interaction.deferReply();
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Green,
             title: "生成中...",
           },
         ],
-      });
+      }));
 
       const image: ArrayBuffer = await fetch(
         `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(text)}&size=256x256&extension=png&ecc=${ecc}`,
       ).then((res) => res.arrayBuffer());
 
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -81,10 +82,10 @@ class QrCommand implements Command {
           },
         ],
         files: [new AttachmentBuilder(Buffer.from(image)).setName("QRcode.png")],
-      });
+      }));
     } else {
       if (!isUrl(text))
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -96,24 +97,24 @@ class QrCommand implements Command {
             },
           ],
           flags: MessageFlags.Ephemeral,
-        });
+        }));
 
       await interaction.deferReply();
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Green,
             title: "読み取り中...",
           },
         ],
-      });
+      }));
 
       const data: QrReadResponse[] = await fetch(
         `https://api.qrserver.com/v1/read-qr-code/?fileurl=${encodeURIComponent(text)}`,
       ).then((res) => res.json());
 
       if (data[0].symbol[0].error)
-        return await interaction.editReply({
+        return await interaction.editReply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -124,9 +125,9 @@ class QrCommand implements Command {
               description: "QRコードはURLかつ、読み取れる必要があります",
             },
           ],
-        });
+        }));
 
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -137,7 +138,7 @@ class QrCommand implements Command {
             description: `内容\n\`\`\`${data[0].symbol[0].data}\`\`\``,
           },
         ],
-      });
+      }));
     }
   }
 

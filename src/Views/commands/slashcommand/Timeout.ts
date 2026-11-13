@@ -16,6 +16,7 @@ import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import Fetch from "@/Models/Fetch";
 import CommandUtils from "@/Controllers/CommandUtils";
+import { v2 } from "@/util/v2";
 
 class TimeoutCommand implements Command {
   public readonly client: Client;
@@ -52,7 +53,7 @@ class TimeoutCommand implements Command {
 
     const member = await Fetch.member(interaction.guild, user.id);
     if (!member)
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -64,10 +65,10 @@ class TimeoutCommand implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     if (member.user.id === interaction.user.id)
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -79,13 +80,13 @@ class TimeoutCommand implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     await interaction.deferReply();
     try {
       await member.timeout(time * 1000, reason);
 
-      await interaction.editReply({
+      await interaction.editReply(v2({
         content: `<@${interaction.user.id}>`,
         embeds: [
           {
@@ -96,9 +97,9 @@ class TimeoutCommand implements Command {
             },
           },
         ],
-      });
+      }));
     } catch (error) {
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -123,7 +124,7 @@ class TimeoutCommand implements Command {
               .setStyle(ButtonStyle.Link),
           ),
         ],
-      });
+      }));
     }
   }
 

@@ -7,6 +7,7 @@ import {
   deleteGuildStatistics,
   findGuildStatistics,
 } from "@/Models/GuildStatistics";
+import { v2 } from "@/util/v2";
 
 class JoinSubCommand implements SubCommand {
   public readonly client: Client;
@@ -39,7 +40,7 @@ class JoinSubCommand implements SubCommand {
     if (!guildStatisticsData) {
       await createGuildStatistics(interaction.guildId);
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -49,11 +50,11 @@ class JoinSubCommand implements SubCommand {
             },
           },
         ],
-      });
+      }));
     } else {
       await deleteGuildStatistics(interaction.guildId);
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -63,7 +64,7 @@ class JoinSubCommand implements SubCommand {
             },
           },
         ],
-      });
+      }));
     }
   }
 

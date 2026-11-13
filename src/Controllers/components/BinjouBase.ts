@@ -10,6 +10,7 @@ import {
 import config from "@/config";
 import { findBinjouSetting, listBinjouRules } from "@/Models/Binjou";
 import { buildBinjouPanel } from "@/Views/binjouPanel";
+import { v2 } from "@/util/v2";
 
 export type BinjouPanelInteraction = ButtonInteraction | ModalSubmitInteraction;
 
@@ -25,7 +26,7 @@ abstract class BinjouBase {
   protected async deny(
     interaction: BinjouPanelInteraction,
   ): Promise<InteractionResponse<boolean>> {
-    return await interaction.reply({
+    return await interaction.reply(v2({
       embeds: [
         {
           color: Colors.Red,
@@ -34,7 +35,7 @@ abstract class BinjouBase {
         },
       ],
       flags: MessageFlags.Ephemeral,
-    });
+    }));
   }
 
   protected async buildPanel(guildId: string): Promise<ContainerBuilder> {

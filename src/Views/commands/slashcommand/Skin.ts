@@ -14,6 +14,7 @@ import {
 import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
+import { v2 } from "@/util/v2";
 
 class SkinCommand implements Command {
   public readonly client: Client;
@@ -57,7 +58,7 @@ class SkinCommand implements Command {
       );
 
       if (!disposition)
-        throw await interaction.editReply({
+        throw await interaction.editReply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -68,11 +69,11 @@ class SkinCommand implements Command {
               description: "指定したユーザーは存在しません",
             },
           ],
-        });
+        }));
 
       const match = disposition.match(/filename="([^"]+)"/);
       if (!match || !match[1])
-        return await interaction.editReply({
+        return await interaction.editReply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -83,11 +84,11 @@ class SkinCommand implements Command {
               description: "指定したユーザーは存在しません",
             },
           ],
-        });
+        }));
 
       const link = match[1].replace(/\.png$/, "");
 
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -109,9 +110,9 @@ class SkinCommand implements Command {
               .setStyle(ButtonStyle.Link),
           ),
         ],
-      });
+      }));
     } catch {
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -122,7 +123,7 @@ class SkinCommand implements Command {
             description: "違うユーザー名で試してください",
           },
         ],
-      });
+      }));
     }
   }
 

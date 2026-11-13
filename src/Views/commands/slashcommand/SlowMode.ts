@@ -14,6 +14,7 @@ import {
 import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
+import { v2 } from "@/util/v2";
 
 class SlowmodeCommand implements Command {
   public readonly client: Client;
@@ -49,7 +50,7 @@ class SlowmodeCommand implements Command {
     try {
       await interaction.channel.setRateLimitPerUser(time);
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -60,9 +61,9 @@ class SlowmodeCommand implements Command {
             description: `低速モードは現在${time}秒です`,
           },
         ],
-      });
+      }));
     } catch (error) {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -87,7 +88,7 @@ class SlowmodeCommand implements Command {
           ),
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 

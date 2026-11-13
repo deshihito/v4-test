@@ -12,6 +12,7 @@ import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
 import { SafewebResponse } from "@/@types/Api";
 import isUrl from "@/util/isUrl";
+import { v2 } from "@/util/v2";
 
 class SafewebCommand implements Command {
   public readonly client: Client;
@@ -45,7 +46,7 @@ class SafewebCommand implements Command {
     const url = interaction.options.getString("url", true);
 
     if (!isUrl(url))
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -57,7 +58,7 @@ class SafewebCommand implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     await interaction.deferReply();
     try {
@@ -66,7 +67,7 @@ class SafewebCommand implements Command {
       ).then((res) => res.json());
 
       if (data.rating === "w") {
-        await interaction.editReply({
+        await interaction.editReply(v2({
           embeds: [
             {
               color: Colors.Yellow,
@@ -81,9 +82,9 @@ class SafewebCommand implements Command {
               },
             },
           ],
-        });
+        }));
       } else if (data.rating === "b") {
-        await interaction.editReply({
+        await interaction.editReply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -98,9 +99,9 @@ class SafewebCommand implements Command {
               },
             },
           ],
-        });
+        }));
       } else if (data.rating === "u") {
-        await interaction.editReply({
+        await interaction.editReply(v2({
           embeds: [
             {
               color: Colors.Grey,
@@ -115,9 +116,9 @@ class SafewebCommand implements Command {
               },
             },
           ],
-        });
+        }));
       } else {
-        await interaction.editReply({
+        await interaction.editReply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -132,10 +133,10 @@ class SafewebCommand implements Command {
               },
             },
           ],
-        });
+        }));
       }
     } catch {
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -146,7 +147,7 @@ class SafewebCommand implements Command {
             description: "サイトの取得に失敗しました",
           },
         ],
-      });
+      }));
     }
   }
 

@@ -15,6 +15,7 @@ import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
 import Permission from "@/util/Permission";
+import { v2 } from "@/util/v2";
 
 class RoleCommand implements Command {
   public readonly client: Client;
@@ -48,7 +49,7 @@ class RoleCommand implements Command {
     const role = interaction.options.getRole("name", true);
 
     if (!(role instanceof Role))
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -60,10 +61,10 @@ class RoleCommand implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     try {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -122,9 +123,9 @@ class RoleCommand implements Command {
             ],
           },
         ],
-      });
+      }));
     } catch (error) {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -149,7 +150,7 @@ class RoleCommand implements Command {
           ),
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 

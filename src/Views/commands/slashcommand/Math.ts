@@ -10,6 +10,7 @@ import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
 import { MathResponse } from "@/@types/Api";
+import { v2 } from "@/util/v2";
 
 class MathCommand implements Command {
   public readonly client: Client;
@@ -43,14 +44,14 @@ class MathCommand implements Command {
     const formula = interaction.options.getString("formula", true);
 
     await interaction.deferReply();
-    await interaction.editReply({
+    await interaction.editReply(v2({
       embeds: [
         {
           color: Colors.Aqua,
           description: `計算しています...少々お待ちください`,
         },
       ],
-    });
+    }));
 
     const abort = new AbortController();
     const abortTimer = setTimeout(() => abort.abort(), 7000);
@@ -64,7 +65,7 @@ class MathCommand implements Command {
       clearTimeout(abortTimer);
 
       if (data.status !== 0) {
-        await interaction.editReply({
+        await interaction.editReply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -75,9 +76,9 @@ class MathCommand implements Command {
               description: `エラーコード: ${data.message}`,
             },
           ],
-        });
+        }));
       } else {
-        await interaction.editReply({
+        await interaction.editReply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -88,11 +89,11 @@ class MathCommand implements Command {
               description: `**式**\n\`\`\`${formula}\`\`\`\n**結果**\n\`\`\`${data.value[0].calculatedvalue}\`\`\``,
             },
           ],
-        });
+        }));
       }
     } catch {
       clearTimeout(abortTimer);
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -104,7 +105,7 @@ class MathCommand implements Command {
               "サーバーエラーまたは計算エラーが発生しました。\n時間を空けて試すか、計算式を変えてやり直してください",
           },
         ],
-      });
+      }));
     }
   }
 

@@ -11,6 +11,7 @@ import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
 import homo from "@/util/homo";
+import { v2 } from "@/util/v2";
 
 class HomoCommand implements Command {
   public readonly client: Client;
@@ -44,7 +45,7 @@ class HomoCommand implements Command {
     const number: string = interaction.options.getString("number", true);
 
     if (isNaN(Number(number)))
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -56,11 +57,11 @@ class HomoCommand implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     const result: string = homo(Number(number));
 
-    await interaction.reply({
+    await interaction.reply(v2({
       embeds: [
         {
           color: Colors.Green,
@@ -71,7 +72,7 @@ class HomoCommand implements Command {
           description: `\`\`\`${result}\`\`\``,
         },
       ],
-    });
+    }));
   }
 
   public build(): SlashCommandOptionsOnlyBuilder {

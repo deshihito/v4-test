@@ -15,6 +15,7 @@ import {
 import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
+import { v2 } from "@/util/v2";
 
 class PanelCommand implements Command {
   public readonly client: Client;
@@ -62,7 +63,7 @@ class PanelCommand implements Command {
     const emojis = ["🇦", "🇧", "🇨", "🇩", "🇪"];
 
     try {
-      await interaction.channel.send({
+      await interaction.channel.send(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -88,11 +89,11 @@ class PanelCommand implements Command {
               ),
           ),
         ],
-      });
+      }));
 
       await interaction.deferReply().then(() => interaction.deleteReply());
     } catch (error) {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -118,7 +119,7 @@ class PanelCommand implements Command {
           ),
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 

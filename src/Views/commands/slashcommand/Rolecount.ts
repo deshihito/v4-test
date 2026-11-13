@@ -12,6 +12,7 @@ import {
 import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
+import { v2 } from "@/util/v2";
 
 class RolecountCommand implements Command {
   public readonly client: Client;
@@ -49,7 +50,7 @@ class RolecountCommand implements Command {
         .filter((role) => !role.managed)
         .filter((role) => role.name !== "@everyone");
 
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -65,9 +66,9 @@ class RolecountCommand implements Command {
               .join("\n"),
           },
         ],
-      });
+      }));
     } catch (error) {
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -91,7 +92,7 @@ class RolecountCommand implements Command {
               .setStyle(ButtonStyle.Link),
           ),
         ],
-      });
+      }));
     }
   }
 

@@ -12,6 +12,7 @@ import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
 import { IpResponse } from "@/@types/Api";
 import { env } from "@/util/Env";
+import { v2 } from "@/util/v2";
 
 class IpCommand implements Command {
   public readonly client: Client;
@@ -54,7 +55,7 @@ class IpCommand implements Command {
         )
       )
     )
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -66,14 +67,14 @@ class IpCommand implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     try {
       const data: IpResponse = await fetch(
         `https://api.ip2location.io/?key=${env.IP_KEY}&ip=${encodeURIComponent(address)}`,
       ).then((res) => res.json());
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -109,9 +110,9 @@ class IpCommand implements Command {
             ],
           },
         ],
-      });
+      }));
     } catch {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -123,7 +124,7 @@ class IpCommand implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 

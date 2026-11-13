@@ -13,6 +13,7 @@ import { findDissokuNoticeIgnore } from "@/Models/BoardNotice";
 import { NotificationQueueService } from "@/Models/NotificationQueue";
 import { NotificationType } from "@/generated";
 import { buildBumpRtaEmbed, finishBumpRtaRound, resolveBumpActorId } from "@/Models/bumpRta";
+import { v2 } from "@/util/v2";
 
 class AfkEvent implements MessageUpdateEvent {
   public readonly client: Client;
@@ -57,7 +58,7 @@ class AfkEvent implements MessageUpdateEvent {
 
       if (created) {
         await newMessage.channel
-          .send({
+          .send(v2({
             embeds: [
               {
                 color: Colors.Blue,
@@ -65,7 +66,7 @@ class AfkEvent implements MessageUpdateEvent {
                 description: `Dissoku UPを受信しました\n2時間後に通知します`,
               },
             ],
-          })
+          }))
           .catch(() => {});
       }
 
@@ -78,7 +79,7 @@ class AfkEvent implements MessageUpdateEvent {
         );
         if (result) {
           await newMessage.channel
-            .send({ embeds: [buildBumpRtaEmbed(NotificationType.dissoku, actorId, result)] })
+            .send(v2({ embeds: [buildBumpRtaEmbed(NotificationType.dissoku, actorId, result)] }))
             .catch(() => {});
         }
       }

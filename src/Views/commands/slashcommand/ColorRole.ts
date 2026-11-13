@@ -14,6 +14,7 @@ import {
 import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
+import { v2 } from "@/util/v2";
 
 class ColorRoleCommand implements Command {
   public readonly client: Client;
@@ -55,7 +56,7 @@ class ColorRoleCommand implements Command {
         mentionable: false,
       });
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -66,9 +67,9 @@ class ColorRoleCommand implements Command {
             description: `作成したロール: ${role}`,
           },
         ],
-      });
+      }));
     } catch (error) {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -93,7 +94,7 @@ class ColorRoleCommand implements Command {
           ),
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 

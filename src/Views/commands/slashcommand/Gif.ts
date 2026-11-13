@@ -12,6 +12,7 @@ import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
 import { GifResponse } from "@/@types/Api";
 import { env } from "@/util/Env";
+import { v2 } from "@/util/v2";
 
 class GifCommand implements Command {
   public readonly client: Client;
@@ -54,7 +55,7 @@ class GifCommand implements Command {
         res.arrayBuffer(),
       );
 
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -68,9 +69,9 @@ class GifCommand implements Command {
           },
         ],
         files: [new AttachmentBuilder(Buffer.from(image)).setName("result.gif")],
-      });
+      }));
     } catch {
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -81,7 +82,7 @@ class GifCommand implements Command {
             description: "違うワードで試してください",
           },
         ],
-      });
+      }));
     }
   }
 

@@ -21,6 +21,7 @@ import {
 } from "@/Models/Hiroyuki";
 import deleteWebhook from "@/Models/deleteWebhook";
 import deleteDuplicateWebhook from "@/Models/deleteDuplicateWebhook";
+import { v2 } from "@/util/v2";
 
 class HiroyukiCommand implements Command {
   public readonly client: Client;
@@ -63,7 +64,7 @@ class HiroyukiCommand implements Command {
 
       void deleteWebhook(hiroyukiData.webhookUrl);
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -75,7 +76,7 @@ class HiroyukiCommand implements Command {
               "ご利用ありがとうございました\nこれからも、TakasumiBOTをよろしくお願いします",
           },
         ],
-      });
+      }));
     } else {
       if (
         !interaction.channel ||
@@ -90,7 +91,7 @@ class HiroyukiCommand implements Command {
         if (interaction.channel.isThread())
           msgText =
             "スレッドでひろゆきを召喚することはできません\n通常のテキストチャンネルで召喚してください";
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               author: {
@@ -102,7 +103,7 @@ class HiroyukiCommand implements Command {
             },
           ],
           flags: MessageFlags.Ephemeral,
-        });
+        }));
       }
 
       await interaction.deferReply();
@@ -120,7 +121,7 @@ class HiroyukiCommand implements Command {
           webhookUrl: webhook.url,
         });
 
-        await interaction.editReply({
+        await interaction.editReply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -130,9 +131,9 @@ class HiroyukiCommand implements Command {
               },
             },
           ],
-        });
+        }));
       } catch (error) {
-        await interaction.editReply({
+        await interaction.editReply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -157,7 +158,7 @@ class HiroyukiCommand implements Command {
                 .setStyle(ButtonStyle.Link),
             ),
           ],
-        });
+        }));
       }
     }
   }

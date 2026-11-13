@@ -15,6 +15,7 @@ import {
 import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
+import { v2 } from "@/util/v2";
 
 class SnowflakeCommand implements Command {
   public readonly client: Client;
@@ -48,7 +49,7 @@ class SnowflakeCommand implements Command {
     const id: string = interaction.options.getString("id", true);
 
     if (isNaN(Number(id)))
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -60,12 +61,12 @@ class SnowflakeCommand implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     try {
       const snowflake: DeconstructedSnowflake = SnowflakeUtil.deconstruct(id);
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -76,9 +77,9 @@ class SnowflakeCommand implements Command {
             description: `Date: ${new Date(Number(snowflake.timestamp)).toLocaleString("ja-JP")}\nWorkerID: ${snowflake.workerId}\nProcessID: ${snowflake.processId}\nIncrement: ${snowflake.increment}`,
           },
         ],
-      });
+      }));
     } catch (error) {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -103,7 +104,7 @@ class SnowflakeCommand implements Command {
           ),
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 

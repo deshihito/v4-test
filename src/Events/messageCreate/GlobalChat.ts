@@ -4,9 +4,8 @@ import {
   Colors,
   ChannelType,
   WebhookClient,
-  EmbedBuilder,
   APIMessage,
-  ColorResolvable,
+  APIEmbed,
 } from "discord.js";
 import { MessageCreateEvent } from "@/@types/Util";
 import config from "@/config";
@@ -23,6 +22,7 @@ import {
 import Mute from "@/Models/Mute";
 import crypto from "node:crypto";
 import { gcerror404 } from "@/Models/sendGlobalChat";
+import { extractV2Text, v2Json } from "@/util/v2";
 
 class GlobalChatEvent implements MessageCreateEvent {
   public readonly client: Client;
@@ -45,8 +45,6 @@ class GlobalChatEvent implements MessageCreateEvent {
 
     if (!guildGlobalChatData) return;
 
-    let embedColor: ColorResolvable = Colors.Green;
-
     const history = await createGlobalChatHistory({
       userId: message.author.id,
       guildId: message.guildId,
@@ -54,23 +52,24 @@ class GlobalChatEvent implements MessageCreateEvent {
       messageId: message.id,
     });
 
-    const embeds = [
-      new EmbedBuilder()
-        .setColor(Math.floor(Math.random() * (0xffffff + 1)))
-        .setAuthor({
+    const embeds: APIEmbed[] = [
+      {
+        color: Math.floor(Math.random() * (0xffffff + 1)),
+        author: {
           name: isAdm ? `${message.author.tag}(管理者)` : `${message.author.tag}`,
           url: `https://discord.com/users/${message.author.id}`,
-          iconURL: message.author.avatarURL() || message.author.defaultAvatarURL,
-        })
-        .setFooter({
+          icon_url: message.author.avatarURL() || message.author.defaultAvatarURL,
+        },
+        footer: {
           text: `${message.guild.name}(${message.guild.id}) | ${history.id}`,
-          iconURL: message.guild.iconURL() || "https://cdn.discordapp.com/embed/avatars/0.png",
-        })
-        .setTimestamp(new Date()),
+          icon_url: message.guild.iconURL() || "https://cdn.discordapp.com/embed/avatars/0.png",
+        },
+        timestamp: new Date().toISOString(),
+      },
     ];
 
     if (message.content.length > 0) {
-      embeds[0].setDescription(parseMessage(message.content));
+      embeds[0].description = parseMessage(message.content);
     }
 
     if (message.reference?.messageId) {
@@ -81,30 +80,31 @@ class GlobalChatEvent implements MessageCreateEvent {
       );
 
       if (replyWebhookMessage) {
-        embeds[0].addFields([
+        const quoted = extractV2Text(replyWebhookMessage);
+        embeds[0].fields = [
           {
             name: "\u200b",
-            value: `**${replyWebhookMessage.embeds[0].author?.name || "不明"}>>** ${replyWebhookMessage.embeds[0].description || "なし"}`,
+            value: `**${quoted.author || "不明"}>>** ${quoted.description || "なし"}`,
           },
-        ]);
+        ];
       } else {
         const replyMessage = await Fetch.message(message.channel, message.reference.messageId);
 
         if (replyMessage) {
           if (await Mute.getUser(replyMessage.author.id)) {
-            embeds[0].addFields([
+            embeds[0].fields = [
               {
                 name: "\u200b",
                 value: "-# **BANされたユーザー**>> 表示できません",
               },
-            ]);
+            ];
           } else {
-            embeds[0].addFields([
+            embeds[0].fields = [
               {
                 name: "\u200b",
                 value: `**${replyMessage.author.tag}>>** ${parseMessage(replyMessage.content.slice(0, 150) || "なし")}`,
               },
-            ]);
+            ];
           }
         }
       }
@@ -113,20 +113,18 @@ class GlobalChatEvent implements MessageCreateEvent {
     const attachment = message.attachments.first();
     if (attachment) {
       if (attachment.height && attachment.width) {
-        embeds.push(
-          new EmbedBuilder()
-            .setColor(embedColor)
-            .setTitle(attachment.name)
-            .setDescription(`[ファイルを開く](${attachment.url})`)
-            .setImage(attachment.url),
-        );
+        embeds.push({
+          color: Colors.Green,
+          title: attachment.name ?? undefined,
+          description: `[ファイルを開く](${attachment.url})`,
+          image: { url: attachment.url },
+        });
       } else {
-        embeds.push(
-          new EmbedBuilder()
-            .setColor(embedColor)
-            .setTitle(attachment.name)
-            .setDescription(`[ファイルを開く](${attachment.url})`),
-        );
+        embeds.push({
+          color: Colors.Green,
+          title: attachment.name ?? undefined,
+          description: `[ファイルを開く](${attachment.url})`,
+        });
       }
     }
 
@@ -140,11 +138,13 @@ class GlobalChatEvent implements MessageCreateEvent {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          username: "TakasumiBOT Global",
-          avatar_url: config.image.botIcon,
-          embeds: embeds,
-        }),
+        body: JSON.stringify(
+          v2Json({
+            username: "TakasumiBOT Global",
+            avatar_url: config.image.botIcon,
+            embeds: embeds,
+          }),
+        ),
       };
 
       let isResend = false;

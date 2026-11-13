@@ -15,6 +15,7 @@ import {
 import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
+import { v2 } from "@/util/v2";
 
 class Ticketommand implements Command {
   public readonly client: Client;
@@ -58,7 +59,7 @@ class Ticketommand implements Command {
       interaction.options.getString("description") || "チケットの発行は下のボタンを押してください";
 
     try {
-      await interaction.channel.send({
+      await interaction.channel.send(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -74,11 +75,11 @@ class Ticketommand implements Command {
               .setLabel("作成"),
           ),
         ],
-      });
+      }));
 
       await interaction.deferReply().then(() => interaction.deleteReply());
     } catch (error) {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -103,7 +104,7 @@ class Ticketommand implements Command {
           ),
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 

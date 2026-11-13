@@ -15,6 +15,7 @@ import {
   findDsioNotice,
   upsertDsioNotice,
 } from "@/Models/BoardNotice";
+import { v2 } from "@/util/v2";
 
 class DsioSubCommand implements SubCommand {
   public readonly client: Client;
@@ -49,7 +50,7 @@ class DsioSubCommand implements SubCommand {
 
     if (!dsioNoticeData) {
       if (!role)
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -60,11 +61,11 @@ class DsioSubCommand implements SubCommand {
               description: "ロールを選択してください",
             },
           ],
-        });
+        }));
 
       const botData = await Fetch.member(interaction.guild, config.bot.dsioId);
       if (!botData)
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -75,11 +76,11 @@ class DsioSubCommand implements SubCommand {
               description: "このサーバーにDiscordServers.ioが参加していません",
             },
           ],
-        });
+        }));
 
       await createDsioNotice(interaction.guildId, role.id);
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -90,12 +91,12 @@ class DsioSubCommand implements SubCommand {
             description: `<@&${role.id}>`,
           },
         ],
-      });
+      }));
     } else {
       if (role) {
         const botData = await Fetch.member(interaction.guild, config.bot.dsioId);
         if (!botData)
-          return await interaction.reply({
+          return await interaction.reply(v2({
             embeds: [
               {
                 color: Colors.Red,
@@ -106,11 +107,11 @@ class DsioSubCommand implements SubCommand {
                 description: "このサーバーにDiscordServers.ioが参加していません",
               },
             ],
-          });
+          }));
 
         await upsertDsioNotice(interaction.guildId, role.id);
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -121,11 +122,11 @@ class DsioSubCommand implements SubCommand {
               description: `<@&${role.id}>`,
             },
           ],
-        });
+        }));
       } else {
         await deleteDsioNotice(interaction.guildId);
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -135,7 +136,7 @@ class DsioSubCommand implements SubCommand {
               },
             },
           ],
-        });
+        }));
       }
     }
   }

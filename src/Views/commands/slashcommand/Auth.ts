@@ -14,6 +14,7 @@ import {
 import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
+import { v2 } from "@/util/v2";
 
 class AuthCommand implements Command {
   public readonly client: Client;
@@ -59,7 +60,7 @@ class AuthCommand implements Command {
     };
 
     if (!("editable" in role))
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -71,10 +72,10 @@ class AuthCommand implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     try {
-      await interaction.channel.send({
+      await interaction.channel.send(v2({
         embeds: [
           {
             color: color[type],
@@ -89,11 +90,11 @@ class AuthCommand implements Command {
               .setLabel("認証"),
           ),
         ],
-      });
+      }));
 
       await interaction.deferReply().then(() => interaction.deleteReply());
     } catch (error) {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -119,7 +120,7 @@ class AuthCommand implements Command {
           ),
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 

@@ -14,6 +14,7 @@ import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import isUrl from "@/util/isUrl";
 import CommandUtils from "@/Controllers/CommandUtils";
+import { v2 } from "@/util/v2";
 
 class ButtonCommand implements Command {
   public readonly client: Client;
@@ -48,7 +49,7 @@ class ButtonCommand implements Command {
     const url = interaction.options.getString("url", true);
 
     if (!isUrl(url))
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             author: {
@@ -60,7 +61,7 @@ class ButtonCommand implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     try {
       await interaction.reply({
@@ -71,7 +72,7 @@ class ButtonCommand implements Command {
         ],
       });
     } catch {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -83,7 +84,7 @@ class ButtonCommand implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 

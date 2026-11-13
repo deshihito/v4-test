@@ -10,6 +10,7 @@ import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import translate from "@/Models/translate";
 import CommandUtils from "@/Controllers/CommandUtils";
+import { v2 } from "@/util/v2";
 
 class RetranslateCommand implements Command {
   public readonly client: Client;
@@ -52,7 +53,7 @@ class RetranslateCommand implements Command {
 
       text = (await translate(text, "auto", "ja")).text;
 
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -63,9 +64,9 @@ class RetranslateCommand implements Command {
             description: text,
           },
         ],
-      });
+      }));
     } catch {
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -76,7 +77,7 @@ class RetranslateCommand implements Command {
             description: "再翻訳文字を変えて、もう一度実行してください",
           },
         ],
-      });
+      }));
     }
   }
 

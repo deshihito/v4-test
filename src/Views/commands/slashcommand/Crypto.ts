@@ -15,6 +15,7 @@ import config from "@/config";
 import crypto from "crypto";
 import CommandUtils from "@/Controllers/CommandUtils";
 import toHash from "@/util/toHash";
+import { v2 } from "@/util/v2";
 
 class CryptoCommand implements Command {
   public readonly client: Client;
@@ -55,7 +56,7 @@ class CryptoCommand implements Command {
         const cipher = crypto.createCipheriv("aes-256-ecb", toHash(key), null);
         cipher.update(text, "utf8", "hex");
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -66,12 +67,12 @@ class CryptoCommand implements Command {
               description: `暗号: \`\`\`${cipher.final("hex")}\`\`\`\n復号鍵: ||\`${key}\`||`,
             },
           ],
-        });
+        }));
       } else {
         const decipher = crypto.createDecipheriv("aes-256-ecb", toHash(key), null);
         decipher.update(text, "hex", "utf8");
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -82,10 +83,10 @@ class CryptoCommand implements Command {
               description: `復号: \`\`\`${decipher.final("utf8")}\`\`\`\n復号鍵: ||\`${key}\`||`,
             },
           ],
-        });
+        }));
       }
     } catch (error) {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -110,7 +111,7 @@ class CryptoCommand implements Command {
           ),
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 

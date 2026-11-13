@@ -7,6 +7,7 @@ import {
 } from "discord.js";
 import { ModalController } from "@/@types/Util";
 import config from "@/config";
+import { v2 } from "@/util/v2";
 
 class ScriptEvent implements ModalController {
   public readonly client: Client;
@@ -44,7 +45,7 @@ class ScriptEvent implements ModalController {
 
       if (res.status === "0") {
         try {
-          await interaction.editReply({
+          await interaction.editReply(v2({
             embeds: [
               {
                 color: Colors.Green,
@@ -58,9 +59,9 @@ class ScriptEvent implements ModalController {
                 },
               },
             ],
-          });
+          }));
         } catch {
-          await interaction.editReply({
+          await interaction.editReply(v2({
             embeds: [
               {
                 color: Colors.Green,
@@ -75,11 +76,11 @@ class ScriptEvent implements ModalController {
               },
             ],
             files: [new AttachmentBuilder(Buffer.from(res.program_output)).setName("data.txt")],
-          });
+          }));
         }
       } else {
         try {
-          await interaction.editReply({
+          await interaction.editReply(v2({
             embeds: [
               {
                 color: Colors.Red,
@@ -93,9 +94,9 @@ class ScriptEvent implements ModalController {
                 },
               },
             ],
-          });
+          }));
         } catch {
-          await interaction.editReply({
+          await interaction.editReply(v2({
             embeds: [
               {
                 color: Colors.Red,
@@ -114,11 +115,11 @@ class ScriptEvent implements ModalController {
                 "error.txt",
               ),
             ],
-          });
+          }));
         }
       }
     } catch (error) {
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -137,7 +138,7 @@ class ScriptEvent implements ModalController {
             },
           },
         ],
-      });
+      }));
     }
   }
 }

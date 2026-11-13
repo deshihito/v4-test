@@ -14,6 +14,7 @@ import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
 import translate from "@/Models/translate";
+import { v2 } from "@/util/v2";
 
 class ToEnContextMenu implements Command {
   public readonly client: Client;
@@ -47,7 +48,7 @@ class ToEnContextMenu implements Command {
     const message = interaction.options.getMessage("message");
 
     if (!message?.cleanContent || !message?.guild)
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -63,10 +64,10 @@ class ToEnContextMenu implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     if (message.cleanContent.length > 2000)
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -82,14 +83,14 @@ class ToEnContextMenu implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     await interaction.deferReply();
     await interaction.editReply("生成中...");
     try {
       const data = await translate(message.cleanContent, "auto", "en");
 
-      await interaction.editReply({
+      await interaction.editReply(v2({
         content: `[翻訳元](https://discord.com/channels/${message.guild.id}/${message.channel.id}/${message.id}/)`,
         embeds: [
           {
@@ -105,9 +106,9 @@ class ToEnContextMenu implements Command {
             },
           },
         ],
-      });
+      }));
     } catch (error) {
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -131,7 +132,7 @@ class ToEnContextMenu implements Command {
               .setStyle(ButtonStyle.Link),
           ),
         ],
-      });
+      }));
     }
   }
 

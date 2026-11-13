@@ -9,6 +9,7 @@ import {
 import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
+import { v2 } from "@/util/v2";
 
 class NumberCommand implements Command {
   public readonly client: Client;
@@ -45,7 +46,7 @@ class NumberCommand implements Command {
 
     const data: string = parseInt(number, Number(source)).toString(Number(target));
 
-    await interaction.reply({
+    await interaction.reply(v2({
       embeds: [
         {
           color: Colors.Green,
@@ -56,7 +57,7 @@ class NumberCommand implements Command {
           description: `\`\`\`${data}\`\`\``,
         },
       ],
-    });
+    }));
   }
 
   public build(): SlashCommandOptionsOnlyBuilder {

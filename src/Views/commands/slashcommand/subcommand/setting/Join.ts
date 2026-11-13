@@ -21,6 +21,7 @@ import {
 } from "@/Models/BoardNotice";
 import deleteDuplicateWebhook from "@/Models/deleteDuplicateWebhook";
 import deleteWebhook from "@/Models/deleteWebhook";
+import { v2 } from "@/util/v2";
 
 class JoinSubCommand implements SubCommand {
   public readonly client: Client;
@@ -62,7 +63,7 @@ class JoinSubCommand implements SubCommand {
       message.length > 0
     ) {
       if (message.length > 100)
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -73,10 +74,10 @@ class JoinSubCommand implements SubCommand {
               description: `参加メッセージは100文字以内にしてください`,
             },
           ],
-        });
+        }));
       await updateJoinNoticeMessage(interaction.guildId, message);
 
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -87,7 +88,7 @@ class JoinSubCommand implements SubCommand {
             description: `設定したメッセージ: \`\`\`${message}\`\`\``,
           },
         ],
-      });
+      }));
     }
 
     if (noticeData) {
@@ -95,7 +96,7 @@ class JoinSubCommand implements SubCommand {
 
       void deleteWebhook(joinNotice.webhookUrl);
 
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -109,11 +110,11 @@ class JoinSubCommand implements SubCommand {
               "```\n-# 参加メッセージが設定されたチャンネルでこのコマンドを実行すると、\n-# 参加メッセージを更新できるようになりました",
           },
         ],
-      });
+      }));
     }
 
     if (!message)
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -125,10 +126,10 @@ class JoinSubCommand implements SubCommand {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     if (message.length > 100)
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -140,10 +141,10 @@ class JoinSubCommand implements SubCommand {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     if (interaction.channel.type !== ChannelType.GuildText)
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -155,7 +156,7 @@ class JoinSubCommand implements SubCommand {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     await interaction.deferReply();
     await deleteDuplicateWebhook(interaction.channel, ["TakasumiBOT joinNotice"]);
@@ -173,7 +174,7 @@ class JoinSubCommand implements SubCommand {
         message,
       );
 
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -184,9 +185,9 @@ class JoinSubCommand implements SubCommand {
             description: `設定したメッセージ: \`\`\`${message}\`\`\``,
           },
         ],
-      });
+      }));
     } catch (error) {
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -211,7 +212,7 @@ class JoinSubCommand implements SubCommand {
               .setStyle(ButtonStyle.Link),
           ),
         ],
-      });
+      }));
     }
   }
 

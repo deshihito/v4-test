@@ -16,6 +16,7 @@ import {
 import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
+import { v2 } from "@/util/v2";
 
 class FollowCommand implements Command {
   public readonly client: Client;
@@ -49,7 +50,7 @@ class FollowCommand implements Command {
     const type: string = interaction.options.getString("type", true);
 
     if (interaction.channel.type !== ChannelType.GuildText)
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -61,7 +62,7 @@ class FollowCommand implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     try {
       const guild: Guild = await interaction.client.guilds.fetch(config.announce.guildId);
@@ -69,7 +70,7 @@ class FollowCommand implements Command {
       if (type === "notice") {
         await guild.channels.addFollower(config.announce.channels.noticeId, interaction.channel);
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -80,11 +81,11 @@ class FollowCommand implements Command {
               description: "このチャンネルでBOTのお知らせを受け取ることができます",
             },
           ],
-        });
+        }));
       } else if (type === "update") {
         await guild.channels.addFollower(config.announce.channels.updateId, interaction.channel);
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -95,10 +96,10 @@ class FollowCommand implements Command {
               description: "このチャンネルでBOTの変更ログを受け取ることができます",
             },
           ],
-        });
+        }));
       }
     } catch (error) {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -123,7 +124,7 @@ class FollowCommand implements Command {
           ),
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 

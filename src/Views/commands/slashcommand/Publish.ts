@@ -18,6 +18,7 @@ import {
   findPublish,
   listPublishesByGuild,
 } from "@/Models/Publish";
+import { v2 } from "@/util/v2";
 
 class PublishCommand implements Command {
   public readonly client: Client;
@@ -59,7 +60,7 @@ class PublishCommand implements Command {
     if (publishData) {
       await deletePublish(interaction.channelId);
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -69,12 +70,12 @@ class PublishCommand implements Command {
             },
           },
         ],
-      });
+      }));
     } else {
       const publishGuilds = await listPublishesByGuild(interaction.guildId);
 
       if (publishGuilds.length >= 6)
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -86,10 +87,10 @@ class PublishCommand implements Command {
             },
           ],
           flags: MessageFlags.Ephemeral,
-        });
+        }));
 
       if (interaction.channel.type !== ChannelType.GuildAnnouncement)
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -101,11 +102,11 @@ class PublishCommand implements Command {
             },
           ],
           flags: MessageFlags.Ephemeral,
-        });
+        }));
 
       await createPublish(interaction.channelId, interaction.guildId);
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -115,7 +116,7 @@ class PublishCommand implements Command {
             },
           },
         ],
-      });
+      }));
     }
   }
 

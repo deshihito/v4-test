@@ -1,6 +1,7 @@
 import {
   Client,
   Colors,
+  ComponentType,
   InteractionResponse,
   MessageFlags,
   Message,
@@ -13,6 +14,7 @@ import Fetch from "@/Models/Fetch";
 import Mute from "@/Models/Mute";
 import { findAdminUniqueByUserId } from "@/Models/Admin";
 import { findTmpReport, deleteTmpReport, createReport, findUserAddress } from "@/Models/Report";
+import { v2 } from "@/util/v2";
 
 class ReportSendEvent implements ModalController {
   public readonly client: Client;
@@ -48,7 +50,7 @@ class ReportSendEvent implements ModalController {
     const adminData = await findAdminUniqueByUserId(interaction.user.id);
 
     if (!adminData)
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -60,12 +62,12 @@ class ReportSendEvent implements ModalController {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     const reportData = await findTmpReport(data[2]);
 
     if (!reportData)
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -77,7 +79,7 @@ class ReportSendEvent implements ModalController {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     await interaction.deferReply();
     try {
@@ -93,7 +95,7 @@ class ReportSendEvent implements ModalController {
         const userAddressData = await findUserAddress(reportData.targetId);
 
         if (!userAddressData)
-          return await interaction.reply({
+          return await interaction.reply(v2({
             embeds: [
               {
                 color: Colors.Red,
@@ -105,14 +107,14 @@ class ReportSendEvent implements ModalController {
               },
             ],
             flags: MessageFlags.Ephemeral,
-          });
+          }));
 
         await Mute.addIp(userAddressData.address, reason);
       } else if (actionType === reportActionType.unMuteIp) {
         const userAddressData = await findUserAddress(reportData.targetId);
 
         if (!userAddressData)
-          return await interaction.reply({
+          return await interaction.reply(v2({
             embeds: [
               {
                 color: Colors.Red,
@@ -124,14 +126,14 @@ class ReportSendEvent implements ModalController {
               },
             ],
             flags: MessageFlags.Ephemeral,
-          });
+          }));
 
         await Mute.deleteIp(userAddressData.address, reason);
       } else if (actionType === "warn") {
         if (reportData.targetType === reportTargetType.user) {
           const user = await Fetch.user(interaction.client, reportData.targetId);
           if (!user)
-            return await interaction.editReply({
+            return await interaction.editReply(v2({
               embeds: [
                 {
                   color: Colors.Red,
@@ -142,9 +144,9 @@ class ReportSendEvent implements ModalController {
                   description: "対象のユーザーが存在しません",
                 },
               ],
-            });
+            }));
 
-          await user.send({
+          await user.send(v2({
             embeds: [
               {
                 color: Colors.Yellow,
@@ -155,11 +157,11 @@ class ReportSendEvent implements ModalController {
                 description: `あなたは以下の理由によって通報されたことにより警告されました\n繰り返し警告されるとサービスの利用を拒否する場合があります\n\n${reason}\n\n質問や異議申し立ては[サポートサーバー](${config.inviteUrl})まで`,
               },
             ],
-          });
+          }));
         } else {
           const guild = await Fetch.guild(interaction.client, reportData.targetId);
           if (!guild)
-            return await interaction.editReply({
+            return await interaction.editReply(v2({
               embeds: [
                 {
                   color: Colors.Red,
@@ -170,11 +172,11 @@ class ReportSendEvent implements ModalController {
                   description: "対象のサーバーが存在しません",
                 },
               ],
-            });
+            }));
 
           const owner = await guild.fetchOwner();
 
-          await owner.send({
+          await owner.send(v2({
             embeds: [
               {
                 color: Colors.Yellow,
@@ -185,12 +187,12 @@ class ReportSendEvent implements ModalController {
                 description: `あなたが所有している${guild.name}(${guild.id})のサーバーは以下の理由によって通報されたことにより警告されました\n繰り返し警告されるとサービスの利用を拒否する場合があります\n\n${reason}\n\n質問や異議申し立ては[サポートサーバー](${config.inviteUrl})まで`,
               },
             ],
-          });
+          }));
         }
       }
 
       if (!interaction.message)
-        return await interaction.editReply({
+        return await interaction.editReply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -201,12 +203,18 @@ class ReportSendEvent implements ModalController {
               description: "通報のメッセージが取得できません",
             },
           ],
-        });
+        }));
 
-      await interaction.message.edit({
-        embeds: interaction.message.embeds,
-        components: [],
-      });
+      await interaction.message.edit(
+        interaction.message.flags.has(MessageFlags.IsComponentsV2)
+          ? {
+              components: interaction.message.components
+                .map((component) => component.toJSON())
+                .filter((component) => component.type !== ComponentType.ActionRow),
+              flags: MessageFlags.IsComponentsV2,
+            }
+          : v2({ embeds: interaction.message.embeds, components: [] }),
+      );
 
       await deleteTmpReport(reportData.id);
 
@@ -223,7 +231,7 @@ class ReportSendEvent implements ModalController {
         originalCreatedAt: reportData.createdAt,
       });
 
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -239,9 +247,9 @@ class ReportSendEvent implements ModalController {
             },
           },
         ],
-      });
+      }));
     } catch (error) {
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -257,7 +265,7 @@ class ReportSendEvent implements ModalController {
             ],
           },
         ],
-      });
+      }));
     }
   }
 }

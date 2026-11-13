@@ -13,6 +13,7 @@ import { pathToFileURL } from "url";
 import Permission from "@/util/Permission";
 import Log from "@/util/Log";
 import config from "@/config";
+import { v2 } from "@/util/v2";
 
 class CommandUtils {
   public static async hasPermissions(
@@ -23,7 +24,7 @@ class CommandUtils {
       (per) => !interaction.member.permissions.has(per),
     );
     if (requiredUserPermission.length !== 0) {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -41,7 +42,7 @@ class CommandUtils {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
       return false;
     }
@@ -50,7 +51,7 @@ class CommandUtils {
       (per) => !interaction.guild.members.me.permissionsIn(interaction.channelId).has(per),
     );
     if (requiredBotPermission.length !== 0) {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -68,7 +69,7 @@ class CommandUtils {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
       return false;
     }

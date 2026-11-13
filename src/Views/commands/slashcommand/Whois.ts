@@ -12,6 +12,7 @@ import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
 import searchWhois from "@/Models/searchWhois";
+import { v2 } from "@/util/v2";
 
 class WhoisCommand implements Command {
   public readonly client: Client;
@@ -45,7 +46,7 @@ class WhoisCommand implements Command {
     const domain = interaction.options.getString("domain", true);
 
     if (!domain.match(/^([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$/))
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -57,12 +58,12 @@ class WhoisCommand implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     try {
       const refer = (await searchWhois("whois.iana.org", domain)).match(/refer:\s*(.*)/);
       if (!refer?.[1])
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -74,7 +75,7 @@ class WhoisCommand implements Command {
             },
           ],
           flags: MessageFlags.Ephemeral,
-        });
+        }));
 
       const data = await searchWhois(refer[1], domain);
 
@@ -82,7 +83,7 @@ class WhoisCommand implements Command {
         files: [new AttachmentBuilder(Buffer.from(data)).setName(`WHOIS_${domain}.txt`)],
       });
     } catch {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -94,7 +95,7 @@ class WhoisCommand implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 

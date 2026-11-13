@@ -11,6 +11,7 @@ import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
 import calcTime from "@/util/calcTime";
 import { findAfk, deleteAfk, createAfk } from "@/Models/Afk";
+import { v2 } from "@/util/v2";
 
 class AfkCommand implements Command {
   public readonly client: Client;
@@ -48,7 +49,7 @@ class AfkCommand implements Command {
     if (afkData) {
       await deleteAfk(interaction.user.id);
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -59,11 +60,11 @@ class AfkCommand implements Command {
             description: `メンションは${afkData.mention}件ありました\n${calcTime(new Date().getTime() - afkData.createdAt.getTime())}間AFKでした`,
           },
         ],
-      });
+      }));
     } else {
       await createAfk(interaction.user.id, message);
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -73,7 +74,7 @@ class AfkCommand implements Command {
             },
           },
         ],
-      });
+      }));
     }
   }
 

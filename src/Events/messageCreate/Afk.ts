@@ -5,6 +5,7 @@ import { relative } from "path";
 import calcTime from "@/util/calcTime";
 import matchId from "@/util/matchId";
 import { findAfk, deleteAfk, incrementAfkMention } from "@/Models/Afk";
+import { v2 } from "@/util/v2";
 
 class AfkEvent implements MessageCreateEvent {
   public readonly client: Client;
@@ -22,7 +23,7 @@ class AfkEvent implements MessageCreateEvent {
       if (afkData) {
         await deleteAfk(message.author.id);
 
-        await message.channel.send({
+        await message.channel.send(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -33,7 +34,7 @@ class AfkEvent implements MessageCreateEvent {
               description: `メンションは${afkData.mention}件ありました\n${calcTime(new Date().getTime() - afkData.createdAt.getTime())}間AFKでした`,
             },
           ],
-        });
+        }));
       } else {
         const mention = message.content.match(/<@\d{17,19}>/g);
         if (!mention) return;
@@ -47,7 +48,7 @@ class AfkEvent implements MessageCreateEvent {
 
         await incrementAfkMention(id);
 
-        await message.channel.send({
+        await message.channel.send(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -58,7 +59,7 @@ class AfkEvent implements MessageCreateEvent {
               description: OthorAfkData.message,
             },
           ],
-        });
+        }));
       }
     } catch{
       return;

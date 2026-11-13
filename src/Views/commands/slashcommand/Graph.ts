@@ -10,6 +10,7 @@ import {
 import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
+import { v2 } from "@/util/v2";
 
 class GraphCommand implements Command {
   public readonly client: Client;
@@ -52,7 +53,7 @@ class GraphCommand implements Command {
         `http://www.rurihabachi.com/web/webapi/functionxgraph/graph?fx=${encodeURIComponent(formula)}&xfrom=${from}&xto=${to}`,
       ).then((res) => res.arrayBuffer());
 
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -66,9 +67,9 @@ class GraphCommand implements Command {
           },
         ],
         files: [new AttachmentBuilder(Buffer.from(image)).setName("graph.png")],
-      });
+      }));
     } catch {
-      await interaction.editReply({
+      await interaction.editReply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -79,7 +80,7 @@ class GraphCommand implements Command {
             description: "数式を変えてやり直してください",
           },
         ],
-      });
+      }));
     }
   }
 

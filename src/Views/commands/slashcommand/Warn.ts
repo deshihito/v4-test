@@ -15,6 +15,7 @@ import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
 import Fetch from "@/Models/Fetch";
+import { v2 } from "@/util/v2";
 
 class WarnCommand implements Command {
   public readonly client: Client;
@@ -50,7 +51,7 @@ class WarnCommand implements Command {
 
     const member = await Fetch.member(interaction.guild, user.id);
     if (!member)
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -62,10 +63,10 @@ class WarnCommand implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     if (member.user.id === interaction.user.id)
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -77,10 +78,10 @@ class WarnCommand implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     try {
-      await member.user.send({
+      await member.user.send(v2({
         embeds: [
           {
             color: Colors.Yellow,
@@ -96,9 +97,9 @@ class WarnCommand implements Command {
             },
           },
         ],
-      });
+      }));
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -109,9 +110,9 @@ class WarnCommand implements Command {
             description: `理由: ${reason}`,
           },
         ],
-      });
+      }));
     } catch (error) {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -137,7 +138,7 @@ class WarnCommand implements Command {
           ),
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 

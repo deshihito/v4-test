@@ -2,10 +2,14 @@ import { Colors } from "discord.js";
 import Log from "@/util/Log";
 import config from "@/config";
 import { env } from "@/util/Env";
+import { v2Json } from "@/util/v2";
 
 class Notice {
   public static async sendData(option: object): Promise<void> {
     if (!env.NOTICE_WEBHOOK) return Log.error("Notice Webhook URLが設定されていません");
+
+    const record = option as Record<string, unknown>;
+    const payload = Array.isArray(record.embeds) ? v2Json(record) : option;
 
     try {
       await fetch(env.NOTICE_WEBHOOK, {
@@ -13,7 +17,7 @@ class Notice {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(option),
+        body: JSON.stringify(payload),
       });
     } catch (error) {
       Log.error(`Webhook通知が送信できませんでした: ${error}`);

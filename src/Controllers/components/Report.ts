@@ -15,6 +15,7 @@ import Fetch from "@/Models/Fetch";
 import createId from "@/util/createId";
 import Mute from "@/Models/Mute";
 import { findUserAddress, createTmpReport } from "@/Models/Report";
+import { v2 } from "@/util/v2";
 
 class ReportEvent implements ModalController {
   public readonly client: Client;
@@ -36,7 +37,7 @@ class ReportEvent implements ModalController {
     const guild = await Fetch.guild(this.client, id);
 
     if (!user && !guild)
-      return await interaction.reply({
+      return await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -56,13 +57,13 @@ class ReportEvent implements ModalController {
           ),
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
 
     try {
       const reportGuild = await Fetch.guild(this.client, config.report.guildId);
 
       if (!reportGuild)
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -82,12 +83,12 @@ class ReportEvent implements ModalController {
             ),
           ],
           flags: MessageFlags.Ephemeral,
-        });
+        }));
 
       const reportChannel = await Fetch.channel(reportGuild, config.report.channelId);
 
       if (!reportChannel || !reportChannel.isSendable())
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -107,7 +108,7 @@ class ReportEvent implements ModalController {
             ),
           ],
           flags: MessageFlags.Ephemeral,
-        });
+        }));
 
       const reportId = createId(10);
 
@@ -124,7 +125,7 @@ class ReportEvent implements ModalController {
 
       if (user) {
         if (user.bot)
-          return await interaction.reply({
+          return await interaction.reply(v2({
             embeds: [
               {
                 color: Colors.Red,
@@ -144,7 +145,7 @@ class ReportEvent implements ModalController {
               ),
             ],
             flags: MessageFlags.Ephemeral,
-          });
+          }));
 
         if (await Mute.getUser(user.id)) {
           components.push(
@@ -191,7 +192,7 @@ class ReportEvent implements ModalController {
           reporterId: interaction.user.id,
         });
 
-        await reportChannel.send({
+        await reportChannel.send(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -205,7 +206,7 @@ class ReportEvent implements ModalController {
             },
           ],
           components: [new ActionRowBuilder<ButtonBuilder>().addComponents(...components)],
-        });
+        }));
       } else if (guild) {
         if (await Mute.getGuild(guild.id)) {
           components.push(
@@ -232,7 +233,7 @@ class ReportEvent implements ModalController {
           reporterId: interaction.user.id,
         });
 
-        await reportChannel.send({
+        await reportChannel.send(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -246,10 +247,10 @@ class ReportEvent implements ModalController {
             },
           ],
           components: [new ActionRowBuilder<ButtonBuilder>().addComponents(...components)],
-        });
+        }));
       }
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -290,9 +291,9 @@ class ReportEvent implements ModalController {
           ),
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     } catch (error) {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -317,7 +318,7 @@ class ReportEvent implements ModalController {
           ),
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 }

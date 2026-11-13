@@ -15,6 +15,7 @@ import {
   findVoteNotice,
   upsertVoteNotice,
 } from "@/Models/BoardNotice";
+import { v2 } from "@/util/v2";
 
 class VoteSubCommand implements SubCommand {
   public readonly client: Client;
@@ -49,7 +50,7 @@ class VoteSubCommand implements SubCommand {
 
     if (!voteNoticeData) {
       if (!role)
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -60,11 +61,11 @@ class VoteSubCommand implements SubCommand {
               description: "ロールを選択してください",
             },
           ],
-        });
+        }));
 
       const botData = await Fetch.member(interaction.guild, config.bot.sabachaId);
       if (!botData)
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -75,11 +76,11 @@ class VoteSubCommand implements SubCommand {
               description: "このサーバーに鯖ちゃんねるが参加していません",
             },
           ],
-        });
+        }));
 
       await createVoteNotice(interaction.guildId, role.id);
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -90,12 +91,12 @@ class VoteSubCommand implements SubCommand {
             description: `<@&${role.id}>`,
           },
         ],
-      });
+      }));
     } else {
       if (role) {
         const botData = await Fetch.member(interaction.guild, config.bot.sabachaId);
         if (!botData)
-          return await interaction.reply({
+          return await interaction.reply(v2({
             embeds: [
               {
                 color: Colors.Red,
@@ -106,11 +107,11 @@ class VoteSubCommand implements SubCommand {
                 description: "このサーバーに鯖ちゃんねるが参加していません",
               },
             ],
-          });
+          }));
 
         await upsertVoteNotice(interaction.guildId, role.id);
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -121,11 +122,11 @@ class VoteSubCommand implements SubCommand {
               description: `<@&${role.id}>`,
             },
           ],
-        });
+        }));
       } else {
         await deleteVoteNotice(interaction.guildId);
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -135,7 +136,7 @@ class VoteSubCommand implements SubCommand {
               },
             },
           ],
-        });
+        }));
       }
     }
   }

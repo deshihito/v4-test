@@ -10,6 +10,7 @@ import CommandUtils from "@/Controllers/CommandUtils";
 import config from "@/config";
 import Fetch from "@/Models/Fetch";
 import Mute from "@/Models/Mute";
+import { v2 } from "@/util/v2";
 
 class MuteSubCommand implements SubCommand {
   public readonly client: Client;
@@ -42,7 +43,7 @@ class MuteSubCommand implements SubCommand {
     if (type === "user") {
       const user = await Fetch.user(interaction.client, id);
       if (!user)
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -54,12 +55,12 @@ class MuteSubCommand implements SubCommand {
             },
           ],
           flags: MessageFlags.Ephemeral,
-        });
+        }));
 
       if (await Mute.isMuteUser(user.id)) {
         await Mute.deleteUser(user.id, reason);
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -69,11 +70,11 @@ class MuteSubCommand implements SubCommand {
               },
             },
           ],
-        });
+        }));
       } else {
         await Mute.addUser(user.id, reason);
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -83,12 +84,12 @@ class MuteSubCommand implements SubCommand {
               },
             },
           ],
-        });
+        }));
       }
     } else if (type === "guild") {
       const guild = await Fetch.guild(interaction.client, id);
       if (!guild)
-        return await interaction.reply({
+        return await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Red,
@@ -100,12 +101,12 @@ class MuteSubCommand implements SubCommand {
             },
           ],
           flags: MessageFlags.Ephemeral,
-        });
+        }));
 
       if (await Mute.getGuild(guild.id)) {
         await Mute.deleteGuild(guild.id, reason);
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -115,11 +116,11 @@ class MuteSubCommand implements SubCommand {
               },
             },
           ],
-        });
+        }));
       } else {
         await Mute.addGuild(guild.id, reason);
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -129,13 +130,13 @@ class MuteSubCommand implements SubCommand {
               },
             },
           ],
-        });
+        }));
       }
     } else if (type === "ip") {
       if (await Mute.getIp(id)) {
         await Mute.deleteIp(id, reason);
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -145,11 +146,11 @@ class MuteSubCommand implements SubCommand {
               },
             },
           ],
-        });
+        }));
       } else {
         await Mute.addIp(id, reason);
 
-        await interaction.reply({
+        await interaction.reply(v2({
           embeds: [
             {
               color: Colors.Green,
@@ -159,7 +160,7 @@ class MuteSubCommand implements SubCommand {
               },
             },
           ],
-        });
+        }));
       }
     }
   }

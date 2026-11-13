@@ -17,6 +17,7 @@ import {
   findVoteNotice,
   findVoteNoticeIgnore,
 } from "@/Models/BoardNotice";
+import { v2 } from "@/util/v2";
 
 export interface BoardServiceDef {
   type: NotificationType;
@@ -260,7 +261,7 @@ export async function handleBoardServiceMessage(message: Message): Promise<void>
 
   if (created) {
     await message.channel
-      .send({
+      .send(v2({
         embeds: [
           {
             color: Colors.White,
@@ -268,7 +269,7 @@ export async function handleBoardServiceMessage(message: Message): Promise<void>
             description: `${def.verb}を受信しました\n${formatDelay(delayMs)}に通知します`,
           },
         ],
-      })
+      }))
       .catch(() => {});
   }
 
@@ -277,7 +278,7 @@ export async function handleBoardServiceMessage(message: Message): Promise<void>
     const result = await finishBumpRtaRound(message.guild.id, def.type, actorId);
     if (result) {
       await message.channel
-        .send({ embeds: [buildBumpRtaEmbed(def.type, actorId, result)] })
+        .send(v2({ embeds: [buildBumpRtaEmbed(def.type, actorId, result)] }))
         .catch(() => {});
     }
   }

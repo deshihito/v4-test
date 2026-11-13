@@ -11,6 +11,7 @@ import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
 import { WikiResponse } from "@/@types/Api";
+import { v2 } from "@/util/v2";
 
 class WikiCommand implements Command {
   public readonly client: Client;
@@ -48,7 +49,7 @@ class WikiCommand implements Command {
         `https://ja.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(word)}`,
       ).then((res) => res.json());
 
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Green,
@@ -57,9 +58,9 @@ class WikiCommand implements Command {
             description: data.extract,
           },
         ],
-      });
+      }));
     } catch {
-      await interaction.reply({
+      await interaction.reply(v2({
         embeds: [
           {
             color: Colors.Red,
@@ -71,7 +72,7 @@ class WikiCommand implements Command {
           },
         ],
         flags: MessageFlags.Ephemeral,
-      });
+      }));
     }
   }
 

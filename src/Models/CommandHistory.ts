@@ -20,17 +20,3 @@ export async function countCommandHistorySince(since: Date) {
     },
   });
 }
-
-/** ユーザーの直近のコマンド実行履歴を取得する */
-export async function findRecentCommandHistory(userId: string, name: string) {
-  return await prisma.commandHistory.findMany({
-    where: {
-      userId: userId,
-      name: name,
-    },
-    orderBy: {
-      executedAt: "desc",
-    },
-    take: 6,
-  });
-}

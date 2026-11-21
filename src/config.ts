@@ -51,9 +51,6 @@ const config = {
   isDebug: false,
   shardCount: parseInt(env.SHARD_COUNT),
   cacheLimit: 5000,
-  anticheat: {
-    automationThreshold: 1000,
-  },
 };
 
 export default config;

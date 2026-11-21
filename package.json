@@ -15,10 +15,8 @@
     "format": "oxfmt --write"
   },
   "dependencies": {
-    "@discordjs/rest": "^2.6.1",
     "@prisma/adapter-pg": "^7.10.0",
     "@t3-oss/env-core": "^0.13.11",
-    "discord-api-types": "^0.38.49",
     "discord.js": "^14.26.4",
     "ioredis": "^6.0.0",
     "node-cron": "^4.5.0",

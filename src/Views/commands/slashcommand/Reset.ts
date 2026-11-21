@@ -8,16 +8,11 @@ import {
   ButtonBuilder,
   ActionRowBuilder,
   ButtonStyle,
-  Guild,
-  ChannelType,
   PermissionFlagsBits,
-  MessageFlags,
 } from "discord.js";
 import { Command, CommandType } from "@/@types/Util";
 import config from "@/config";
 import CommandUtils from "@/Controllers/CommandUtils";
-import Report from "@/util/Report";
-import { relative } from "path";
 import { v2 } from "@/util/v2";
 
 class ResetCommand implements Command {

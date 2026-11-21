@@ -11,7 +11,6 @@ import {
 import { GuildMemberAddEvent } from "@/@types/Util";
 import { deleteLeaveNotice, findLeaveNotice } from "@/Models/BoardNotice";
 import config from "@/config";
-import { relative } from "path";
 import Fetch from "@/Models/Fetch";
 import { v2 } from "@/util/v2";
 

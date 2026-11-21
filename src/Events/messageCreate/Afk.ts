@@ -1,7 +1,6 @@
 import { Client, Message, Colors, ChannelType } from "discord.js";
 import { MessageCreateEvent } from "@/@types/Util";
 import config from "@/config";
-import { relative } from "path";
 import calcTime from "@/util/calcTime";
 import matchId from "@/util/matchId";
 import { findAfk, deleteAfk, incrementAfkMention } from "@/Models/Afk";
